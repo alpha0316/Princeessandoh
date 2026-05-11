@@ -279,7 +279,7 @@ function App() {
                     <img className="project-icon__asset" src={gasAppIcon} alt="" />
                   ) : project.preview === 'vendor-pro' ? (
                     <div style={{ width: 52, height: 52, borderRadius: 16, background: '#4F46E5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ color: '#fff', fontWeight: 800, fontSize: 22, fontFamily: 'sans-serif', letterSpacing: '-0.03em' }}>VP</span>
+                      <span style={{ color: '#fff', fontWeight: 800, fontSize: 22, fontFamily: 'sans-serif', }}>V' </span>
                     </div>
                   ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52" fill="none">
