@@ -1,0 +1,385 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   User Journey — Flow Section
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Scroll-pin wrapper ──────────────────────────────────────────────────── */
+/*
+  fc-outer  : provides the scroll depth the section "consumes".
+               Height is set to equal the total content height by JS.
+  fc-pinned : position:sticky — stays glued to the viewport top while the
+               user scrolls through fc-outer.
+  fc-section: the real content div, translated up by JS so the user sees
+               it scroll inside the pinned viewport.
+
+  When the user has scrolled all the way through fc-outer the sticky releases
+  naturally and the page continues to the next section.  Scrolling up reverses
+  the same behaviour.
+*/
+.fc-outer {
+  position: relative;
+  /* height set by JS (ResizeObserver + scroll listener) */
+}
+
+.fc-pinned {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Content (translated by JS) ─────────────────────────────────────────── */
+
+.fc-section {
+  padding: 72px 0 120px;
+  background-color: #ffffff;
+  background-repeat: repeat;
+  background-size: 420px auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  will-change: transform;
+}
+
+/* Two-column layout — position-based for manual arrangement */
+.fc-canvas {
+  position: relative;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ── Left: flow column ───────────────────────────────────────────────────── */
+
+.fc-flow {
+  position: relative;
+  width: 340px;
+  min-height: 3700px;
+  overflow: visible;
+}
+
+/* ── Flow cards ──────────────────────────────────────────────────────────── */
+
+.fc-card {
+  width: 240px;
+  height: 260px;
+  min-height: 195px;
+  border-radius: 10px;
+  padding: 20px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.fc-card--green {
+  background: #B3EFBD;
+  border: solid #5ab87a;
+}
+
+.fc-card--yellow {
+  background: #f5cc60;
+  border: dashed #c49a18;
+}
+
+.fc-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+
+.fc-card__list {
+  margin: 0;
+  padding-left: 14px;
+  font-size: 14px;
+  color: #2a2a2a;
+  line-height: 1.65;
+  list-style: disc;
+}
+
+/* ── Down arrow (between flow steps) ────────────────────────────────────── */
+
+.fc-arrow-down {
+  display: block;
+  margin: 2px 0;
+}
+
+/* ── fc-card extra variants (error / info) ───────────────────────────────── */
+
+.fc-card--error {
+  background: #fdd0c7;
+  border: 1.5px #d4704a;
+}
+
+.fc-card--info {
+  background: #cce4ff;
+  border: #4a8acd;
+}
+
+/* ── Decision block wrapper ──────────────────────────────────────────────── */
+
+.fc-decision-block {
+  width: 100%;
+}
+
+/* ── Decision row (L-arrows + diamond) ───────────────────────────────────── */
+
+.fc-decision-row {
+  position: relative;
+  width: 100%;
+  height: 230px;
+}
+
+/* Left cell — No L-arrow. top: 115px = 50% of diamond height (230px),
+   which is exactly the diamond's left point. */
+.fc-branch-no {
+  position: absolute;
+  left: 0;
+  top: 115px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Wrapper that shrinks to SVG size so the label can be positioned on the arrow */
+.fc-arrow-wrap {
+  position: relative;
+  /* display: inline-block; */
+  /* shrink-wraps to the image */
+  align-self: flex-end;
+  /* keeps it right-aligned in fc-branch-no */
+}
+
+.fc-arrow-wrap--mirror {
+  align-self: flex-start;
+  /* width: 150%; */
+  /* left-aligned in fc-branch-yes */
+}
+
+/* The L-shaped SVG (AvailableToNoBus Arrow.svg).
+   Its horizontal arm sits at y≈2 (top of SVG), so no additional top offset is needed —
+   the arm already lands at the diamond's left point via the fc-branch-no top. */
+.fc-no-lshape {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  position: relative;
+  left: -67%;
+  top: 0;
+}
+
+/* Mirrored copy used for the Yes right cell (d2) */
+.fc-no-lshape--mirror {
+  transform: scaleX(-1);
+  position: relative;
+  top: 0%;
+}
+
+/* "No" label — overlaid on the vertical segment of the L-arrow
+   The vertical run is at x≈14 of the 213 px SVG (≈6.6 %).
+   We nudge it slightly to the right so it reads clearly.           */
+.fc-no-label {
+  position: absolute;
+  left: 3%;
+  top: 45%;
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+}
+
+/* Right cell — Yes connector (starts at diamond's right edge, extends rightward) */
+.fc-branch-yes {
+  position: absolute;
+  /* left: calc(30% + 115px); */
+  top: 48%;
+  height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 50%;
+  left: 83%;
+}
+
+/* "Yes" label — overlaid on the mirrored L-arrow's vertical segment
+   Mirror of fc-no-label: sits near right edge (100% - 14% ≈ 86%).  */
+
+
+/* L-shaped arrow from d1 YES → Closest Bus / schema (AvailablleToClosesBus.svg 153×204) */
+.fc-yes-bus-connector {
+  width: 180px;
+  height: auto;
+}
+
+/* Flipped L-arrow from d2 diamond YES branch → schema rail */
+.fc-yes-schema-connector {
+  position: absolute;
+ left: 0%;
+  top: 22;
+  /* transform: scaleX(-1); */
+  width: 313px;
+  height: auto;
+  pointer-events: none;
+}
+
+/* ── Below-cards row (aligned under respective arrows) ───────────────────── */
+
+.fc-decision-below {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+}
+
+/* No card aligns to the left — where the L-arrow's downward tip lands */
+.fc-below-cell--no {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Yes card aligns to the right — position driven entirely by inline style */
+.fc-below-cell--yes {
+  position: absolute;
+  top: 0;
+  display: flex;
+  width: max-content;
+}
+
+/* ── Diamond ─────────────────────────────────────────────────────────────── */
+
+.fc-diamond {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 230px;
+  height: 230px;
+  background: #1a1a1a;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fc-diamond__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  padding: 0 24px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+/* ── Right: schema rail (NOT sticky — travels with translated content) ───── */
+
+.fc-rail {
+  position: absolute;
+  right: -10%;
+  top: 8px;   /* tune: Bus card aligns ~191px below arrow (d1.top 1038 + 115 − Bus-rail-offset ~634) */
+  width: 296px;
+  /* establishes containing block for fc-cross-connector */
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Cross-connector: right:100% keeps arrowhead at schema card's left edge.
+   top is now relative to fc-rail (which has position:relative), so the
+   original 248px offset minus the 72px fc-section top-padding = 176px.   */
+.fc-cross-connector {
+  position: absolute;
+  right: 100%;
+  top: 10%;   /* tune: canvas d1-arrow (1038+115=1153) − rail-top (328) = 825px within rail */
+  width: 700%;
+  height: auto;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.fc-rail-arrow {
+  display: block;
+  margin: 5px 0;
+}
+
+/* ── SchemaCard ──────────────────────────────────────────────────────────── */
+
+.fc-schema {
+  width: 100%;
+  background: #ffffff;
+  border: 2px #7c3aed;
+  border-top: #5b21b6 solid 3px;
+  border-radius: 14px;
+  padding: 22px 20px 26px;
+  box-shadow: 0 2px 16px rgba(124, 58, 237, 0.08);
+}
+
+.fc-schema__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 18px;
+  line-height: 1.2;
+}
+
+.fc-schema__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fc-schema__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fc-schema__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ede9fe;
+  color: #5b21b6;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 34px;
+}
+
+.fc-schema__type {
+  font-size: 13px;
+  color: #555;
+}
+
+/* ── Scroll-driven node entrance ─────────────────────────────────────────── */
+
+[data-flow-node] {
+  opacity: 0;
+  transform: translateY(-10px);
+  will-change: opacity, transform;
+}
+
+[data-flow-node].fc-node--entered {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity   0.5s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Diamond springs in on top of the wrapper entrance */
+.fc-node--entered .fc-diamond {
+  animation: fc-diamond-pop 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes fc-diamond-pop {
+  from { transform: translateX(-50%) scale(0.8); }
+  to   { transform: translateX(-50%) scale(1); }
+}

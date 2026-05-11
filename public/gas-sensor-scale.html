@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLE Gas Cylinder Scale — 3D Interactive (Raised Rim)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;color:#eee;font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
+  canvas{display:block}
+  #ui{position:absolute;top:0;left:0;width:100%;padding:14px 20px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:10}
+  #ui>*{pointer-events:auto}
+  #title h1{font-size:17px;font-weight:700;letter-spacing:1px;color:#fff}
+  #title p{font-size:10px;color:#888;margin-top:2px}
+  #ctrl{display:flex;flex-direction:column;gap:7px;background:rgba(25,25,25,0.88);padding:12px 16px;border-radius:10px;backdrop-filter:blur(8px);border:1px solid #333;max-width:260px}
+  #ctrl label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px}
+  .row{display:flex;gap:5px;flex-wrap:wrap}
+  .btn{background:#252525;color:#bbb;border:1px solid #3a3a3a;padding:5px 11px;border-radius:5px;cursor:pointer;font-size:10px;transition:all .15s}
+  .btn:hover{background:#333;color:#fff}
+  .btn.on{background:#4488ff;color:#fff;border-color:#4488ff}
+  #legend{position:absolute;bottom:50px;left:16px;background:rgba(15,15,15,0.92);padding:10px 14px;border-radius:8px;border:1px solid #333;font-size:9px;z-index:10}
+  #legend div{display:flex;align-items:center;gap:7px;margin:3px 0}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  #info{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:10px;color:#555;z-index:10}
+  #annot{position:absolute;top:50%;left:50%;pointer-events:none;z-index:5}
+  .label3d{position:absolute;color:#fff;font-size:9px;background:rgba(0,0,0,0.65);padding:2px 6px;border-radius:3px;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,0.1)}
+</style>
+</head>
+<body>
+<div id="ui">
+  <div id="title">
+    <h1>BLE GAS CYLINDER SCALE</h1>
+    <p>Raised Rim Cavity Design — Drag to rotate, scroll to zoom</p>
+  </div>
+  <div id="ctrl">
+    <label>Views</label>
+    <div class="row">
+      <button class="btn" onclick="setView('top')">Top</button>
+      <button class="btn" onclick="setView('bottom')">Bottom</button>
+      <button class="btn" onclick="setView('side')">Side</button>
+      <button class="btn" onclick="setView('front')">Front</button>
+      <button class="btn" onclick="setView('iso')">Isometric</button>
+      <button class="btn" onclick="setView('eagle')">Eagle Eye</button>
+    </div>
+    <label>Options</label>
+    <div class="row">
+      <button class="btn" id="bCut" onclick="toggleCut()">Section Cut</button>
+      <button class="btn" id="bExp" onclick="toggleExplode()">Explode</button>
+      <button class="btn" id="bWire" onclick="toggleWire()">Wireframe</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="bSpin" onclick="toggleSpin()">Auto-Spin</button>
+      <button class="btn" id="bLabel" onclick="toggleLabels()">Labels</button>
+      <button class="btn" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+</div>
+<div id="annot" style="display:none"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const PI = Math.PI, PI2 = PI*2;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x151515);
+const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.1, 500);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.localClippingEnabled = false;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+const dl = new THREE.DirectionalLight(0xffffff, 0.85);
+dl.position.set(4,7,5); dl.castShadow=true;
+dl.shadow.mapSize.set(1024,1024);
+scene.add(dl);
+scene.add(new THREE.DirectionalLight(0x6688cc,0.2).translateX(-4).translateY(2).translateZ(-3));
+scene.add(new THREE.DirectionalLight(0xffffff,0.25).translateY(-2).translateZ(4));
+
+const gnd = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:0.9}));
+gnd.rotation.x=-PI/2; gnd.position.y=-1.6; gnd.receiveShadow=true; scene.add(gnd);
+const grid = new THREE.GridHelper(12,24,0x2a2a2a,0x222222); grid.position.y=-1.59; scene.add(grid);
+
+const mat = (c,r=0.6,m=0.1) => new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const matE = (c,e,ei=0.8) => new THREE.MeshStandardMaterial({color:c,emissive:e,emissiveIntensity:ei,roughness:0.3});
+
+const mHousing   = mat(0x3a3a3a, 0.65, 0.1);
+const mRim       = mat(0x4e4e4e, 0.5, 0.15);
+const mRimInner  = mat(0x383838, 0.7, 0.05);
+const mFloor     = mat(0x333333, 0.8, 0.05);
+const mLoadCell  = mat(0xb0b0b0, 0.3, 0.6);
+const mStrain    = mat(0xd4a847, 0.4, 0.4);
+const mBattery   = mat(0x2d5a27, 0.5, 0.2);
+const mHX711     = mat(0x0d3320, 0.4, 0.3);
+const mESP32     = mat(0x1a2a55, 0.4, 0.3);
+const mChip      = mat(0x111111, 0.3, 0.5);
+const mBLE       = mat(0x223388, 0.4, 0.3);
+const mBLEglow   = matE(0x4488ff, 0x4488ff, 0.8);
+const mLED       = matE(0x22cc55, 0x22cc55, 1.0);
+const mHalo      = new THREE.MeshStandardMaterial({color:0x22cc55,emissive:0x22cc55,emissiveIntensity:0.4,transparent:true,opacity:0.2,roughness:0.3});
+const mRubber    = mat(0x0d0d0d, 0.95, 0);
+const mUSB       = mat(0x666666, 0.3, 0.5);
+const mSeal      = matE(0xccaa00, 0xccaa00, 0.2);
+
+const scaleG = new THREE.Group();
+scene.add(scaleG);
+
+const R = 1.5, baseH = 0.4, rimH = 0.32, rimW = 0.18, totalH = baseH + rimH;
+
+const bodyG = new THREE.Group();
+const baseGeo = new THREE.CylinderGeometry(R, R*0.97, baseH, 64);
+const baseMesh = new THREE.Mesh(baseGeo, mHousing);
+baseMesh.castShadow = true;
+bodyG.add(baseMesh);
+bodyG.userData = {origY: 0, label: 'Housing Base'};
+scaleG.add(bodyG);
+
+const rimG = new THREE.Group();
+const rimOuterGeo = new THREE.CylinderGeometry(R, R, rimH, 64, 1, true);
+rimG.add(new THREE.Mesh(rimOuterGeo, mRim));
+const rimTopGeo = new THREE.RingGeometry(R - rimW, R, 64);
+const rimTopMesh = new THREE.Mesh(rimTopGeo, mRim);
+rimTopMesh.rotation.x = -PI/2; rimTopMesh.position.y = rimH;
+rimG.add(rimTopMesh);
+const rimInnerGeo = new THREE.CylinderGeometry(R - rimW, R - rimW, rimH, 64, 1, true);
+rimG.add(new THREE.Mesh(rimInnerGeo, mRimInner));
+const edgeGeo = new THREE.TorusGeometry(R - rimW/2, rimW/2 * 0.3, 8, 64);
+const edgeMesh = new THREE.Mesh(edgeGeo, mRim);
+edgeMesh.rotation.x = PI/2; edgeMesh.position.y = rimH;
+rimG.add(edgeMesh);
+rimG.position.y = baseH/2;
+rimG.userData = {origY: baseH/2, label: 'Raised Rim'};
+scaleG.add(rimG);
+
+const floorG = new THREE.Group();
+const floorGeo = new THREE.CylinderGeometry(R - rimW - 0.02, R - rimW - 0.02, 0.04, 64);
+floorG.add(new THREE.Mesh(floorGeo, mFloor));
+for (let rr = 0.3; rr < R - rimW; rr += 0.25) {
+  const ringGeo = new THREE.TorusGeometry(rr, 0.008, 6, 64);
+  const ring = new THREE.Mesh(ringGeo, mat(0x444444, 0.8, 0.05));
+  ring.rotation.x = PI/2; ring.position.y = 0.025;
+  floorG.add(ring);
+}
+for (let i = 0; i < 48; i++) {
+  const a = (i/48)*PI2;
+  for (let rr = 0.35; rr < R - rimW - 0.1; rr += 0.2) {
+    const d = new THREE.Mesh(new THREE.SphereGeometry(0.012,6,6), mat(0x4a4a4a,0.8));
+    d.position.set(Math.cos(a)*rr, 0.025, Math.sin(a)*rr);
+    floorG.add(d);
+  }
+}
+floorG.position.y = baseH/2;
+floorG.userData = {origY: baseH/2, label: 'Cavity Floor'};
+scaleG.add(floorG);
+
+const sealGeo = new THREE.TorusGeometry(R*0.99, 0.012, 8, 64);
+const seal = new THREE.Mesh(sealGeo, mSeal);
+seal.rotation.x = PI/2; seal.position.y = baseH/2 - 0.01;
+seal.userData = {origY: baseH/2 - 0.01};
+scaleG.add(seal);
+
+const lcG = new THREE.Group();
+lcG.add(new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.08, 0.28), mLoadCell));
+for (const x of [-0.4, 0.4]) {
+  const sg = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 0.1), mStrain);
+  sg.position.set(x, 0.05, 0); lcG.add(sg);
+}
+for (const x of [-0.88, 0.88]) {
+  const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.09,12), mat(0x888888,0.3,0.7));
+  bolt.position.set(x, 0, 0); lcG.add(bolt);
+}
+lcG.position.y = 0.1;
+lcG.userData = {origY: 0.1, label: 'Load Cell'};
+scaleG.add(lcG);
+
+const batG = new THREE.Group();
+const batBody = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.65,16), mBattery);
+batBody.rotation.z = PI/2; batG.add(batBody);
+const batTerm = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.03,12), mUSB);
+batTerm.rotation.z = PI/2; batTerm.position.x = 0.34; batG.add(batTerm);
+batG.position.set(-0.5, -0.05, 0.3);
+batG.userData = {origY: -0.05, label: 'Battery 18650'};
+scaleG.add(batG);
+
+const hxG = new THREE.Group();
+hxG.add(new THREE.Mesh(new THREE.BoxGeometry(0.35,0.04,0.25), mHX711));
+const hxC = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.02,0.12), mChip);
+hxC.position.y = 0.03; hxG.add(hxC);
+hxG.position.set(0.15, -0.07, 0.35);
+hxG.userData = {origY: -0.07, label: 'HX711 ADC'};
+scaleG.add(hxG);
+
+const espG = new THREE.Group();
+espG.add(new THREE.Mesh(new THREE.BoxGeometry(0.45,0.04,0.28), mESP32));
+const espC = new THREE.Mesh(new THREE.BoxGeometry(0.22,0.025,0.16), mChip);
+espC.position.y = 0.032; espG.add(espC);
+const ant = new THREE.Mesh(new THREE.BoxGeometry(0.03,0.015,0.16), mat(0x6699ee,0.3,0.5));
+ant.position.set(0.19,0.03,0); espG.add(ant);
+espG.position.set(0.3, -0.07, -0.2);
+espG.userData = {origY: -0.07, label: 'ESP32 MCU'};
+scaleG.add(espG);
+
+const bleG = new THREE.Group();
+bleG.add(new THREE.Mesh(new THREE.BoxGeometry(0.24,0.18,0.22), mBLE));
+const bLed = new THREE.Mesh(new THREE.SphereGeometry(0.025,12,12), mBLEglow);
+bLed.position.set(0.13, 0.02, 0); bleG.add(bLed);
+bleG.position.set(R + 0.1, baseH/2 + rimH*0.4, 0);
+bleG.userData = {origY: baseH/2 + rimH*0.4, label: 'BLE Module'};
+scaleG.add(bleG);
+
+const ledG = new THREE.Group();
+ledG.add(new THREE.Mesh(new THREE.SphereGeometry(0.04,16,16), mLED));
+const halo = new THREE.Mesh(new THREE.SphereGeometry(0.07,16,16), mHalo);
+ledG.add(halo);
+ledG.position.set(-R*0.82, baseH/2 + rimH*0.5, R*0.55);
+ledG.userData = {origY: baseH/2 + rimH*0.5, label: 'Status LED'};
+scaleG.add(ledG);
+
+const usb = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.05,0.06), mUSB);
+usb.position.set(0, -0.06, R*0.96);
+usb.userData = {origY: -0.06, label: 'USB-C Port'};
+scaleG.add(usb);
+
+const feetG = new THREE.Group();
+[[-0.82,-0.82],[0.82,-0.82],[-0.82,0.82],[0.82,0.82]].forEach(([fx,fz]) => {
+  const f = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,0.08,16), mRubber);
+  f.position.set(fx, -baseH/2 - 0.04, fz); f.castShadow = true; feetG.add(f);
+});
+feetG.userData = {origY: 0, label: 'Rubber Feet'};
+scaleG.add(feetG);
+
+scaleG.position.y = 0.2;
+
+let drag=false, pan=false, prev={x:0,y:0};
+let sph = {th: PI/4, ph: PI/3.2, r: 8.5};
+let tgt = new THREE.Vector3(0,0.1,0);
+let spinning = false;
+
+function upCam(){
+  const {th,ph,r}=sph;
+  camera.position.set(tgt.x+r*Math.sin(ph)*Math.cos(th), tgt.y+r*Math.cos(ph), tgt.z+r*Math.sin(ph)*Math.sin(th));
+  camera.lookAt(tgt);
+}
+upCam();
+
+const cv = renderer.domElement;
+cv.addEventListener('mousedown',e=>{if(e.button===0)drag=true;if(e.button===2)pan=true;prev={x:e.clientX,y:e.clientY}});
+cv.addEventListener('mousemove',e=>{
+  const dx=e.clientX-prev.x, dy=e.clientY-prev.y;
+  if(drag){sph.th-=dx*0.005;sph.ph=Math.max(0.05,Math.min(PI-0.05,sph.ph+dy*0.005));upCam()}
+  if(pan){const s=0.004*sph.r,rv=new THREE.Vector3(),u=new THREE.Vector3();rv.crossVectors(camera.up,new THREE.Vector3().subVectors(camera.position,tgt)).normalize();u.copy(camera.up);tgt.add(rv.multiplyScalar(dx*s));tgt.add(u.multiplyScalar(-dy*s));upCam()}
+  prev={x:e.clientX,y:e.clientY};
+});
+window.addEventListener('mouseup',()=>{drag=false;pan=false});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('wheel',e=>{sph.r=Math.max(2,Math.min(15,sph.r+e.deltaY*0.005));upCam()});
+
+let tDist=0;
+cv.addEventListener('touchstart',e=>{
+  if(e.touches.length===1){drag=true;prev={x:e.touches[0].clientX,y:e.touches[0].clientY}}
+  else if(e.touches.length===2){drag=false;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;tDist=Math.sqrt(dx*dx+dy*dy)}
+});
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1&&drag){const dx=e.touches[0].clientX-prev.x,dy=e.touches[0].clientY-prev.y;sph.th-=dx*0.005;sph.ph=Math.max(0.05,Math.min(PI-0.05,sph.ph+dy*0.005));upCam();prev={x:e.touches[0].clientX,y:e.touches[0].clientY}}
+  else if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,d=Math.sqrt(dx*dx+dy*dy);sph.r=Math.max(2,Math.min(15,sph.r-(d-tDist)*0.015));tDist=d;upCam()}
+},{passive:false});
+cv.addEventListener('touchend',()=>{drag=false});
+
+function animTo(th,ph,r,t){
+  const s={th:sph.th,ph:sph.ph,r:sph.r,tx:tgt.x,ty:tgt.y,tz:tgt.z};
+  const e={th,ph,r,tx:t?t.x:0,ty:t?t.y:0.1,tz:t?t.z:0};
+  const d=500,st=performance.now();
+  (function step(now){
+    let p=Math.min((now-st)/d,1); p=p*p*(3-2*p);
+    sph.th=s.th+(e.th-s.th)*p; sph.ph=s.ph+(e.ph-s.ph)*p; sph.r=s.r+(e.r-s.r)*p;
+    tgt.set(s.tx+(e.tx-s.tx)*p, s.ty+(e.ty-s.ty)*p, s.tz+(e.tz-s.tz)*p);
+    upCam(); if(p<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+function setView(n){
+  const v={top:{th:0,ph:0.08,r:5.5},bottom:{th:0,ph:PI-0.08,r:5.5},side:{th:0,ph:PI/2,r:5.5},front:{th:PI/2,ph:PI/2,r:5.5},iso:{th:PI/4,ph:PI/3.5,r:6.5},eagle:{th:PI/5,ph:PI/5.5,r:5}}[n];
+  if(v) animTo(v.th,v.ph,v.r);
+}
+
+let isExp=false, isCut=false, isWire=false, showLabels=false;
+
+function toggleExplode(){
+  isExp=!isExp;
+  document.getElementById('bExp').classList.toggle('on',isExp);
+  const sp=isExp?1:0, dur=500, st=performance.now();
+  const map=[
+    {o:rimG, dy:0.7},{o:floorG, dy:0.35},{o:lcG, dy:0.05},
+    {o:batG, dy:-0.5},{o:hxG, dy:-0.5},{o:espG, dy:-0.5},
+    {o:feetG, dy:-0.9},{o:bleG, dy:0.7}
+  ];
+  const starts=map.map(m=>m.o.position.y);
+  const ends=map.map(m=>(m.o.userData.origY||0)+m.dy*sp);
+  (function step(now){
+    let t=Math.min((now-st)/dur,1); t=t*t*(3-2*t);
+    map.forEach((m,i)=>{m.o.position.y=starts[i]+(ends[i]-starts[i])*t});
+    if(t<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+const clipPlane = new THREE.Plane(new THREE.Vector3(0,0,-1), 0);
+function toggleCut(){
+  isCut=!isCut;
+  document.getElementById('bCut').classList.toggle('on',isCut);
+  scaleG.traverse(c=>{if(c.isMesh){c.material.clippingPlanes=isCut?[clipPlane]:[];c.material.clipShadows=true;c.material.needsUpdate=true}});
+  renderer.localClippingEnabled=isCut;
+}
+
+function toggleWire(){
+  isWire=!isWire;
+  document.getElementById('bWire').classList.toggle('on',isWire);
+  scaleG.traverse(c=>{if(c.isMesh){c.material.wireframe=isWire;c.material.needsUpdate=true}});
+}
+
+function toggleSpin(){
+  spinning=!spinning;
+  document.getElementById('bSpin').classList.toggle('on',spinning);
+}
+
+function toggleLabels(){
+  showLabels=!showLabels;
+  document.getElementById('bLabel').classList.toggle('on',showLabels);
+  document.getElementById('annot').style.display=showLabels?'block':'none';
+}
+
+function resetAll(){
+  if(isExp)toggleExplode();if(isCut)toggleCut();if(isWire)toggleWire();
+  animTo(PI/4,PI/3.5,6.5);
+}
+
+const labelTargets = [
+  {obj: rimG, off: new THREE.Vector3(0, rimH+0.1, 0), text: 'Raised Rim'},
+  {obj: floorG, off: new THREE.Vector3(0.6, 0.15, 0), text: 'Cavity Floor'},
+  {obj: lcG, off: new THREE.Vector3(-0.7, 0.15, 0), text: 'Load Cell'},
+  {obj: batG, off: new THREE.Vector3(0, 0.2, 0), text: 'Battery 18650'},
+  {obj: hxG, off: new THREE.Vector3(0, 0.15, 0), text: 'HX711'},
+  {obj: espG, off: new THREE.Vector3(0, 0.15, 0), text: 'ESP32'},
+  {obj: bleG, off: new THREE.Vector3(0, 0.18, 0), text: 'BLE Module'},
+  {obj: ledG, off: new THREE.Vector3(0, 0.15, 0), text: 'LED'},
+];
+
+const annotDiv = document.getElementById('annot');
+const labelEls = labelTargets.map(lt => {
+  const el = document.createElement('div');
+  el.className = 'label3d'; el.textContent = lt.text;
+  annotDiv.appendChild(el); return el;
+});
+
+function updateLabels(){
+  const hw = innerWidth/2, hh = innerHeight/2;
+  labelTargets.forEach((lt, i) => {
+    const wp = new THREE.Vector3();
+    lt.obj.getWorldPosition(wp); wp.add(lt.off); wp.project(camera);
+    labelEls[i].style.left = (wp.x * hw + hw) + 'px';
+    labelEls[i].style.top = (-wp.y * hh + hh) + 'px';
+    labelEls[i].style.opacity = wp.z < 1 ? 1 : 0;
+  });
+}
+
+let t2 = 0;
+function animate(){
+  requestAnimationFrame(animate);
+  if(spinning){sph.th+=0.004;upCam()}
+  t2+=0.025;
+  const p=0.5+0.5*Math.sin(t2*2);
+  mLED.emissiveIntensity=0.5+p*0.5;
+  mHalo.opacity=0.12+p*0.12;
+  mBLEglow.emissiveIntensity=0.4+p*0.5;
+  if(showLabels) updateLabels();
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+// labels off by default
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LPG Gas Cylinder</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#f2f2f2;overflow:hidden}
+  canvas{display:block}
+  #fill-ctrl{
+    position:absolute;top:16px;right:18px;
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,0.9);
+    padding:8px 14px;border-radius:999px;
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(0,0,0,0.08);
+    box-shadow:0 2px 12px rgba(0,0,0,0.07);
+    pointer-events:auto;z-index:10;
+  }
+  #fill-ctrl label{font-size:10px;color:#888;font-family:'Segoe UI',sans-serif;letter-spacing:0.4px;text-transform:uppercase;white-space:nowrap}
+  #fill-ctrl input[type=range]{width:90px;accent-color:#e85d2c}
+  #fill-ctrl .val{font-size:11px;font-weight:700;color:#e85d2c;min-width:30px;text-align:right;font-family:'Segoe UI',sans-serif}
+</style>
+</head>
+<body>
+
+<div id="fill-ctrl">
+  <label>Gas Fill Level</label>
+  <input type="range" id="fillSlider" min="5" max="100" value="22" oninput="setFill(this.value)">
+  <span class="val" id="fillVal">22%</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const PI=Math.PI, PI2=PI*2, sin=Math.sin, cos=Math.cos;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xf2f2f2);
+
+const camera=new THREE.PerspectiveCamera(32,innerWidth/innerHeight,0.1,200);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.6;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.55));
+const key=new THREE.DirectionalLight(0xffffff,0.9);
+key.position.set(5,10,7);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
+const rim=new THREE.DirectionalLight(0xddeeff,0.4);rim.position.set(-5,4,-5);scene.add(rim);
+const fill=new THREE.DirectionalLight(0xfff5ee,0.35);fill.position.set(2,-2,5);scene.add(fill);
+const botPt=new THREE.PointLight(0xff8844,0.4,10);botPt.position.set(0,-3,3);scene.add(botPt);
+
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({color:0xeaeaea,roughness:0.9}));
+gnd.rotation.x=-PI/2;gnd.position.y=-5.5;gnd.receiveShadow=true;scene.add(gnd);
+
+const cylGroup=new THREE.Group();
+scene.add(cylGroup);
+
+const R=1.15,bodyH=4.2,collarR=0.48,collarH=0.7;
+const footR=1.18,footH=0.5;
+
+const glassMat=new THREE.MeshPhysicalMaterial({color:0xc8d0d8,metalness:0.2,roughness:0.05,transparent:true,opacity:0.22,side:THREE.DoubleSide,clearcoat:1.0,clearcoatRoughness:0.03,envMapIntensity:2.0});
+const contourMat=new THREE.LineBasicMaterial({color:0x999999,transparent:true,opacity:0.55});
+const contourMatStrong=new THREE.LineBasicMaterial({color:0x888888,transparent:true,opacity:0.7});
+const metalFrameMat=new THREE.MeshStandardMaterial({color:0xb0b8c0,roughness:0.25,metalness:0.75,transparent:true,opacity:0.55});
+const metalSolidMat=new THREE.MeshStandardMaterial({color:0x999999,roughness:0.25,metalness:0.8});
+const seamMat=new THREE.MeshStandardMaterial({color:0xb0b8c0,roughness:0.3,metalness:0.6,transparent:true,opacity:0.5});
+
+function addEdges(geo,parent,mat,yOff){
+  const edges=new THREE.EdgesGeometry(geo,30);
+  const line=new THREE.LineSegments(edges,mat);
+  if(yOff!==undefined)line.position.y=yOff;
+  parent.add(line);
+}
+
+// Body
+const bodyGeo=new THREE.CylinderGeometry(R,R,bodyH,64,1,true);
+cylGroup.add(new THREE.Mesh(bodyGeo,glassMat));
+for(let cy=-bodyH/2;cy<=bodyH/2;cy+=0.6){const pts=[];for(let j=0;j<=64;j++){const a2=j/64*PI2;pts.push(new THREE.Vector3(cos(a2)*R*1.002,cy,sin(a2)*R*1.002));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+for(let vAng=0;vAng<PI2;vAng+=PI/4){const pts=[];for(let vy=-bodyH/2;vy<=bodyH/2;vy+=0.1){pts.push(new THREE.Vector3(cos(vAng)*R*1.002,vy,sin(vAng)*R*1.002));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+for(const ey of[-bodyH/2,bodyH/2]){const pts=[];for(let j=0;j<=64;j++){const a2=j/64*PI2;pts.push(new THREE.Vector3(cos(a2)*R*1.003,ey,sin(a2)*R*1.003));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMatStrong));}
+
+// Top dome
+const dS=32;
+const topPts=[];
+for(let i=0;i<=dS;i++){const t=i/dS,a=t*PI/2,r=R*cos(a);topPts.push(new THREE.Vector2(Math.max(r,collarR),R*sin(a)));}
+const topDome=new THREE.Mesh(new THREE.LatheGeometry(topPts,64),glassMat);
+topDome.position.y=bodyH/2;cylGroup.add(topDome);
+for(let dc=0;dc<5;dc++){const t2=dc/5,a2=t2*PI/2,dr=Math.max(R*cos(a2),collarR),dy=R*sin(a2);const pts=[];for(let j=0;j<=64;j++){const ang=j/64*PI2;pts.push(new THREE.Vector3(cos(ang)*dr*1.003,bodyH/2+dy,sin(ang)*dr*1.003));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+for(let mAng=0;mAng<PI2;mAng+=PI/4){const pts=[];for(let i=0;i<=dS;i++){const t=i/dS,a=t*PI/2,dr=Math.max(R*cos(a),collarR)*1.003;pts.push(new THREE.Vector3(cos(mAng)*dr,bodyH/2+R*sin(a),sin(mAng)*dr));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+
+// Bottom dome
+const botPts=[];
+for(let i=0;i<=dS;i++){const t=i/dS,a=t*PI/2,r=R*cos(a);botPts.push(new THREE.Vector2(Math.max(r,footR*0.7),-R*sin(a)));}
+const botDome=new THREE.Mesh(new THREE.LatheGeometry(botPts,64),glassMat);
+botDome.position.y=-bodyH/2;cylGroup.add(botDome);
+for(let dc=0;dc<4;dc++){const t2=dc/4,a2=t2*PI/2,dr=Math.max(R*cos(a2),footR*0.7),dy=-R*sin(a2);const pts=[];for(let j=0;j<=64;j++){const ang=j/64*PI2;pts.push(new THREE.Vector3(cos(ang)*dr*1.003,-bodyH/2+dy,sin(ang)*dr*1.003));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+
+// Collar
+const collarGeo=new THREE.CylinderGeometry(collarR,collarR,collarH,32);
+const collar=new THREE.Mesh(collarGeo,metalFrameMat);
+collar.position.y=bodyH/2+R*0.82+collarH/2;cylGroup.add(collar);
+addEdges(collarGeo,cylGroup,contourMatStrong,bodyH/2+R*0.82+collarH/2);
+const collarCapGeo=new THREE.CylinderGeometry(collarR+0.02,collarR+0.02,0.06,32);
+const collarCap=new THREE.Mesh(collarCapGeo,metalSolidMat);
+collarCap.position.y=bodyH/2+R*0.82+collarH+0.03;cylGroup.add(collarCap);
+addEdges(collarCapGeo,cylGroup,contourMatStrong,bodyH/2+R*0.82+collarH+0.03);
+
+// Handles
+function mkHandle(ry){
+  const g=new THREE.Group();
+  const armG=new THREE.CylinderGeometry(0.065,0.075,1.1,12);
+  const aL=new THREE.Mesh(armG,metalFrameMat);aL.position.set(-0.32,0.55,0);g.add(aL);
+  const aR=new THREE.Mesh(armG,metalFrameMat);aR.position.set(0.32,0.55,0);g.add(aR);
+  const armEdge=new THREE.EdgesGeometry(armG,20);
+  const aeL=new THREE.LineSegments(armEdge,contourMatStrong);aeL.position.set(-0.32,0.55,0);g.add(aeL);
+  const aeR=new THREE.LineSegments(armEdge,contourMatStrong);aeR.position.set(0.32,0.55,0);g.add(aeR);
+  const brGeo=new THREE.CylinderGeometry(0.06,0.06,0.64,12);
+  const br=new THREE.Mesh(brGeo,metalFrameMat);br.rotation.z=PI/2;br.position.y=1.1;g.add(br);
+  const brEdge=new THREE.LineSegments(new THREE.EdgesGeometry(brGeo,20),contourMatStrong);brEdge.rotation.z=PI/2;brEdge.position.y=1.1;g.add(brEdge);
+  const cG=new THREE.SphereGeometry(0.07,8,8);
+  [[-0.32,1.1,0],[0.32,1.1,0],[-0.32,0,0],[0.32,0,0]].forEach(([x,y,z])=>{const c=new THREE.Mesh(cG,metalFrameMat);c.position.set(x,y,z);g.add(c);});
+  g.rotation.y=ry;g.position.y=bodyH/2+R*0.55;return g;
+}
+cylGroup.add(mkHandle(0));cylGroup.add(mkHandle(PI/2));
+
+// Valve
+const vG=new THREE.Group();
+const vBodyGeo=new THREE.CylinderGeometry(0.14,0.17,0.28,12);
+vG.add(new THREE.Mesh(vBodyGeo,metalSolidMat));
+vG.add(new THREE.LineSegments(new THREE.EdgesGeometry(vBodyGeo,15),contourMatStrong));
+const knobGeo=new THREE.CylinderGeometry(0.2,0.2,0.1,6);
+const knob=new THREE.Mesh(knobGeo,metalSolidMat);knob.position.y=0.19;vG.add(knob);
+const knobE=new THREE.LineSegments(new THREE.EdgesGeometry(knobGeo,10),contourMatStrong);knobE.position.y=0.19;vG.add(knobE);
+for(let i=0;i<6;i++){const ridge=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.08,0.04),metalSolidMat);const ra=i*PI2/6;ridge.position.set(cos(ra)*0.2,0.19,sin(ra)*0.2);ridge.rotation.y=-ra;vG.add(ridge);}
+const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.18,8),metalSolidMat);stem.position.y=-0.22;vG.add(stem);
+const nozzle=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.18,8),metalSolidMat);nozzle.rotation.z=PI/2;nozzle.position.set(0.18,0,0);vG.add(nozzle);
+vG.position.y=bodyH/2+R*0.82+collarH+0.1;cylGroup.add(vG);
+
+// Seam bands
+const mkRing=(y,rr,tr)=>{
+  const m=new THREE.Mesh(new THREE.TorusGeometry(rr,tr,8,64),seamMat);m.rotation.x=PI/2;m.position.y=y;cylGroup.add(m);
+  const pts=[];for(let j=0;j<=64;j++){const a2=j/64*PI2;pts.push(new THREE.Vector3(cos(a2)*(rr+tr*1.1),y,sin(a2)*(rr+tr*1.1)));}
+  cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMatStrong));
+};
+mkRing(0,R+0.01,0.06);mkRing(-bodyH*0.35,R+0.005,0.02);mkRing(bodyH*0.35,R+0.005,0.02);
+
+// Foot ring
+const fG=new THREE.Group();
+fG.add(new THREE.Mesh(new THREE.CylinderGeometry(footR,footR,footH,64,1,true),metalFrameMat));
+fG.add(new THREE.Mesh(new THREE.CylinderGeometry(footR-0.08,footR-0.08,footH,64,1,true),metalFrameMat));
+const fBot=new THREE.Mesh(new THREE.RingGeometry(footR-0.08,footR,64),metalFrameMat);fBot.rotation.x=-PI/2;fBot.position.y=-footH/2;fG.add(fBot);
+const fTop2=new THREE.Mesh(new THREE.RingGeometry(footR-0.08,footR,64),metalFrameMat);fTop2.rotation.x=-PI/2;fTop2.position.y=footH/2;fG.add(fTop2);
+for(const fy of[-footH/2,footH/2]){for(const fr of[footR,footR-0.08]){const pts=[];for(let j=0;j<=64;j++){const a2=j/64*PI2;pts.push(new THREE.Vector3(cos(a2)*fr,fy,sin(a2)*fr));}fG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMatStrong));}}
+for(let i=0;i<4;i++){const sa=i*PI/2;const sl=new THREE.Mesh(new THREE.BoxGeometry(0.38,0.14,0.12),new THREE.MeshStandardMaterial({color:0xeaeaea}));sl.position.set(cos(sa)*footR*0.93,-footH*0.18,sin(sa)*footR*0.93);sl.rotation.y=-sa;fG.add(sl);}
+fG.position.y=-bodyH/2-R*0.5-footH/2+0.15;cylGroup.add(fG);
+
+// Liquid
+const liquidMat=new THREE.MeshPhysicalMaterial({color:0xe85d2c,emissive:0x993311,emissiveIntensity:0.2,transparent:true,opacity:0.6,roughness:0.06,metalness:0.02,side:THREE.DoubleSide});
+const surfMat2=new THREE.MeshPhysicalMaterial({color:0xf4943e,emissive:0xcc5522,emissiveIntensity:0.15,transparent:true,opacity:0.65,roughness:0.02,side:THREE.DoubleSide});
+const innerR=R-0.06;
+const liqGeo=new THREE.CylinderGeometry(innerR,innerR,1,64);
+const liqMesh=new THREE.Mesh(liqGeo,liquidMat);cylGroup.add(liqMesh);
+const surfGeo=new THREE.CircleGeometry(innerR,64);
+const surfMesh=new THREE.Mesh(surfGeo,surfMat2);surfMesh.rotation.x=-PI/2;cylGroup.add(surfMesh);
+const innerGlow=new THREE.PointLight(0xff7733,0.5,3);cylGroup.add(innerGlow);
+
+// Particles
+let fillLevel=0.22;
+const maxP=3000,particleCount=1200;
+const pos2=new Float32Array(maxP*3),vel2=new Float32Array(maxP*3),szs2=new Float32Array(maxP),life2=new Float32Array(maxP);
+const cylBottom=-bodyH/2-R*0.4,cylTop2=bodyH/2+R*0.3;
+function initP(i){const a=Math.random()*PI2,r2=Math.random()*innerR;pos2[i*3]=cos(a)*r2;pos2[i*3+1]=cylBottom+Math.random()*(cylTop2-cylBottom);pos2[i*3+2]=sin(a)*r2;vel2[i*3]=(Math.random()-0.5)*0.008;vel2[i*3+1]=(Math.random()-0.5)*0.004+0.001;vel2[i*3+2]=(Math.random()-0.5)*0.008;szs2[i]=0.015+Math.random()*0.04;life2[i]=Math.random()*150;}
+for(let i=0;i<maxP;i++)initP(i);
+const pGeo=new THREE.BufferGeometry();
+pGeo.setAttribute('position',new THREE.BufferAttribute(pos2,3));
+pGeo.setAttribute('size',new THREE.BufferAttribute(szs2,1));
+const pVS=`attribute float size;varying float vY;void main(){vY=position.y;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(220.0/-mv.z);gl_Position=projectionMatrix*mv;}`;
+const pFS=`varying float vY;uniform float uFillY;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float a=smoothstep(0.5,0.1,d);float blend=smoothstep(uFillY-0.4,uFillY+0.6,vY);vec3 liqC=vec3(1.0,0.55,0.25);vec3 gasC=vec3(0.8,0.85,0.95);vec3 c=mix(liqC,gasC,blend);a*=mix(0.5,0.2,blend);gl_FragColor=vec4(c,a);}`;
+const pUni={uTime:{value:0},uFillY:{value:0}};
+cylGroup.add(new THREE.Points(pGeo,new THREE.ShaderMaterial({uniforms:pUni,vertexShader:pVS,fragmentShader:pFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+// Bubbles
+const bCnt=100;
+const bPos2=new Float32Array(bCnt*3),bVel2=new Float32Array(bCnt*3),bSz2=new Float32Array(bCnt);
+function initB(i){const a=Math.random()*PI2,r2=Math.random()*(innerR-0.2);const minY=cylBottom,maxY=minY+(cylTop2-cylBottom)*fillLevel;bPos2[i*3]=cos(a)*r2;bPos2[i*3+1]=minY+Math.random()*(maxY-minY);bPos2[i*3+2]=sin(a)*r2;bVel2[i*3]=0;bVel2[i*3+1]=0.004+Math.random()*0.012;bVel2[i*3+2]=0;bSz2[i]=0.05+Math.random()*0.1;}
+for(let i=0;i<bCnt;i++)initB(i);
+const bGeo2=new THREE.BufferGeometry();
+bGeo2.setAttribute('position',new THREE.BufferAttribute(bPos2,3));
+bGeo2.setAttribute('size',new THREE.BufferAttribute(bSz2,1));
+const bVS2=`attribute float size;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}`;
+const bFS2=`void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float ring=smoothstep(0.33,0.44,d)*smoothstep(0.5,0.44,d);float inner=smoothstep(0.5,0.0,d)*0.06;float hl=smoothstep(0.25,0.12,length(gl_PointCoord-vec2(0.33,0.33)));vec3 c=vec3(1.0,0.7,0.4)+hl*0.4;gl_FragColor=vec4(c,ring*0.6+inner);}`;
+cylGroup.add(new THREE.Points(bGeo2,new THREE.ShaderMaterial({vertexShader:bVS2,fragmentShader:bFS2,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+// Simulation
+const shakeF={x:0,y:0,z:0},tiltA={x:0,z:0};
+function updateSim(dt){
+  const minY=cylBottom,liqH2=(cylTop2-cylBottom)*fillLevel,maxLiqY=minY+liqH2,maxGasY=cylTop2;
+  liqMesh.scale.y=Math.max(0.01,liqH2);liqMesh.position.y=minY+liqH2/2;surfMesh.position.y=minY+liqH2;innerGlow.position.y=minY+liqH2;
+  pUni.uFillY.value=maxLiqY;pUni.uTime.value+=dt;
+  for(let i=0;i<particleCount;i++){
+    const ix=i*3,iy=ix+1,iz=ix+2;life2[i]+=dt;
+    vel2[ix]+=(Math.random()-0.5)*0.003;vel2[iy]+=(Math.random()-0.5)*0.0015-0.00015;vel2[iz]+=(Math.random()-0.5)*0.003;
+    vel2[ix]*=0.97;vel2[iy]*=0.97;vel2[iz]*=0.97;
+    pos2[ix]+=vel2[ix];pos2[iy]+=vel2[iy];pos2[iz]+=vel2[iz];
+    const py=pos2[iy];let mR=innerR;
+    if(py>bodyH/2){const t2=Math.min((py-bodyH/2)/(R*0.8),1);mR=innerR*(1-t2)+collarR*t2;}
+    if(py<-bodyH/2){const t2=Math.min((-bodyH/2-py)/(R*0.6),1);mR=innerR*(1-t2*0.3);}
+    const d2=Math.sqrt(pos2[ix]*pos2[ix]+pos2[iz]*pos2[iz]);
+    if(d2>mR){const n=mR/d2;pos2[ix]*=n;pos2[iz]*=n;vel2[ix]*=-0.3;vel2[iz]*=-0.3;}
+    if(pos2[iy]<minY){pos2[iy]=minY;vel2[iy]=Math.abs(vel2[iy])*0.4;}
+    if(pos2[iy]>maxGasY){pos2[iy]=maxGasY;vel2[iy]=-Math.abs(vel2[iy])*0.4;}
+    if(life2[i]>180+Math.random()*80)initP(i);
+  }
+  pGeo.attributes.position.needsUpdate=true;
+  for(let i=0;i<bCnt;i++){
+    const ix=i*3,iy=ix+1,iz=ix+2;
+    bVel2[iy]+=0.0003;bVel2[ix]*=0.96;bVel2[iy]*=0.98;bVel2[iz]*=0.96;
+    bPos2[ix]+=bVel2[ix];bPos2[iy]+=bVel2[iy];bPos2[iz]+=bVel2[iz];
+    const bd=Math.sqrt(bPos2[ix]*bPos2[ix]+bPos2[iz]*bPos2[iz]);
+    if(bd>innerR-0.2){const n=(innerR-0.2)/bd;bPos2[ix]*=n;bPos2[iz]*=n;bVel2[ix]*=-0.2;bVel2[iz]*=-0.2;}
+    if(bPos2[iy]>maxLiqY){initB(i);bPos2[iy]=minY;}
+    if(bPos2[iy]<minY){bPos2[iy]=minY;bVel2[iy]=Math.abs(bVel2[iy]);}
+  }
+  bGeo2.attributes.position.needsUpdate=true;
+}
+
+// Camera
+let drag=false,prev={x:0,y:0};
+const sph={th:PI/4,ph:PI/2.8,r:11};
+const tgt=new THREE.Vector3(0,0.5,0);
+function upCam(){const{th,ph,r}=sph;camera.position.set(tgt.x+r*sin(ph)*cos(th),tgt.y+r*cos(ph),tgt.z+r*sin(ph)*sin(th));camera.lookAt(tgt);}
+upCam();
+const cv=renderer.domElement;
+cv.addEventListener('mousedown',e=>{if(e.button===0)drag=true;prev={x:e.clientX,y:e.clientY}});
+cv.addEventListener('mousemove',e=>{if(drag){const dx=e.clientX-prev.x,dy=e.clientY-prev.y;sph.th-=dx*0.005;sph.ph=Math.max(0.1,Math.min(PI-0.1,sph.ph+dy*0.005));upCam();}prev={x:e.clientX,y:e.clientY};});
+window.addEventListener('mouseup',()=>{drag=false});
+cv.addEventListener('wheel',e=>{sph.r=Math.max(4,Math.min(22,sph.r+e.deltaY*0.008));upCam()});
+
+function setFill(v){
+  fillLevel=v/100;
+  document.getElementById('fillVal').textContent=v+'%';
+}
+
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta()*60,3);
+  sph.th+=0.003;upCam();
+  updateSim(dt);
+  const t=clock.elapsedTime;
+  surfMesh.rotation.z=sin(t*1.5)*0.025;
+  surfMesh.rotation.x=-PI/2+cos(t*1.2)*0.02;
+  botPt.intensity=0.3+sin(t*2)*0.1;
+  renderer.render(scene,camera);
+}
+animate();
+setFill(22);
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>

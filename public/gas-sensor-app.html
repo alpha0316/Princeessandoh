@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<title>Gas Monitor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f6f8;--card:#ffffff;--text:#1a1a2e;--sub:#8b8fa3;
+  --accent:#e85d2c;--accent2:#f4943e;--green:#22c55e;--green2:#16a34a;
+  --yellow:#f59e0b;--red:#ef4444;
+  --shadow:0 2px 16px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.08);
+  --radius:16px;
+}
+html,body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);
+  overflow-x:hidden;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  max-width:430px;margin:0 auto;
+  min-height:100vh;
+}
+
+/* ── Status Bar ── */
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 24px 4px;font-size:13px;font-weight:600;color:var(--text);
+}
+.status-bar .time{font-weight:700}
+.status-bar .icons{display:flex;gap:5px;align-items:center}
+.status-bar .icons svg{width:16px;height:16px}
+
+/* ── Header ── */
+.header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 24px 12px;
+}
+.header h1{font-size:22px;font-weight:800;letter-spacing:-0.5px}
+.header-right{display:flex;gap:12px;align-items:center}
+.icon-btn{
+  width:40px;height:40px;border-radius:12px;background:var(--card);
+  border:none;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);cursor:pointer;color:var(--sub);
+}
+.icon-btn:active{transform:scale(0.95)}
+.notif-dot{position:relative}
+.notif-dot::after{
+  content:'';position:absolute;top:8px;right:8px;width:8px;height:8px;
+  border-radius:50%;background:var(--red);border:2px solid var(--card);
+}
+
+/* ── Gauge Card ── */
+.gauge-card{
+  margin:0 20px;padding:20px 20px 16px;
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.gauge-card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:4px;
+}
+.gauge-card-header h2{font-size:15px;font-weight:700;color:var(--text)}
+.gauge-card-header .info-icon{
+  width:18px;height:18px;border-radius:50%;border:1.5px solid var(--sub);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--sub);cursor:pointer;
+}
+.view-stats-btn{
+  font-size:12px;font-weight:600;color:var(--sub);
+  background:var(--card);border:1.5px solid #e0e2e8;
+  padding:6px 14px;border-radius:10px;cursor:pointer;
+}
+.view-stats-btn:active{background:#f0f0f0}
+
+.score-row{
+  display:flex;align-items:center;gap:10px;
+  margin:8px 0 2px;
+}
+.score-emoji{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.score-emoji.good{background:#e8faf0}
+.score-emoji.warn{background:#fff7e6}
+.score-emoji.bad{background:#fef2f2}
+.score-val{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1}
+.score-unit{font-size:16px;font-weight:500;color:var(--sub);margin-left:2px}
+.score-change{
+  font-size:12px;font-weight:700;padding:3px 8px;border-radius:8px;
+  margin-left:4px;
+}
+.score-change.up{color:#16a34a;background:#e8faf0}
+.score-change.down{color:#ef4444;background:#fef2f2}
+
+.gauge-wrap{
+  position:relative;width:100%;
+  display:flex;justify-content:center;
+  margin:4px 0 0;
+}
+.gauge-svg{width:100%;max-width:320px}
+
+.gauge-feedback{
+  text-align:center;margin-top:4px;padding-top:10px;
+  border-top:1px solid #f0f1f3;
+}
+.gauge-feedback strong{font-weight:700}
+.gauge-feedback p{font-size:13px;color:var(--sub);line-height:1.5}
+
+/* ── Stats Row ── */
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  margin:14px 20px;
+}
+.stat-card{
+  background:var(--card);border-radius:14px;padding:14px 12px;
+  box-shadow:var(--shadow);text-align:center;
+}
+.stat-icon{
+  width:32px;height:32px;border-radius:10px;margin:0 auto 8px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.stat-val{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.stat-label{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px}
+
+/* ── 3D Cylinder Card ── */
+.cyl-card{
+  margin:0 20px;background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;position:relative;
+}
+.cyl-card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 18px 0;
+}
+.cyl-card-header h3{font-size:14px;font-weight:700}
+.cyl-badge{
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;padding:4px 10px;
+  border-radius:8px;
+}
+.cyl-badge.live{color:#16a34a;background:#e8faf0}
+#cylinder-canvas{
+  width:100%;height:280px;display:block;
+  touch-action:none;
+}
+.cyl-controls{
+  display:flex;gap:6px;padding:0 14px 14px;flex-wrap:wrap;
+}
+.cyl-btn{
+  flex:1;min-width:60px;padding:8px 10px;border-radius:10px;
+  background:#f5f6f8;border:none;font-size:11px;font-weight:600;
+  color:var(--sub);cursor:pointer;transition:all .15s;
+}
+.cyl-btn:active{transform:scale(0.96);background:#eaebf0}
+.cyl-btn.active{background:var(--accent);color:#fff}
+.cyl-slider-wrap{
+  padding:2px 18px 8px;display:flex;align-items:center;gap:10px;
+}
+.cyl-slider-label{font-size:11px;font-weight:600;color:var(--sub);min-width:55px}
+.cyl-slider{
+  flex:1;-webkit-appearance:none;height:4px;border-radius:2px;
+  background:#e8e9ed;outline:none;
+}
+.cyl-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(232,93,44,0.3);
+}
+.cyl-slider-val{font-size:13px;font-weight:700;color:var(--accent);min-width:35px;text-align:right}
+
+/* ── Activity Section ── */
+.activity-section{
+  margin:14px 20px;
+}
+.activity-section h3{font-size:14px;font-weight:700;margin-bottom:10px}
+.activity-list{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.activity-item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-bottom:1px solid #f2f3f5;
+}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.activity-text{flex:1}
+.activity-text p{font-size:13px;font-weight:600;color:var(--text)}
+.activity-text span{font-size:11px;color:var(--sub)}
+.activity-val{font-size:13px;font-weight:700;text-align:right}
+
+/* ── CTA Button ── */
+.cta-wrap{margin:14px 20px 8px}
+.cta-btn{
+  width:100%;padding:16px;border:none;border-radius:14px;
+  font-size:15px;font-weight:700;color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px rgba(232,93,44,0.3);
+  transition:transform .15s;
+}
+.cta-btn:active{transform:scale(0.98)}
+.cta-btn.refill{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.cta-btn.ok{background:linear-gradient(135deg,var(--green),var(--green2))}
+
+.cta-secondary{
+  text-align:center;padding:10px;font-size:13px;
+  font-weight:600;color:var(--sub);cursor:pointer;
+}
+
+/* ── Bottom Nav ── */
+.bottom-nav{
+  display:flex;justify-content:space-around;align-items:center;
+  padding:10px 20px 28px;background:var(--card);
+  border-top:1px solid #f0f1f3;margin-top:14px;
+  position:sticky;bottom:0;
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:4px 12px;
+}
+.nav-item svg{width:22px;height:22px}
+.nav-item span{font-size:10px;font-weight:600}
+.nav-item.active svg{color:var(--accent)}
+.nav-item.active span{color:var(--accent)}
+.nav-item:not(.active) svg{color:var(--sub)}
+.nav-item:not(.active) span{color:var(--sub)}
+</style>
+</head>
+<body>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <span class="time">9:41</span>
+  <div class="icons">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><rect x="1" y="6" width="3" height="12" rx="1"/><rect x="6" y="4" width="3" height="14" rx="1"/><rect x="11" y="2" width="3" height="16" rx="1"/><rect x="16" y="0" width="3" height="18" rx="1"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="18" height="12" rx="2"/><path d="M23 13v-2" stroke-linecap="round"/></svg>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>Gas Monitor</h1>
+  <div class="header-right">
+    <button class="icon-btn notif-dot">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <button class="icon-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Gauge Card -->
+<div class="gauge-card">
+  <div class="gauge-card-header">
+    <div style="display:flex;align-items:center;gap:6px">
+      <h2>Gas Level</h2>
+      <div class="info-icon">i</div>
+    </div>
+    <button class="view-stats-btn" onclick="toggleStats()">View Stats</button>
+  </div>
+  <div class="score-row">
+    <div class="score-emoji bad" id="scoreEmoji">⚠️</div>
+    <span class="score-val" id="scoreVal">22</span>
+    <span class="score-unit">%</span>
+    <span class="score-change down" id="scoreChange">-3.2%/day</span>
+  </div>
+  <div class="gauge-wrap">
+    <svg class="gauge-svg" viewBox="0 0 300 175" id="gaugeSvg"></svg>
+  </div>
+  <div class="gauge-feedback">
+    <p id="feedbackText"><strong>Low Gas Alert</strong> — Your cylinder is running low. Consider scheduling a refill soon.</p>
+  </div>
+</div>
+
+<!-- 3D Cylinder Card -->
+<div class="cyl-card">
+  <div class="cyl-card-header">
+    <h3>Cylinder View</h3>
+    <div class="cyl-badge live">
+      <span style="width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block"></span>
+      Live
+    </div>
+  </div>
+  <canvas id="cylinder-canvas"></canvas>
+  <div class="cyl-slider-wrap">
+    <span class="cyl-slider-label">Fill Level</span>
+    <input type="range" class="cyl-slider" id="fillRange" min="0" max="100" value="22" oninput="updateFill(this.value)">
+    <span class="cyl-slider-val" id="fillRangeVal">22%</span>
+  </div>
+  <div class="cyl-controls">
+    <button class="cyl-btn active" id="btnSpin" onclick="toggleSpin()">Auto-Spin</button>
+    <button class="cyl-btn" onclick="shakeIt()">Shake</button>
+    <button class="cyl-btn" onclick="tiltIt()">Tilt</button>
+    <button class="cyl-btn" onclick="setView('front')">Front</button>
+    <button class="cyl-btn" onclick="setView('iso')">3D</button>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#fff7e6">⚖️</div>
+    <div class="stat-val" id="statWeight">3.9</div>
+    <div class="stat-label">kg Left</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#e8faf0">📅</div>
+    <div class="stat-val" id="statDays">~7</div>
+    <div class="stat-label">Days Left</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#f0f0ff">🔥</div>
+    <div class="stat-val" id="statUsage">0.58</div>
+    <div class="stat-label">kg/Day</div>
+  </div>
+</div>
+
+<!-- Activity Section -->
+<div class="activity-section">
+  <h3>Recent Activity</h3>
+  <div class="activity-list">
+    <div class="activity-item">
+      <div class="activity-dot" style="background:#fef2f2">🔻</div>
+      <div class="activity-text">
+        <p>Gas level dropped below 25%</p>
+        <span>Today, 8:30 AM</span>
+      </div>
+      <div class="activity-val" style="color:var(--red)">22%</div>
+    </div>
+    <div class="activity-item">
+      <div class="activity-dot" style="background:#fff7e6">📊</div>
+      <div class="activity-text">
+        <p>Daily usage: 0.58 kg</p>
+        <span>Yesterday</span>
+      </div>
+      <div class="activity-val">-3.2%</div>
+    </div>
+    <div class="activity-item">
+      <div class="activity-dot" style="background:#e8faf0">✅</div>
+      <div class="activity-text">
+        <p>Connected to scale via BLE</p>
+        <span>2 days ago</span>
+      </div>
+      <div class="activity-val" style="color:var(--green)">Active</div>
+    </div>
+    <div class="activity-item">
+      <div class="activity-dot" style="background:#f0f0ff">🔄</div>
+      <div class="activity-text">
+        <p>Last refill — full cylinder</p>
+        <span>May 1, 2026</span>
+      </div>
+      <div class="activity-val" style="color:#6366f1">18 kg</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA Button -->
+<div class="cta-wrap">
+  <button class="cta-btn refill" id="ctaBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    Schedule Refill
+  </button>
+</div>
+<div class="cta-secondary">View Usage History</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Home</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Analytics</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span>Alerts</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>Settings</span>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════
+//   GAUGE — SVG Semi-circular Meter
+// ══════════════════════════════════
+const gaugeSvg = document.getElementById('gaugeSvg');
+const cx=150, cy=145, gaugeR=115;
+let currentFill = 22;
+const maxWeight = 18;
+
+function polarToXY(angle, r) {
+  return { x: cx + r * Math.cos(angle), y: cy - r * Math.sin(angle) };
+}
+
+function pctToAngle(pct) {
+  return Math.PI * (1 - pct / 100);
+}
+
+function drawGauge(fillPct) {
+  const svg = gaugeSvg;
+  svg.innerHTML = '';
+  const pct = Math.max(0, Math.min(100, fillPct));
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+
+  const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+  grad.setAttribute('id','arcGrad');
+  grad.setAttribute('x1','0%');grad.setAttribute('y1','0%');
+  grad.setAttribute('x2','100%');grad.setAttribute('y2','0%');
+  const stops = pct > 50
+    ? [['0%','#6366f1'],['50%','#3b82f6'],['100%','#22c55e']]
+    : pct > 25
+      ? [['0%','#3b82f6'],['50%','#e85d2c'],['100%','#f59e0b']]
+      : [['0%','#f59e0b'],['50%','#e85d2c'],['100%','#ef4444']];
+  stops.forEach(([offset, color]) => {
+    const s = document.createElementNS('http://www.w3.org/2000/svg','stop');
+    s.setAttribute('offset', offset);
+    s.setAttribute('stop-color', color);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+
+  const needleGrad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+  needleGrad.setAttribute('id','needleGrad');
+  needleGrad.setAttribute('x1','0%');needleGrad.setAttribute('y1','0%');
+  needleGrad.setAttribute('x2','0%');needleGrad.setAttribute('y2','100%');
+  [['0%','#3b4a6b'],['100%','#1a1a2e']].forEach(([o,c])=>{
+    const s = document.createElementNS('http://www.w3.org/2000/svg','stop');
+    s.setAttribute('offset',o);s.setAttribute('stop-color',c);
+    needleGrad.appendChild(s);
+  });
+  defs.appendChild(needleGrad);
+  svg.appendChild(defs);
+
+  const bgLeft = polarToXY(Math.PI, gaugeR);
+  const bgRight = polarToXY(0, gaugeR);
+  const bgPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+  bgPath.setAttribute('d', `M ${bgLeft.x} ${bgLeft.y} A ${gaugeR} ${gaugeR} 0 0 1 ${bgRight.x} ${bgRight.y}`);
+  bgPath.setAttribute('fill','none');
+  bgPath.setAttribute('stroke','#e8e9ed');
+  bgPath.setAttribute('stroke-width','22');
+  bgPath.setAttribute('stroke-linecap','round');
+  svg.appendChild(bgPath);
+
+  if (pct > 0) {
+    const fillAngle = pctToAngle(pct);
+    const fillEnd = polarToXY(fillAngle, gaugeR);
+    const large = pct > 50 ? 1 : 0;
+    const fillPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+    fillPath.setAttribute('d', `M ${bgLeft.x} ${bgLeft.y} A ${gaugeR} ${gaugeR} 0 ${large} 1 ${fillEnd.x} ${fillEnd.y}`);
+    fillPath.setAttribute('fill','none');
+    fillPath.setAttribute('stroke','url(#arcGrad)');
+    fillPath.setAttribute('stroke-width','22');
+    fillPath.setAttribute('stroke-linecap','round');
+    svg.appendChild(fillPath);
+  }
+
+  for (let i = 0; i <= 50; i++) {
+    const angle = pctToAngle(i / 50 * 100);
+    const isMajor = i % 10 === 0;
+    const isMid = i % 5 === 0;
+    const inner = isMajor ? gaugeR - 32 : isMid ? gaugeR - 28 : gaugeR - 24;
+    const outer = gaugeR - 18;
+    const p1 = polarToXY(angle, inner);
+    const p2 = polarToXY(angle, outer);
+    const tick = document.createElementNS('http://www.w3.org/2000/svg','line');
+    tick.setAttribute('x1', p1.x);tick.setAttribute('y1', p1.y);
+    tick.setAttribute('x2', p2.x);tick.setAttribute('y2', p2.y);
+    tick.setAttribute('stroke', isMajor ? '#999' : '#c8cad0');
+    tick.setAttribute('stroke-width', isMajor ? 2 : 1);
+    svg.appendChild(tick);
+  }
+
+  [0, 25, 50, 75, 100].forEach(val => {
+    const angle = pctToAngle(val);
+    const p = polarToXY(angle, gaugeR + 20);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', p.x);
+    txt.setAttribute('y', p.y);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('dominant-baseline','middle');
+    txt.setAttribute('fill','#8b8fa3');
+    txt.setAttribute('font-size','13');
+    txt.setAttribute('font-weight','600');
+    txt.setAttribute('font-family','Inter,sans-serif');
+    txt.textContent = val;
+    svg.appendChild(txt);
+  });
+
+  const needleAngle = pctToAngle(pct);
+  const needleLen = gaugeR - 10;
+  const needleTip = polarToXY(needleAngle, needleLen);
+  const nPerp = needleAngle + Math.PI / 2;
+  const baseW = 5;
+  const nL = { x: cx + baseW * Math.cos(nPerp), y: cy - baseW * Math.sin(nPerp) };
+  const nR = { x: cx - baseW * Math.cos(nPerp), y: cy + baseW * Math.sin(nPerp) };
+
+  const needle = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  needle.setAttribute('points',`${needleTip.x},${needleTip.y} ${nL.x},${nL.y} ${nR.x},${nR.y}`);
+  needle.setAttribute('fill','url(#needleGrad)');
+  svg.appendChild(needle);
+
+  const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('cx', cx);dot.setAttribute('cy', cy);dot.setAttribute('r','8');
+  dot.setAttribute('fill','#1a1a2e');
+  svg.appendChild(dot);
+  const dot2 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot2.setAttribute('cx', cx);dot2.setAttribute('cy', cy);dot2.setAttribute('r','4');
+  dot2.setAttribute('fill','#3b4a6b');
+  svg.appendChild(dot2);
+}
+
+// ══════════════════════════════════
+//   UPDATE ALL UI FROM FILL VALUE
+// ══════════════════════════════════
+function updateUI(pct) {
+  currentFill = pct;
+  const weight = (maxWeight * pct / 100).toFixed(1);
+  const dailyUsage = 0.58;
+  const daysLeft = Math.round(weight / dailyUsage);
+
+  drawGauge(pct);
+
+  document.getElementById('scoreVal').textContent = Math.round(pct);
+  document.getElementById('statWeight').textContent = weight;
+  document.getElementById('statDays').textContent = daysLeft > 0 ? '~' + daysLeft : '0';
+  document.getElementById('statUsage').textContent = dailyUsage.toFixed(2);
+
+  const emoji = document.getElementById('scoreEmoji');
+  const change = document.getElementById('scoreChange');
+  const feedback = document.getElementById('feedbackText');
+  const cta = document.getElementById('ctaBtn');
+
+  if (pct > 50) {
+    emoji.textContent = '😊'; emoji.className = 'score-emoji good';
+    change.className = 'score-change up'; change.textContent = 'Healthy';
+    feedback.innerHTML = '<strong>Good Level</strong> — Your gas supply is sufficient. No action needed.';
+    cta.className = 'cta-btn ok'; cta.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> All Good — No Refill Needed';
+  } else if (pct > 25) {
+    emoji.textContent = '😐'; emoji.className = 'score-emoji warn';
+    change.className = 'score-change down'; change.textContent = '-3.2%/day';
+    feedback.innerHTML = '<strong>Moderate Level</strong> — Monitor your usage. Consider planning a refill soon.';
+    cta.className = 'cta-btn refill'; cta.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Plan Refill';
+  } else {
+    emoji.textContent = '⚠️'; emoji.className = 'score-emoji bad';
+    change.className = 'score-change down'; change.textContent = '-3.2%/day';
+    feedback.innerHTML = '<strong>Low Gas Alert</strong> — Your cylinder is running low. Consider scheduling a refill soon.';
+    cta.className = 'cta-btn refill'; cta.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Schedule Refill Now';
+  }
+
+  document.getElementById('fillRange').value = pct;
+  document.getElementById('fillRangeVal').textContent = Math.round(pct) + '%';
+}
+
+function updateFill(val) {
+  updateUI(parseInt(val));
+  if (typeof setFillLevel === 'function') setFillLevel(parseInt(val));
+}
+
+function toggleStats() {
+  const w = (maxWeight * currentFill / 100).toFixed(1);
+  const days = Math.round(w / 0.58);
+  const msg = `Weight: ${w} kg / Max: ${maxWeight} kg\nDaily avg: 0.58 kg\nEstimated days remaining: ${days}`;
+  // Use a non-blocking notification fallback for iframe context
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;white-space:pre-line;text-align:center;max-width:80%;box-shadow:0 4px 20px rgba(0,0,0,0.25)';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+updateUI(22);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const PI=Math.PI, PI2=PI*2, sin=Math.sin, cos=Math.cos;
+
+const canvas = document.getElementById('cylinder-canvas');
+const cW = canvas.clientWidth || 400;
+const cH = 280;
+canvas.width = cW * Math.min(devicePixelRatio, 2);
+canvas.height = cH * Math.min(devicePixelRatio, 2);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+
+const camera = new THREE.PerspectiveCamera(30, cW/cH, 0.1, 200);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(cW, cH);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.6;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+keyLight.position.set(5, 10, 7);
+scene.add(keyLight);
+scene.add(new THREE.DirectionalLight(0xddeeff, 0.4)).position.set(-5, 4, -5);
+scene.add(new THREE.DirectionalLight(0xfff5ee, 0.35)).position.set(2, -2, 5);
+
+const cylGroup = new THREE.Group();
+scene.add(cylGroup);
+
+const R=1.15, bodyH=4.2, collarR=0.48, collarH=0.7;
+const footR=1.18, footH=0.5;
+
+const glassMat=new THREE.MeshPhysicalMaterial({color:0xc8d0d8,metalness:0.2,roughness:0.05,transparent:true,opacity:0.22,side:THREE.DoubleSide,clearcoat:1.0,clearcoatRoughness:0.03,envMapIntensity:2.0});
+const contourMat=new THREE.LineBasicMaterial({color:0x999999,transparent:true,opacity:0.55});
+const contourMatStrong=new THREE.LineBasicMaterial({color:0x888888,transparent:true,opacity:0.7});
+const metalFrameMat=new THREE.MeshStandardMaterial({color:0xb0b8c0,roughness:0.25,metalness:0.75,transparent:true,opacity:0.55});
+const metalSolidMat=new THREE.MeshStandardMaterial({color:0x999999,roughness:0.25,metalness:0.8});
+const seamMat=new THREE.MeshStandardMaterial({color:0xb0b8c0,roughness:0.3,metalness:0.6,transparent:true,opacity:0.5});
+
+function addEdges(geo,parent,mat,yOff){const edges=new THREE.EdgesGeometry(geo,30);const line=new THREE.LineSegments(edges,mat||contourMatStrong);if(yOff!==undefined)line.position.y=yOff;parent.add(line);}
+
+const bodyGeo=new THREE.CylinderGeometry(R,R,bodyH,64,1,true);
+cylGroup.add(new THREE.Mesh(bodyGeo,glassMat));
+
+for(let cy2=-bodyH/2;cy2<=bodyH/2;cy2+=0.7){const pts=[];for(let j=0;j<=64;j++){const a=j/64*PI2;pts.push(new THREE.Vector3(cos(a)*R*1.002,cy2,sin(a)*R*1.002));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+for(let vAng=0;vAng<PI2;vAng+=PI/4){const pts=[];for(let vy=-bodyH/2;vy<=bodyH/2;vy+=0.1)pts.push(new THREE.Vector3(cos(vAng)*R*1.002,vy,sin(vAng)*R*1.002));cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+for(let ey of [-bodyH/2,bodyH/2]){const pts=[];for(let j=0;j<=64;j++){const a=j/64*PI2;pts.push(new THREE.Vector3(cos(a)*R*1.003,ey,sin(a)*R*1.003));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMatStrong));}
+
+const dS=32,topPts=[];
+for(let i=0;i<=dS;i++){const t=i/dS,a=t*PI/2,r=R*cos(a);topPts.push(new THREE.Vector2(Math.max(r,collarR),R*sin(a)));}
+const topDome=new THREE.Mesh(new THREE.LatheGeometry(topPts,64),glassMat);
+topDome.position.y=bodyH/2;cylGroup.add(topDome);
+for(let dc=0;dc<5;dc++){const t=dc/5,a=t*PI/2,dr=Math.max(R*cos(a),collarR),dy=R*sin(a),pts=[];for(let j=0;j<=64;j++){const ang=j/64*PI2;pts.push(new THREE.Vector3(cos(ang)*dr*1.003,bodyH/2+dy,sin(ang)*dr*1.003));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+
+const botPts2=[];
+for(let i=0;i<=dS;i++){const t=i/dS,a=t*PI/2,r=R*cos(a);botPts2.push(new THREE.Vector2(Math.max(r,footR*0.7),-R*sin(a)));}
+const botDome=new THREE.Mesh(new THREE.LatheGeometry(botPts2,64),glassMat);
+botDome.position.y=-bodyH/2;cylGroup.add(botDome);
+for(let dc=0;dc<4;dc++){const t=dc/4,a=t*PI/2,dr=Math.max(R*cos(a),footR*0.7),dy=-R*sin(a),pts=[];for(let j=0;j<=64;j++){const ang=j/64*PI2;pts.push(new THREE.Vector3(cos(ang)*dr*1.003,-bodyH/2+dy,sin(ang)*dr*1.003));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMat));}
+
+const collarGeo=new THREE.CylinderGeometry(collarR,collarR,collarH,32);
+const collar=new THREE.Mesh(collarGeo,metalFrameMat);
+collar.position.y=bodyH/2+R*0.82+collarH/2;cylGroup.add(collar);
+addEdges(collarGeo,cylGroup,contourMatStrong,bodyH/2+R*0.82+collarH/2);
+
+const capGeo=new THREE.CylinderGeometry(collarR+0.02,collarR+0.02,0.06,32);
+const cap=new THREE.Mesh(capGeo,metalSolidMat);
+cap.position.y=bodyH/2+R*0.82+collarH+0.03;cylGroup.add(cap);
+
+function mkHandle(ry){const g=new THREE.Group();const armG=new THREE.CylinderGeometry(0.065,0.075,1.1,12);const aL=new THREE.Mesh(armG,metalFrameMat);aL.position.set(-0.32,0.55,0);g.add(aL);const aR=new THREE.Mesh(armG,metalFrameMat);aR.position.set(0.32,0.55,0);g.add(aR);const ae=new THREE.EdgesGeometry(armG,20);const aeL=new THREE.LineSegments(ae,contourMatStrong);aeL.position.set(-0.32,0.55,0);g.add(aeL);const aeR=new THREE.LineSegments(ae,contourMatStrong);aeR.position.set(0.32,0.55,0);g.add(aeR);const brGeo=new THREE.CylinderGeometry(0.06,0.06,0.64,12);const br=new THREE.Mesh(brGeo,metalFrameMat);br.rotation.z=PI/2;br.position.y=1.1;g.add(br);g.rotation.y=ry;g.position.y=bodyH/2+R*0.55;return g;}
+cylGroup.add(mkHandle(0));cylGroup.add(mkHandle(PI/2));
+
+const vG=new THREE.Group();
+const vbGeo=new THREE.CylinderGeometry(0.14,0.17,0.28,12);
+vG.add(new THREE.Mesh(vbGeo,metalSolidMat));
+const knobGeo=new THREE.CylinderGeometry(0.2,0.2,0.1,6);
+const knob=new THREE.Mesh(knobGeo,metalSolidMat);knob.position.y=0.19;vG.add(knob);
+const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.18,8),metalSolidMat);stem.position.y=-0.22;vG.add(stem);
+const nozzle=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.18,8),metalSolidMat);nozzle.rotation.z=PI/2;nozzle.position.set(0.18,0,0);vG.add(nozzle);
+vG.position.y=bodyH/2+R*0.82+collarH+0.1;cylGroup.add(vG);
+
+const mkRing=(y,rr,tr)=>{const m=new THREE.Mesh(new THREE.TorusGeometry(rr,tr,8,64),seamMat);m.rotation.x=PI/2;m.position.y=y;cylGroup.add(m);const pts=[];for(let j=0;j<=64;j++){const a=j/64*PI2;pts.push(new THREE.Vector3(cos(a)*(rr+tr*1.1),y,sin(a)*(rr+tr*1.1)));}cylGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMatStrong));};
+mkRing(0,R+0.01,0.06);mkRing(-bodyH*0.35,R+0.005,0.02);mkRing(bodyH*0.35,R+0.005,0.02);
+
+const fG=new THREE.Group();
+fG.add(new THREE.Mesh(new THREE.CylinderGeometry(footR,footR,footH,64,1,true),metalFrameMat));
+fG.add(new THREE.Mesh(new THREE.CylinderGeometry(footR-0.08,footR-0.08,footH,64,1,true),metalFrameMat));
+const fBot=new THREE.Mesh(new THREE.RingGeometry(footR-0.08,footR,64),metalFrameMat);fBot.rotation.x=-PI/2;fBot.position.y=-footH/2;fG.add(fBot);
+for(let fy of [-footH/2,footH/2])for(let fr of [footR,footR-0.08]){const pts=[];for(let j=0;j<=64;j++){const a=j/64*PI2;pts.push(new THREE.Vector3(cos(a)*fr,fy,sin(a)*fr));}fG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),contourMatStrong));}
+fG.position.y=-bodyH/2-R*0.5-footH/2+0.15;cylGroup.add(fG);
+
+const liquidMat=new THREE.MeshPhysicalMaterial({color:0xe85d2c,emissive:0x993311,emissiveIntensity:0.2,transparent:true,opacity:0.6,roughness:0.06,metalness:0.02,side:THREE.DoubleSide});
+const surfMat=new THREE.MeshPhysicalMaterial({color:0xf4943e,emissive:0xcc5522,emissiveIntensity:0.15,transparent:true,opacity:0.65,roughness:0.02,side:THREE.DoubleSide});
+const innerR=R-0.06;
+const liqGeo=new THREE.CylinderGeometry(innerR,innerR,1,64);
+const liqMesh=new THREE.Mesh(liqGeo,liquidMat);cylGroup.add(liqMesh);
+const surfGeo=new THREE.CircleGeometry(innerR,64);
+const surfMesh=new THREE.Mesh(surfGeo,surfMat);surfMesh.rotation.x=-PI/2;cylGroup.add(surfMesh);
+const innerGlow=new THREE.PointLight(0xff7733,0.5,3);cylGroup.add(innerGlow);
+
+let particleCount=800, fillLevel=0.22, turbulence=0.25;
+const maxP=1500;
+const pos=new Float32Array(maxP*3),vel=new Float32Array(maxP*3);
+const szs=new Float32Array(maxP),life=new Float32Array(maxP);
+const cylBottom=-bodyH/2-R*0.4,cylTop=bodyH/2+R*0.3;
+
+function initP(i){const a=Math.random()*PI2,r2=Math.random()*innerR;pos[i*3]=cos(a)*r2;pos[i*3+1]=cylBottom+Math.random()*(cylTop-cylBottom);pos[i*3+2]=sin(a)*r2;vel[i*3]=(Math.random()-0.5)*0.008;vel[i*3+1]=(Math.random()-0.5)*0.004+0.001;vel[i*3+2]=(Math.random()-0.5)*0.008;szs[i]=0.015+Math.random()*0.04;life[i]=Math.random()*150;}
+for(let i=0;i<maxP;i++) initP(i);
+
+const pGeo=new THREE.BufferGeometry();
+pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+pGeo.setAttribute('size',new THREE.BufferAttribute(szs,1));
+const pVS=`attribute float size;varying float vY;void main(){vY=position.y;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(220.0/-mv.z);gl_Position=projectionMatrix*mv;}`;
+const pFS=`varying float vY;uniform float uFillY;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float a=smoothstep(0.5,0.1,d);float blend=smoothstep(uFillY-0.4,uFillY+0.6,vY);vec3 liqC=vec3(1.0,0.55,0.25);vec3 gasC=vec3(0.8,0.85,0.95);vec3 c=mix(liqC,gasC,blend);a*=mix(0.5,0.2,blend);gl_FragColor=vec4(c,a);}`;
+const pUni={uTime:{value:0},uFillY:{value:0}};
+cylGroup.add(new THREE.Points(pGeo,new THREE.ShaderMaterial({uniforms:pUni,vertexShader:pVS,fragmentShader:pFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+const bCnt=60;
+const bPos=new Float32Array(bCnt*3),bVel=new Float32Array(bCnt*3),bSz=new Float32Array(bCnt);
+function initB(i){const a=Math.random()*PI2,r2=Math.random()*(innerR-0.2);const minY=cylBottom,maxY=minY+(cylTop-cylBottom)*fillLevel;bPos[i*3]=cos(a)*r2;bPos[i*3+1]=minY+Math.random()*(maxY-minY);bPos[i*3+2]=sin(a)*r2;bVel[i*3]=0;bVel[i*3+1]=0.004+Math.random()*0.012;bVel[i*3+2]=0;bSz[i]=0.05+Math.random()*0.1;}
+for(let i=0;i<bCnt;i++) initB(i);
+
+const bGeo=new THREE.BufferGeometry();
+bGeo.setAttribute('position',new THREE.BufferAttribute(bPos,3));
+bGeo.setAttribute('size',new THREE.BufferAttribute(bSz,1));
+const bVS=`attribute float size;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}`;
+const bFS=`void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float ring=smoothstep(0.33,0.44,d)*smoothstep(0.5,0.44,d);float inner=smoothstep(0.5,0.0,d)*0.06;float hl=smoothstep(0.25,0.12,length(gl_PointCoord-vec2(0.33,0.33)));vec3 c=vec3(1.0,0.7,0.4)+hl*0.4;gl_FragColor=vec4(c,ring*0.6+inner);}`;
+cylGroup.add(new THREE.Points(bGeo,new THREE.ShaderMaterial({vertexShader:bVS,fragmentShader:bFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+let shakeF={x:0,y:0,z:0},tiltA={x:0,z:0},tiltT={x:0,z:0};
+
+function updateSim(dt){
+  const minY=cylBottom,liqH=(cylTop-cylBottom)*fillLevel;
+  const maxLiqY=minY+liqH,maxGasY=cylTop;
+  liqMesh.scale.y=Math.max(0.01,liqH);liqMesh.position.y=minY+liqH/2;
+  surfMesh.position.y=minY+liqH;innerGlow.position.y=minY+liqH;
+  pUni.uFillY.value=maxLiqY;pUni.uTime.value+=dt;
+  const gx=Math.sin(tiltA.z)*0.002,gz=-Math.sin(tiltA.x)*0.002;
+  const turb=turbulence*0.01;
+  for(let i=0;i<particleCount;i++){const ix=i*3,iy=ix+1,iz=ix+2;life[i]+=dt;vel[ix]+=(Math.random()-0.5)*turb+gx+shakeF.x*0.04;vel[iy]+=(Math.random()-0.5)*turb*0.4-0.00015+shakeF.y*0.04;vel[iz]+=(Math.random()-0.5)*turb+gz+shakeF.z*0.04;vel[ix]*=0.97;vel[iy]*=0.97;vel[iz]*=0.97;pos[ix]+=vel[ix];pos[iy]+=vel[iy];pos[iz]+=vel[iz];const py=pos[iy];let mR=innerR;if(py>bodyH/2){const t2=Math.min((py-bodyH/2)/(R*0.8),1);mR=innerR*(1-t2)+collarR*t2;}if(py<-bodyH/2){const t2=Math.min((-bodyH/2-py)/(R*0.6),1);mR=innerR*(1-t2*0.3);}const d=Math.sqrt(pos[ix]*pos[ix]+pos[iz]*pos[iz]);if(d>mR){const n=mR/d;pos[ix]*=n;pos[iz]*=n;vel[ix]*=-0.3;vel[iz]*=-0.3;}if(pos[iy]<minY){pos[iy]=minY;vel[iy]=Math.abs(vel[iy])*0.4;}if(pos[iy]>maxGasY){pos[iy]=maxGasY;vel[iy]=-Math.abs(vel[iy])*0.4;}if(life[i]>180+Math.random()*80)initP(i);}
+  pGeo.attributes.position.needsUpdate=true;
+  for(let i=0;i<bCnt;i++){const ix=i*3,iy=ix+1,iz=ix+2;bVel[iy]+=0.0003;bVel[ix]+=(Math.random()-0.5)*0.001+gx*2+shakeF.x*0.07;bVel[iz]+=(Math.random()-0.5)*0.001+gz*2+shakeF.z*0.07;bVel[ix]*=0.96;bVel[iy]*=0.98;bVel[iz]*=0.96;bPos[ix]+=bVel[ix];bPos[iy]+=bVel[iy];bPos[iz]+=bVel[iz];const bd=Math.sqrt(bPos[ix]*bPos[ix]+bPos[iz]*bPos[iz]);if(bd>innerR-0.2){const n=(innerR-0.2)/bd;bPos[ix]*=n;bPos[iz]*=n;}if(bPos[iy]>maxLiqY){initB(i);bPos[iy]=minY;}if(bPos[iy]<minY){bPos[iy]=minY;bVel[iy]=Math.abs(bVel[iy]);}}
+  bGeo.attributes.position.needsUpdate=true;
+  shakeF.x*=0.93;shakeF.y*=0.93;shakeF.z*=0.93;
+  tiltA.x+=(tiltT.x-tiltA.x)*0.025;tiltA.z+=(tiltT.z-tiltA.z)*0.025;
+  tiltT.x*=0.985;tiltT.z*=0.985;
+  cylGroup.rotation.x=tiltA.x;cylGroup.rotation.z=tiltA.z;
+}
+
+let sph={th:PI/4,ph:PI/2.8,r:11};
+let tgt=new THREE.Vector3(0,0.5,0);
+let spinning=true;
+
+function upCam(){const{th,ph,r}=sph;camera.position.set(tgt.x+r*Math.sin(ph)*Math.cos(th),tgt.y+r*Math.cos(ph),tgt.z+r*Math.sin(ph)*Math.sin(th));camera.lookAt(tgt);}
+upCam();
+
+let drag=false,prev={x:0,y:0},tD=0;
+canvas.addEventListener('mousedown',e=>{drag=true;prev={x:e.clientX,y:e.clientY}});
+canvas.addEventListener('mousemove',e=>{if(!drag)return;const dx=e.clientX-prev.x,dy=e.clientY-prev.y;sph.th-=dx*0.005;sph.ph=Math.max(0.1,Math.min(PI-0.1,sph.ph+dy*0.005));shakeF.x+=dx*0.001;shakeF.z+=dy*0.001;upCam();prev={x:e.clientX,y:e.clientY};});
+window.addEventListener('mouseup',()=>drag=false);
+canvas.addEventListener('wheel',e=>{e.preventDefault();sph.r=Math.max(5,Math.min(18,sph.r+e.deltaY*0.008));upCam();},{passive:false});
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){drag=true;prev={x:e.touches[0].clientX,y:e.touches[0].clientY}}else if(e.touches.length===2){drag=false;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;tD=Math.sqrt(dx*dx+dy*dy);}},{passive:true});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches.length===1&&drag){const dx=e.touches[0].clientX-prev.x,dy=e.touches[0].clientY-prev.y;sph.th-=dx*0.005;sph.ph=Math.max(0.1,Math.min(PI-0.1,sph.ph+dy*0.005));shakeF.x+=dx*0.0012;shakeF.z+=dy*0.0012;upCam();prev={x:e.touches[0].clientX,y:e.touches[0].clientY};}else if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;const d=Math.sqrt(dx*dx+dy*dy);sph.r=Math.max(5,Math.min(18,sph.r-(d-tD)*0.02));tD=d;upCam();}},{passive:false});
+canvas.addEventListener('touchend',()=>drag=false);
+
+function setFillLevel(v){fillLevel=v/100;}
+function shakeIt(){shakeF.x=(Math.random()-0.5)*0.18;shakeF.y=(Math.random()-0.5)*0.12;shakeF.z=(Math.random()-0.5)*0.18;for(let i=0;i<particleCount;i++){vel[i*3]+=(Math.random()-0.5)*0.05;vel[i*3+1]+=(Math.random()-0.5)*0.05;vel[i*3+2]+=(Math.random()-0.5)*0.05;}}
+function tiltIt(){tiltT.x=(Math.random()-0.5)*0.6;tiltT.z=(Math.random()-0.5)*0.6;}
+function toggleSpin(){spinning=!spinning;document.getElementById('btnSpin').classList.toggle('active',spinning);}
+function setView(n){const v={front:{th:0,ph:PI/2,r:11},side:{th:PI/2,ph:PI/2,r:11},top:{th:0,ph:0.15,r:10},iso:{th:PI/4,ph:PI/2.8,r:11}}[n];if(!v)return;const dur=500,st=performance.now(),s={...sph};(function step(now){let t=Math.min((now-st)/dur,1);t=t*t*(3-2*t);sph.th=s.th+(v.th-s.th)*t;sph.ph=s.ph+(v.ph-s.ph)*t;sph.r=s.r+(v.r-s.r)*t;upCam();if(t<1)requestAnimationFrame(step);})(performance.now());}
+
+const clock=new THREE.Clock();
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta()*60,3);if(spinning){sph.th+=0.003;upCam();}updateSim(dt);const t=clock.elapsedTime;surfMesh.rotation.z=Math.sin(t*1.5)*0.025+tiltA.z*0.35;surfMesh.rotation.x=-PI/2+Math.cos(t*1.2)*0.02+tiltA.x*0.35;renderer.render(scene,camera);}
+animate();
+
+setFillLevel(22);
+
+function resizeCanvas(){const w=canvas.clientWidth;canvas.width=w*Math.min(devicePixelRatio,2);canvas.height=cH*Math.min(devicePixelRatio,2);camera.aspect=w/cH;camera.updateProjectionMatrix();renderer.setSize(w,cH);}
+window.addEventListener('resize',resizeCanvas);
+</script>
+</body>
+</html>
