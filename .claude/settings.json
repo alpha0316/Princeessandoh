@@ -3,7 +3,15 @@
     "allow": [
       "Bash(npx tsc:*)",
       "Bash(echo \"exit:$?\")",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(git config *)",
+      "Bash(GIT_TRACE_PACKET=0 GIT_CURL_VERBOSE=0 git push origin main --force --progress)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(git ls-tree *)",
+      "Bash(git rm *)",
+      "Bash(xargs -0 git add)",
+      "Bash(grep -ciE \"\\\\.\\(mov|mp4|heic\\)$\")",
+      "Bash(grep -iE \"\\\\.\\(jpg|jpeg|png\\)$\")"
     ],
     "additionalDirectories": [
       "/tmp"

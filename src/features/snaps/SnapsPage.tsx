@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import avatarImg from '../../assets/image 1.png'
 import Navbar from '../../components/Navbar'
 
@@ -223,6 +224,15 @@ const socialLinks = [
 ]
 
 export default function SnapsPage({ onNavigate }: SnapsPageProps) {
+  const [lightbox, setLightbox] = useState<SnapItem | null>(null)
+
+  useEffect(() => {
+    if (!lightbox) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightbox(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lightbox])
+
   return (
     <div className="snaps-page">
       <Navbar activePage="snaps" onNavigate={onNavigate} />
@@ -250,7 +260,15 @@ export default function SnapsPage({ onNavigate }: SnapsPageProps) {
 
         <section className="snaps-grid" aria-label="Recent design gallery">
           {snaps.map((item) => (
-            <article key={item.title} className="snaps-card">
+            <article
+              key={item.title}
+              className="snaps-card"
+              onClick={() => setLightbox(item)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View ${item.title} full size`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLightbox(item) }}
+            >
               <img className="snaps-card__image" src={item.image} alt={item.alt} loading="lazy" />
               <div className="snaps-card__overlay">
                 <p className="snaps-card__title">{item.title}</p>
@@ -259,6 +277,23 @@ export default function SnapsPage({ onNavigate }: SnapsPageProps) {
           ))}
         </section>
       </main>
+
+      {lightbox && (
+        <div className="snaps-lightbox" onClick={() => setLightbox(null)} role="dialog" aria-modal="true" aria-label={lightbox.title}>
+          <button className="snaps-lightbox__close" onClick={() => setLightbox(null)} aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+          <img
+            className="snaps-lightbox__img"
+            src={lightbox.image}
+            alt={lightbox.alt}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <p className="snaps-lightbox__title">{lightbox.title}</p>
+        </div>
+      )}
     </div>
   )
 }
