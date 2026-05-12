@@ -219,7 +219,7 @@ function App() {
     <div className="page home min-h-screen">
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 999,
-        background: '#111', color: '#fff', textAlign: 'center',
+        background: 'blue', color: '#fff', textAlign: 'center',
         fontSize: 16, padding: '4px 0',
       }}>
         Portfolio under development (50% Complete)
@@ -228,7 +228,7 @@ function App() {
         <p className="mobile-notice__title">Best on Desktop</p>
         <p className="mobile-notice__text">
           Hey there! This portfolio is best experienced on a desktop or larger screen.
-          Mobile responsive is coming soon — for now, open it on your laptop or desktop for the full experience.
+          Mobile responsive is coming soon. For now, open it on your laptop or desktop for the full experience.
         </p>
       </div>
       <DynamicIsland />
