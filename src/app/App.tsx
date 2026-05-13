@@ -219,7 +219,7 @@ function App() {
     <div className="page home min-h-screen">
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 999,
-        background: 'blue', color: '#fff', textAlign: 'center',
+        background: 'black', color: '#fff', textAlign: 'center',
         fontSize: 16, padding: '4px 0',
       }}>
         Portfolio under development (50% Complete)
