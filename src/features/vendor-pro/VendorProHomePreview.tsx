@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import CursorIcon from '../../components/icons/CursorIcon'
-import homeVend from '../../assets/Vendor Pro/HomeVend.mp4'
-import orderHistory from '../../assets/Vendor Pro/OrderHistory.svg'
+import homeVend from '../../assets/vendor-pro/HomeVend.mp4'
+import orderHistory from '../../assets/vendor-pro/OrderHistory.svg'
 import vendorProLogoSrc from '../../assets/App Logos/Vendor Pro.svg'
 
 const ORANGE = '#F97316'
