@@ -30,13 +30,12 @@ const socialLinks = [
     ),
   },
   {
-    id: 'mail',
-    href: 'mailto:princeessandoh316@gmail.com',
-    tooltip: 'Send me a mail',
+    id: 'behance',
+    href: 'https://www.behance.net/princeessandoh1',
+    tooltip: 'View my Behance',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988H0V5.021h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zM3 11h3.584c2.508 0 2.906-3-.312-3H3v3zm3.391 3H3v3.016h3.341c3.055 0 2.868-3.016.05-3.016z" />
       </svg>
     ),
   },
@@ -110,7 +109,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               <div key={link.id} style={{ position: 'relative' }}>
                 <a
                   href={link.href}
-                  target={link.id !== 'mail' ? '_blank' : undefined}
+                  target="_blank"
                   rel="noopener noreferrer"
                   onMouseEnter={() => setActiveTooltip(link.id)}
                   onMouseLeave={() => setActiveTooltip(null)}
@@ -187,16 +186,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
         <ul style={{ paddingLeft: 0, marginBottom: 20, listStyle: 'none' }}>
           {[
             {
-              title: 'Product Designer, TastyPad',
-              location: 'India',
-              period: 'April 2025 – Present',
-              bullets: [
-                'Designed a social-driven food platform integrating restaurants, recipes, articles, meal, fitness plans and user activity into a unified experience.',
-                'Integrated gamification elements such as progress bars, achievement badges, and reward-based milestones, driving user interaction and maintaining plan engagement.',
-              ],
-            },
-            {
-              title: 'Product Designer, Uzeka',
+              title: 'UIUX Designer, Uzeka',
               location: 'Angola',
               period: 'August 2024 – Present',
               bullets: [
@@ -205,7 +195,25 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               ],
             },
             {
-              title: 'Product Designer, NEXA LABS — WholeHealth, Citadel',
+              title: 'UIUX Designer, Doryne',
+              location: '',
+              period: 'Jan 2026 – Present',
+              bullets: [
+                'Designing functional interface with my business partner for vendors, riders and consumer. An all in one ecosystem where vendors or restaurant owners upload orders to the app, update their stocks, monitor their finances and assign orders to their riders.',
+                'Creating multiple more revenue options for riders and couriers in the process. We currently have about 5 vendors with over 10 riders on KNUST campus with almost 500 users.',
+              ],
+            },
+            {
+              title: 'UIUX Designer, TastyPad',
+              location: 'India',
+              period: 'April 2025 – May 2026',
+              bullets: [
+                'Designed a social-driven food platform integrating restaurants, recipes, articles, meal, fitness plans and user activity into a unified experience.',
+                'Integrated gamification elements such as progress bars, achievement badges, and reward-based milestones, driving user interaction and maintaining plan engagement.',
+              ],
+            },
+            {
+              title: 'UIUX Designer, NEXA LABS — WholeHealth, Citadel',
               location: '',
               period: 'August 2024 – June 2025',
               bullets: [
@@ -215,12 +223,12 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               ],
             },
             {
-              title: 'Product Designer & Developer, Shuttle App',
+              title: 'UIUX Designer & Developer, Shuttle App',
               location: 'Personal Project',
               period: 'Jan 2024 – Present',
               bullets: [
                 'Led end-to-end product design for the Shuttle App, defining core system architecture, user flows, and real-time tracking experiences across rider and student interfaces.',
-                'Designed scalable interaction patterns and state-driven UI that improved clarity of bus movement, arrival prediction, and overall user trust.',
+                'We have successfully onboarded 6 shuttles to our platform and looking forward to launching soon.',
               ],
             },
             {
@@ -233,7 +241,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               ],
             },
             {
-              title: 'Product Designer, Dine QR',
+              title: 'UIUX Designer, Dine QR',
               location: '',
               period: 'Sept 2023 – Jan 2024',
               bullets: [
@@ -242,12 +250,12 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               ],
             },
             {
-              title: 'Product Designer, Bismuth',
+              title: 'UIUX Designer, Bismuth',
               location: 'USA',
               period: 'June 2023 – Jan 2024',
               bullets: [
-                'As the Product Designer on Cocycle, led the end-to-end user experience, translating a complex sustainability and donation ecosystem into a clear, intuitive interface.',
-                'Focused on simplifying data visualization, improving trust through transparency, and creating an engaging experience that motivates consistent, sustainable giving.',
+                'As the UIUX Designer on Cocycle, I led the end-to-end user experience, translating a complex sustainability and donation ecosystem into a clear, intuitive interface.',
+                'My work focused on simplifying data visualization, improving trust through transparency, and creating an engaging experience that motivates consistent, sustainable giving.',
               ],
             },
           ].map((job) => (
@@ -265,7 +273,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
 
         <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, color: '#555', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Education</div>
         <div style={{ color: '#444', fontSize: 14, marginBottom: 20, lineHeight: 1.65 }}>
-          Final year Computer Science student at Kwame Nkrumah University of Science and Technology.
+          BsC. Computer Science, Kwame Nkrumah University of Science and Technology.
         </div>
 
         <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, color: '#555', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Skills</div>

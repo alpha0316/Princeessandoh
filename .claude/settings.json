@@ -11,7 +11,16 @@
       "Bash(git rm *)",
       "Bash(xargs -0 git add)",
       "Bash(grep -ciE \"\\\\.\\(mov|mp4|heic\\)$\")",
-      "Bash(grep -iE \"\\\\.\\(jpg|jpeg|png\\)$\")"
+      "Bash(grep -iE \"\\\\.\\(jpg|jpeg|png\\)$\")",
+      "Bash(npx tsc *)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5199)",
+      "Bash(npx playwright *)",
+      "Bash(npm install *)",
+      "Bash(node -e ' *)",
+      "Bash(pkill -f \"vite --port 5199\")",
+      "Bash(npm uninstall *)"
     ],
     "additionalDirectories": [
       "/tmp"
