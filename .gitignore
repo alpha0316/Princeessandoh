@@ -35,3 +35,6 @@ dist-ssr
 *.HEIC
 src/assets/Work/*.mov
 src/assets/Work/*.MOV
+
+# ...except assets imported directly by source code, which must ship in the repo
+!src/assets/vendor-pro/HomeVend.mp4
