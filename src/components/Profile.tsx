@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { DeviceMobile, Image, Monitor, PaintBrush } from '@phosphor-icons/react'
-import { PinterestIcon, XIcon } from './SocialIcons'
+import { useEffect, useRef, useState } from 'react'
+import { DeviceMobile, Monitor } from '@phosphor-icons/react'
 import ProjectCard from './ProjectCard'
+import DockNav from './DockNav'
 import { projects } from '../data/projects'
 import '../styles/profile.css'
 
@@ -12,6 +12,29 @@ export default function Profile() {
   const cardCount = tab === 'mobile' ? 6 : 4
   const tabProjects = projects.filter((p) => p.platform === tab)
   const emptyCount = Math.max(0, cardCount - tabProjects.length)
+  const [dockHidden, setDockHidden] = useState(false)
+  const lastScrollY = useRef(0)
+  const dockTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const currentY = window.scrollY
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setDockHidden(true)
+      } else if (currentY < lastScrollY.current) {
+        setDockHidden(false)
+      }
+      lastScrollY.current = currentY
+
+      clearTimeout(dockTimer.current)
+      dockTimer.current = setTimeout(() => setDockHidden(false), 1200)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      clearTimeout(dockTimer.current)
+    }
+  }, [])
 
   return (
     <div className="profile-page">
@@ -23,18 +46,18 @@ export default function Profile() {
         <p className="profile-tagline">
           Product <b>Design</b> <i>And</i> Engineering
         </p>
-
-        <div className="tab-toggle">
-          <button className={tab === 'mobile' ? 'is-active' : ''} onClick={() => setTab('mobile')}>
-            <DeviceMobile size={16} weight={tab === 'mobile' ? 'fill' : 'regular'} />
-            Mobile Apps
-          </button>
-          <button className={tab === 'web' ? 'is-active' : ''} onClick={() => setTab('web')}>
-            <Monitor size={16} weight={tab === 'web' ? 'fill' : 'regular'} />
-            Web Apps
-          </button>
-        </div>
       </header>
+
+      <div className="tab-toggle">
+        <button className={tab === 'mobile' ? 'is-active' : ''} onClick={() => setTab('mobile')}>
+          <DeviceMobile size={16} weight={tab === 'mobile' ? 'fill' : 'regular'} />
+          Mobile Apps
+        </button>
+        <button className={tab === 'web' ? 'is-active' : ''} onClick={() => setTab('web')}>
+          <Monitor size={16} weight={tab === 'web' ? 'fill' : 'regular'} />
+          Web Apps
+        </button>
+      </div>
 
       <main className={`project-grid project-grid--${tab}`}>
         {tabProjects.map((project) => (
@@ -47,24 +70,7 @@ export default function Profile() {
         ))}
       </main>
 
-      <footer className="dock">
-        <button className="dock-item is-active">
-          <PaintBrush size={18} weight="fill" />
-        </button>
-        <button className="dock-item">
-          <XIcon size={15} />
-        </button>
-        <button className="dock-item">
-          <PinterestIcon size={16} />
-        </button>
-        <button className="dock-item dock-item--text">Bē</button>
-        <button className="dock-item">
-          <Image size={17} />
-        </button>
-        <button className="dock-item dock-item--avatar">
-          <img src="/avatar.png" alt="Profile" />
-        </button>
-      </footer>
+      <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} />
     </div>
   )
 }

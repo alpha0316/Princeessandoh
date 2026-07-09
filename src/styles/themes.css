@@ -11,9 +11,9 @@
 
 .theme-dark {
   --bg: #0a0a14;
-  --text: rgba(220,225,240,0.8);
-  --text-muted: rgba(220,225,240,0.3);
-  --border: rgba(220,225,240,0.08);
+  --text: #ffffff;
+  --text-muted: rgba(255,255,255,0.3);
+  --border: rgba(255,255,255,0.08);
   --card-bg: rgba(30,32,50,0.6);
   --card-shadow: rgba(0,0,0,0.2);
   --dock-bg: rgba(30,32,50,0.85);
