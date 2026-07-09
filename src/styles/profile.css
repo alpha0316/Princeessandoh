@@ -1,0 +1,198 @@
+/* ---------- layout shell ---------- */
+.profile-page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px 130px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color: #0b0b0c;
+}
+
+/* ---------- header ---------- */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.profile-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 24px rgba(20, 20, 30, 0.1);
+}
+
+.profile-name {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.profile-name .squiggle {
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: #0b0b0c;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.profile-tagline {
+  font-size: 17px;
+  color: #4a4a4f;
+  font-weight: 500;
+  margin-bottom: 26px;
+}
+
+.profile-tagline b {
+  color: #0b0b0c;
+  font-weight: 700;
+}
+
+.profile-tagline i {
+  color: #a3a3a8;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.tab-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 6px;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(20, 20, 30, 0.06);
+}
+
+.tab-toggle button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #7a7a80;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tab-toggle button:hover {
+  color: #0b0b0c;
+}
+
+.tab-toggle button.is-active {
+  background: #0b0b0c;
+  color: #fff;
+}
+
+/* ---------- project grid ---------- */
+.project-grid {
+  width: 100%;
+  max-width: 1400px;
+  display: grid;
+  gap: 20px;
+  margin-bottom: 44px;
+}
+
+.project-grid--web {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.project-grid--mobile {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(20, 20, 30, 0.04);
+}
+
+.project-grid--web .project-card {
+  aspect-ratio: 16 / 10;
+}
+
+.project-grid--mobile .project-card {
+  aspect-ratio: 9 / 16;
+}
+
+/* ---------- dock ---------- */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px;
+  box-shadow: 0 10px 30px rgba(20, 20, 30, 0.1);
+}
+
+.dock-item {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #0b0b0c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.dock-item:hover {
+  background: #f4f4f6;
+}
+
+.dock-item.is-active {
+  background: #f0f0f2;
+}
+
+.dock-item--text {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.dock-item--avatar {
+  overflow: hidden;
+}
+
+.dock-item--avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .project-grid--web,
+  .project-grid--mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .project-grid--web,
+  .project-grid--mobile {
+    grid-template-columns: 1fr;
+  }
+}
