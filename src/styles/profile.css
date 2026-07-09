@@ -404,27 +404,31 @@
 
 @media (max-width: 768px) {
   .project-grid {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-    padding: 0 12px;
+    margin-left: 0px;
+    margin-right: 0px;
+    width: auto;
+    padding: 0;
   }
 
   .project-grid--mobile {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    scroll-snap-type: y mandatory;
-    overflow-y: auto;
-    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    overflow: visible;
+    height: auto;
+    scroll-snap-type: none;
   }
 
   .project-grid--mobile .project-card {
     width: 100%;
-    min-height: 100vh;
-    aspect-ratio: auto;
-    border-radius: 0;
-    scroll-snap-align: start;
+    aspect-ratio: 470 / 640;
+    border-radius: 28px;
+    scroll-snap-align: none;
     flex-shrink: 0;
+    min-height: auto;
+  }
+
+  .dock-nav {
+    bottom: 4vh;
   }
 }
