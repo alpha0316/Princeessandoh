@@ -1,0 +1,26 @@
+.theme-light {
+  --bg: #f4f3f8;
+  --text: #000000;
+  --text-muted: rgba(0,0,0,0.3);
+  --border: rgba(0,0,0,0.08);
+  --card-bg: #fff;
+  --card-shadow: rgba(20, 20, 30, 0.04);
+  --dock-bg: #fff;
+  --tab-bg: #fff;
+}
+
+.theme-dark {
+  --bg: #0a0a14;
+  --text: rgba(220,225,240,0.8);
+  --text-muted: rgba(220,225,240,0.3);
+  --border: rgba(220,225,240,0.08);
+  --card-bg: rgba(30,32,50,0.6);
+  --card-shadow: rgba(0,0,0,0.2);
+  --dock-bg: rgba(30,32,50,0.85);
+  --tab-bg: rgba(30,32,50,0.6);
+}
+
+html, body {
+  background: var(--bg);
+  transition: background 0.4s ease;
+}

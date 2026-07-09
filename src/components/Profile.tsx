@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { DeviceMobile, Image, Monitor, PaintBrush } from '@phosphor-icons/react'
 import { PinterestIcon, XIcon } from './SocialIcons'
+import ProjectCard from './ProjectCard'
+import { projects } from '../data/projects'
 import '../styles/profile.css'
 
 type Tab = 'mobile' | 'web'
@@ -8,6 +10,8 @@ type Tab = 'mobile' | 'web'
 export default function Profile() {
   const [tab, setTab] = useState<Tab>('mobile')
   const cardCount = tab === 'mobile' ? 6 : 4
+  const tabProjects = projects.filter((p) => p.platform === tab)
+  const emptyCount = Math.max(0, cardCount - tabProjects.length)
 
   return (
     <div className="profile-page">
@@ -33,8 +37,13 @@ export default function Profile() {
       </header>
 
       <main className={`project-grid project-grid--${tab}`}>
-        {Array.from({ length: cardCount }).map((_, i) => (
-          <div key={i} className="project-card project-card--empty" />
+        {tabProjects.map((project) => (
+          <div key={project.id} className="project-card">
+            <ProjectCard project={project} />
+          </div>
+        ))}
+        {Array.from({ length: emptyCount }).map((_, i) => (
+          <div key={`empty-${i}`} className="project-card project-card--empty" />
         ))}
       </main>
 
