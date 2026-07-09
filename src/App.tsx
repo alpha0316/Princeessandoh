@@ -24,13 +24,6 @@ export default function App() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         zIndex: 20, pointerEvents: 'all',
       }}>
-        <div style={{
-          fontFamily: FONT, fontSize: 10, fontWeight: 700,
-          letterSpacing: '0.32em', color: 'rgba(24,26,72,0.42)',
-          textTransform: 'uppercase',
-        }}>
-          Alpha · Prince Essandoh
-        </div>
         <div style={{ display: 'flex', gap: 26, alignItems: 'center' }}>
           {isDev && WEATHERS.map(w => (
             <button key={w} onClick={() => setManualWeather(w)} style={{
@@ -42,30 +35,11 @@ export default function App() {
             }}>{w}</button>
           ))}
           {isDev && <span style={{ width: 1, height: 14, background: 'rgba(24,26,72,0.1)' }} />}
-          {['Work', 'About', 'Contact'].map(item => (
-            <a key={item} style={{
-              fontFamily: FONT, fontSize: 10, letterSpacing: '0.18em',
-              color: 'rgba(24,26,72,0.3)', textDecoration: 'none',
-              textTransform: 'uppercase', cursor: 'pointer',
-              transition: 'color 0.2s',
-            }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(24,26,72,0.72)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(24,26,72,0.3)')}
-            >{item}</a>
-          ))}
+     
         </div>
       </nav>
       <Profile />
-      <footer style={{
-        position: 'fixed', bottom: 32, left: 56, zIndex: 20,
-      }}>
-        <p style={{
-          fontFamily: FONT, fontSize: 9, letterSpacing: '0.16em',
-          color: 'rgba(24,26,72,0.22)',
-        }}>
-          ©2026 ALPHA · ESSANDOH PRINCE TAKYI
-        </p>
-      </footer>
+  
     </>
   )
 }

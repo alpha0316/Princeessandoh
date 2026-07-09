@@ -108,8 +108,8 @@ void main() {
   // as a single curl, never a multi-wrap ring/coil. This only warps
   // *where* the existing marble samples from, so the swirl is made of
   // the same palette colors — motion, not a painted-on color patch ──
-  float curlFalloff = exp(-length(diff) * 2.1) * uMouseStr;
-  float curlAngle = curlFalloff * 1.2;
+  float curlFalloff = exp(-length(diff) * 1.5) * uMouseStr;
+  float curlAngle = curlFalloff * 2.4;
   float sa = sin(curlAngle), ca = cos(curlAngle);
   vec2 curled = mat2(ca, -sa, sa, ca) * diff;
 
