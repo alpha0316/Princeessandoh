@@ -48,8 +48,8 @@ export function initMouseTracking() {
   }
 
   const onOrientation = (e: DeviceOrientationEvent) => {
-    const g = e.gamma ?? 0  // -90 to 90, left-right tilt
-    const b = e.beta ?? 0   // -180 to 180, front-back tilt
+    const g = e.gamma ?? 0
+    const b = e.beta ?? 0
     const dx = ((g - tiltX) / 90) * 8
     const dy = ((b - tiltY) / 90) * 8
     tiltX = g
@@ -63,14 +63,42 @@ export function initMouseTracking() {
     mouse.strength = Math.min(1, mouse.strength + 0.5)
   }
 
+  // ── Shake detection ─────────────────────────────────────────────
+  let lastShake = 0
+  let shakeCount = 0
+  const SHAKE_THRESHOLD = 18
+  const SHAKE_COOLDOWN = 1200
+
+  const onMotion = (e: DeviceMotionEvent) => {
+    const a = e.accelerationIncludingGravity
+    if (!a || a.x === null || a.y === null || a.z === null) return
+    const total = Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z)
+    const now = Date.now()
+
+    if (total > SHAKE_THRESHOLD && now - lastShake > 200) {
+      lastShake = now
+      shakeCount++
+      if (shakeCount >= 2) {
+        shakeCount = 0
+        mouse.vx += (Math.random() - 0.5) * 3
+        mouse.vy += (Math.random() - 0.5) * 3
+        mouse.strength = 1
+      }
+    } else if (now - lastShake > SHAKE_COOLDOWN) {
+      shakeCount = 0
+    }
+  }
+
   window.addEventListener('mousemove', onMove)
   window.addEventListener('mouseleave', onLeave)
   window.addEventListener('deviceorientation', onOrientation)
+  window.addEventListener('devicemotion', onMotion)
 
   return () => {
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseleave', onLeave)
     window.removeEventListener('deviceorientation', onOrientation)
+    window.removeEventListener('devicemotion', onMotion)
   }
 }
 

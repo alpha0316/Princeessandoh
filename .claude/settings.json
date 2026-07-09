@@ -61,7 +61,8 @@
       "Bash(grep -iE \"^\\(Globe|GlobeSimple|AppleLogo|GooglePlayLogo|ArrowUpRight\\)\\\\.d\\\\.ts$\")",
       "Bash(node shot13.mjs)",
       "Bash(node shot14.mjs)",
-      "Bash(node shot15.mjs)"
+      "Bash(node shot15.mjs)",
+      "Bash(node shot16.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"
