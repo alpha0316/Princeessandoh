@@ -50,24 +50,24 @@ export function initMouseTracking() {
   const onOrientation = (e: DeviceOrientationEvent) => {
     const g = e.gamma ?? 0
     const b = e.beta ?? 0
-    const dx = ((g - tiltX) / 90) * 8
-    const dy = ((b - tiltY) / 90) * 8
+    const dx = ((g - tiltX) / 90) * 3
+    const dy = ((b - tiltY) / 90) * 3
     tiltX = g
     tiltY = b
     mouse.vx += dx
     mouse.vy += dy
-    mouse.vx = Math.max(-1.5, Math.min(1.5, mouse.vx))
-    mouse.vy = Math.max(-1.5, Math.min(1.5, mouse.vy))
+    mouse.vx = Math.max(-0.8, Math.min(0.8, mouse.vx))
+    mouse.vy = Math.max(-0.8, Math.min(0.8, mouse.vy))
     mouse.nx = 0.5 + g / 180
     mouse.ny = 0.5 + b / 360
-    mouse.strength = Math.min(1, mouse.strength + 0.5)
+    mouse.strength = Math.min(1, mouse.strength + 0.3)
   }
 
   // ── Shake detection ─────────────────────────────────────────────
   let lastShake = 0
   let shakeCount = 0
-  const SHAKE_THRESHOLD = 18
-  const SHAKE_COOLDOWN = 1200
+  const SHAKE_THRESHOLD = 24
+  const SHAKE_COOLDOWN = 1500
 
   const onMotion = (e: DeviceMotionEvent) => {
     const a = e.accelerationIncludingGravity
@@ -75,14 +75,14 @@ export function initMouseTracking() {
     const total = Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z)
     const now = Date.now()
 
-    if (total > SHAKE_THRESHOLD && now - lastShake > 200) {
+    if (total > SHAKE_THRESHOLD && now - lastShake > 250) {
       lastShake = now
       shakeCount++
       if (shakeCount >= 2) {
         shakeCount = 0
-        mouse.vx += (Math.random() - 0.5) * 3
-        mouse.vy += (Math.random() - 0.5) * 3
-        mouse.strength = 1
+        mouse.vx += (Math.random() - 0.5) * 1.5
+        mouse.vy += (Math.random() - 0.5) * 1.5
+        mouse.strength = 0.8
       }
     } else if (now - lastShake > SHAKE_COOLDOWN) {
       shakeCount = 0

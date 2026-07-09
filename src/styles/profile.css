@@ -101,6 +101,8 @@
   display: grid;
   gap: 20px;
   margin-bottom: 44px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .project-grid--web {
@@ -390,8 +392,8 @@
 
 @media (max-width: 768px) {
   .project-grid {
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: 12px;
+    margin-right: 12px;
     width: auto;
   }
 }

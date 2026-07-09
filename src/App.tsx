@@ -7,7 +7,6 @@ import WeatherOverlay, { type Weather } from './components/WeatherOverlay'
 import Profile from './components/Profile'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { useWeather } from './hooks/useWeather'
-import { requestOrientationPermission } from './stores/mouse'
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
@@ -19,29 +18,18 @@ function AppContent() {
   const weather = isDev ? manualWeather : detectedWeather
   const { theme, toggle } = useTheme()
   const isNight = theme === 'dark'
-  const [orientationGranted, setOrientationGranted] = useState(false)
-  const needsPermission = typeof DeviceOrientationEvent !== 'undefined' &&
-    'requestPermission' in DeviceOrientationEvent &&
-    /iPhone|iPad|iPod/i.test(navigator.userAgent)
 
-  const handleEnableMotion = async () => {
-    const result = await requestOrientationPermission()
-    if (result === 'granted') setOrientationGranted(true)
-  }
+  useEffect(() => {
+    if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
+      ;(DeviceOrientationEvent as any).requestPermission().then(() => {})
+    }
+    if (typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent) {
+      ;(DeviceMotionEvent as any).requestPermission().then(() => {})
+    }
+  }, [])
 
   return (
     <div className={`theme-${theme}`}>
-      {needsPermission && !orientationGranted && (
-        <button onClick={handleEnableMotion} style={{
-          position: 'fixed', bottom: 100, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 100, padding: '10px 20px', borderRadius: 999,
-          background: '#0b0b0c', color: '#fff', border: 'none',
-          fontFamily: "'Syne', sans-serif", fontSize: 11,
-          letterSpacing: '0.1em', cursor: 'pointer',
-        }}>
-          Enable Motion
-        </button>
-      )}
       <FluidBackground />
       {isNight && <div style={{
         position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
