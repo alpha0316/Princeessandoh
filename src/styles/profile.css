@@ -139,6 +139,12 @@
   display: flex;
   justify-content: center;
   gap: 5px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.app-card:hover .app-card-indicators {
+  opacity: 1;
 }
 
 .app-card-dot {
