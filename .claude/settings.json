@@ -66,7 +66,12 @@
       "Bash(node shot17.mjs)",
       "Bash(node shot18.mjs)",
       "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/shot*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/layout-*.png)",
-      "Bash(node shot19.mjs)"
+      "Bash(node shot19.mjs)",
+      "Bash(node shot20.mjs)",
+      "Bash(node shot21.mjs)",
+      "Bash(node shot22.mjs)",
+      "Bash(node shot23.mjs)",
+      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/shot*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)"
     ],
     "additionalDirectories": [
       "/tmp"
