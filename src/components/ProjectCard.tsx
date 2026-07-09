@@ -1,19 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ProjectLinkIcon from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
 const AUTO_ADVANCE_MS = 1400
 const DOT_LIMIT = 7
-const SWIPE_THRESHOLD = 40
 
 export default function ProjectCard({ project }: { project: Project }) {
   const [index, setIndex] = useState(0)
   const [hovered, setHovered] = useState(false)
   const intervalRef = useRef<number | undefined>(undefined)
-  const touchStartX = useRef(0)
-  const touchDelta = useRef(0)
-  const [offset, setOffset] = useState(0)
-  const [swiping, setSwiping] = useState(false)
 
   useEffect(() => {
     if (!hovered || project.images.length <= 1) return
@@ -22,39 +17,6 @@ export default function ProjectCard({ project }: { project: Project }) {
     }, AUTO_ADVANCE_MS)
     return () => window.clearInterval(intervalRef.current)
   }, [hovered, project.images.length])
-
-  const goTo = useCallback((i: number) => {
-    setIndex(i)
-    setOffset(0)
-    setSwiping(false)
-  }, [])
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
-    touchDelta.current = 0
-    setSwiping(true)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchDelta.current = e.touches[0].clientX - touchStartX.current
-    setOffset(touchDelta.current)
-  }
-
-  const handleTouchEnd = () => {
-    if (Math.abs(touchDelta.current) > SWIPE_THRESHOLD) {
-      if (touchDelta.current > 0 && index > 0) {
-        goTo(index - 1)
-      } else if (touchDelta.current < 0 && index < project.images.length - 1) {
-        goTo(index + 1)
-      } else {
-        setOffset(0)
-        setSwiping(false)
-      }
-    } else {
-      setOffset(0)
-      setSwiping(false)
-    }
-  }
 
   const handleLeave = () => {
     setHovered(false)
@@ -74,7 +36,7 @@ export default function ProjectCard({ project }: { project: Project }) {
               className={`app-card-dot ${i === index ? 'is-active' : ''}`}
               onClick={(e) => {
                 e.stopPropagation()
-                goTo(i)
+                setIndex(i)
               }}
               role="tab"
               aria-selected={i === index}
@@ -92,23 +54,9 @@ export default function ProjectCard({ project }: { project: Project }) {
         </div>
       )}
 
-      <div
-        className="app-card-screen"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
+      <div className="app-card-screen">
         {project.images.length > 0 ? (
-          <div className="app-card-track" style={{
-            transform: `translateX(${-index * 100 + (swiping ? offset / (project.images[index].includes('v2-svg') ? 2 : 1) : 0)}px)`,
-            transition: swiping ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}>
-            {project.images.map((src, i) => (
-              <div key={i} className="app-card-slide">
-                <img src={src} alt={`${project.name} screenshot ${i + 1}`} />
-              </div>
-            ))}
-          </div>
+          <img src={project.images[index]} alt={`${project.name} screenshot ${index + 1}`} />
         ) : (
           <div className="app-card-placeholder">{project.name.charAt(0)}</div>
         )}

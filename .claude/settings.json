@@ -71,9 +71,7 @@
       "Bash(node shot21.mjs)",
       "Bash(node shot22.mjs)",
       "Bash(node shot23.mjs)",
-      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/shot*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)",
-      "Bash(node shot24.mjs)",
-      "Bash(node shot25.mjs)"
+      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/shot*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)"
     ],
     "additionalDirectories": [
       "/tmp"
