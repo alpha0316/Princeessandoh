@@ -190,17 +190,31 @@
 .app-card-screen {
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-card-track {
+  display: flex;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+.app-card-slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px;
+  padding: 24px 20px;
 }
 
-.app-card-screen img {
+.app-card-slide img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  display: block;
+  image-rendering: auto;
 }
 
 .app-card-placeholder {
@@ -229,16 +243,19 @@
   align-items: flex-end;
   padding: 0 18px 20px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
   opacity: 0;
   transition: opacity 0.24s ease;
   pointer-events: none;
 }
 
+/* backdrop-filter lives only on the visible state — some browsers still
+   render backdrop-filter's blur even when the element's opacity is 0,
+   which was blurring the screenshot underneath in the default state. */
 .app-card-overlay.is-visible {
   opacity: 1;
   pointer-events: auto;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .app-card-footer {
@@ -330,7 +347,7 @@
   width: 360px;
   height: 52px;
   padding: 2px;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 2.55);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -400,11 +417,11 @@
 
 .dock-nav-item.is-active {
   opacity: 1;
-  padding: 4px 16px;
+  padding: 4px 4px;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -471,20 +488,6 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 20px;
-    overflow: visible;
-    height: auto;
-    scroll-snap-type: none;
-  }
-
-  .project-grid--mobile .project-card {
-    width: 360px;
-    height: 636px;
-    aspect-ratio: auto;
-    border-radius: 28px;
-    scroll-snap-align: none;
-    flex-shrink: 0;
-    min-height: auto;
-    justify-self: center;
   }
 
   .dock-nav {

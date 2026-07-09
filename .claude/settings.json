@@ -71,7 +71,17 @@
       "Bash(node shot21.mjs)",
       "Bash(node shot22.mjs)",
       "Bash(node shot23.mjs)",
-      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/shot*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)"
+      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/shot*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)",
+      "Bash(node shot26.mjs)",
+      "Bash(node shot27.mjs)",
+      "Bash(node shot28.mjs)",
+      "Bash(node shot29.mjs)",
+      "Bash(node inspect.mjs)",
+      "Bash(sips -g pixelWidth -g pixelHeight /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/layout-mobile-390.png)",
+      "Bash(sips -c 900 390 layout-mobile-390.png --out mobile-top.png)",
+      "Bash(sips -c 900 390 -p 900 0 layout-mobile-390.png --out mobile-second.png)",
+      "Bash(node shot30.mjs)",
+      "Bash(node shot31.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"

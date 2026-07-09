@@ -1,22 +1,80 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import ProjectLinkIcon from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
-const AUTO_ADVANCE_MS = 1400
+const AUTO_ADVANCE_MS = 6000
 const DOT_LIMIT = 7
+const SWIPE_COMMIT_RATIO = 0.22
+
+let uid = 0
 
 export default function ProjectCard({ project }: { project: Project }) {
   const [index, setIndex] = useState(0)
   const [hovered, setHovered] = useState(false)
   const intervalRef = useRef<number | undefined>(undefined)
+  const initDelayRef = useRef((uid++ * 1.3 + Math.random() * 2) % 30 * 1000)
+
+  const screenRef = useRef<HTMLDivElement>(null)
+  const [frameWidth, setFrameWidth] = useState(0)
+  const touchStartX = useRef(0)
+  const [dragPx, setDragPx] = useState(0)
+  const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
-    if (!hovered || project.images.length <= 1) return
-    intervalRef.current = window.setInterval(() => {
-      setIndex((i) => (i + 1) % project.images.length)
-    }, AUTO_ADVANCE_MS)
-    return () => window.clearInterval(intervalRef.current)
-  }, [hovered, project.images.length])
+    const measure = () => setFrameWidth(screenRef.current?.clientWidth ?? 0)
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      intervalRef.current = window.setInterval(() => {
+        setIndex((i) => (i + 1) % project.images.length)
+      }, AUTO_ADVANCE_MS)
+    }, initDelayRef.current)
+    return () => {
+      clearTimeout(timer)
+      clearInterval(intervalRef.current)
+    }
+  }, [project.images.length])
+
+  const goTo = useCallback(
+    (i: number) => setIndex(Math.max(0, Math.min(project.images.length - 1, i))),
+    [project.images.length],
+  )
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    setDragging(true)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const raw = e.touches[0].clientX - touchStartX.current
+    // Rubber-band resistance past the first/last slide, so it never feels
+    // like it's stuck — just gets progressively harder to pull.
+    const atStart = index === 0 && raw > 0
+    const atEnd = index === project.images.length - 1 && raw < 0
+    setDragPx(atStart || atEnd ? raw / 3 : raw)
+  }
+
+  const handleTouchEnd = () => {
+    if (Math.abs(dragPx) > frameWidth * SWIPE_COMMIT_RATIO) {
+      goTo(index + (dragPx < 0 ? 1 : -1))
+    }
+    setDragPx(0)
+    setDragging(false)
+  }
+
+  const handleEnter = () => {
+    // Touch devices can fire a synthetic mouseenter on tap with no matching
+    // mouseleave (mobile Safari/Chrome's "sticky hover"), which would leave
+    // the overlay — and its backdrop blur — stuck on. Only real hover-capable
+    // pointers (mouse/trackpad) should trigger the preview.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      setHovered(true)
+    }
+  }
 
   const handleLeave = () => {
     setHovered(false)
@@ -25,9 +83,10 @@ export default function ProjectCard({ project }: { project: Project }) {
 
   const showDots = project.images.length > 1 && project.images.length <= DOT_LIMIT
   const showSwipeTrack = project.images.length > DOT_LIMIT
+  const trackOffset = -index * frameWidth + dragPx
 
   return (
-    <div className="app-card" onMouseEnter={() => setHovered(true)} onMouseLeave={handleLeave}>
+    <div className="app-card" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
       {showDots && (
         <div className="app-card-indicators" role="tablist" aria-label="Preview position">
           {project.images.map((_, i) => (
@@ -36,7 +95,7 @@ export default function ProjectCard({ project }: { project: Project }) {
               className={`app-card-dot ${i === index ? 'is-active' : ''}`}
               onClick={(e) => {
                 e.stopPropagation()
-                setIndex(i)
+                goTo(i)
               }}
               role="tab"
               aria-selected={i === index}
@@ -54,9 +113,27 @@ export default function ProjectCard({ project }: { project: Project }) {
         </div>
       )}
 
-      <div className="app-card-screen">
+      <div
+        className="app-card-screen"
+        ref={screenRef}
+        onTouchStart={project.images.length > 1 ? handleTouchStart : undefined}
+        onTouchMove={project.images.length > 1 ? handleTouchMove : undefined}
+        onTouchEnd={project.images.length > 1 ? handleTouchEnd : undefined}
+      >
         {project.images.length > 0 ? (
-          <img src={project.images[index]} alt={`${project.name} screenshot ${index + 1}`} />
+          <div
+            className="app-card-track"
+            style={{
+              transform: `translateX(${trackOffset}px)`,
+              transition: dragging ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+            }}
+          >
+            {project.images.map((src, i) => (
+              <div key={i} className="app-card-slide">
+                <img src={src} alt={`${project.name} screenshot ${i + 1}`} />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="app-card-placeholder">{project.name.charAt(0)}</div>
         )}
