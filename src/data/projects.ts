@@ -2,11 +2,11 @@ import type { Project } from '../types/project'
 
 // Screenshots live in public/v2 - SVG/<App>/<Screen>.svg — encodeURI handles
 // the spaces in those folder/file names.
-const asset = (path: string) => encodeURI(`/v2 - SVG/${path}`)
+const asset = (path: string) => `/v2-svg/${path}`
 
 // Logos and links are still TODO — add `logo` (path to an icon) and entries
-// in `links` ({ type: 'web' | 'x' | 'appstore' | 'playstore', url }) per app
-// once they're ready.
+// in `links` ({ type: 'web' | 'x' | 'appstore' | 'playstore' | 'custom', url,
+// label, icon? }) per app once they're ready. `custom` needs its own `icon`.
 export const projects: Project[] = [
   {
     id: 'somu',
@@ -18,9 +18,9 @@ export const projects: Project[] = [
       asset('Somu/Pro Plan.svg'),
     ],
     links: [
-      { type: 'web', url: '#' },
-      { type: 'x', url: '#' },
-      { type: 'appstore', url: '#' },
+      { type: 'web', url: '#', label: 'Website' },
+      { type: 'x', url: '#', label: 'X' },
+      { type: 'appstore', url: '#', label: 'App Store' },
     ],
     platform: 'mobile',
   },

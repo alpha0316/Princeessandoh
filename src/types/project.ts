@@ -1,8 +1,12 @@
-export type ProjectLinkType = 'web' | 'x' | 'appstore' | 'playstore'
+export type ProjectLinkType = 'web' | 'x' | 'appstore' | 'playstore' | 'custom'
 
 export type ProjectLink = {
   type: ProjectLinkType
   url: string
+  label: string
+  /** Required when type is 'custom' — path to the link's own icon (e.g. a
+   * group/community icon that isn't one of the built-in platform icons). */
+  icon?: string
 }
 
 export type Project = {

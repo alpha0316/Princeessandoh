@@ -29,15 +29,17 @@ export default function ProjectCard({ project }: { project: Project }) {
   return (
     <div className="app-card" onMouseEnter={() => setHovered(true)} onMouseLeave={handleLeave}>
       {showDots && (
-        <div className="app-card-indicators">
+        <div className="app-card-indicators" role="tablist" aria-label="Preview position">
           {project.images.map((_, i) => (
             <button
               key={i}
-              className={`app-card-dot ${i <= index ? 'is-filled' : ''}`}
+              className={`app-card-dot ${i === index ? 'is-active' : ''}`}
               onClick={(e) => {
                 e.stopPropagation()
                 setIndex(i)
               }}
+              role="tab"
+              aria-selected={i === index}
               aria-label={`Show screenshot ${i + 1}`}
             />
           ))}
@@ -60,29 +62,32 @@ export default function ProjectCard({ project }: { project: Project }) {
         )}
       </div>
 
-      <div className={`app-card-overlay ${hovered ? 'is-visible' : ''}`}>
-        <div className="app-card-overlay-head">
-          {project.logo && <img className="app-card-logo" src={project.logo} alt="" />}
-          <div className="app-card-overlay-text">
-            <span className="app-card-name">{project.name}</span>
-            <span className="app-card-desc">{project.description}</span>
+      <div className={`app-card-overlay ${hovered ? 'is-visible' : ''}`} aria-hidden={!hovered}>
+        <footer className="app-card-footer">
+          <div className="app-card-overlay-head">
+            {project.logo && <img className="app-card-logo" src={project.logo} alt="" />}
+            <div className="app-card-overlay-text">
+              <h3 className="app-card-name">{project.name}</h3>
+              <p className="app-card-desc">{project.description}</p>
+            </div>
           </div>
-        </div>
-        {project.links.length > 0 && (
-          <div className="app-card-links">
-            {project.links.map((link) => (
-              <a
-                key={link.type}
-                href={link.url}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ProjectLinkIcon type={link.type} />
-              </a>
-            ))}
-          </div>
-        )}
+          {project.links.length > 0 && (
+            <nav className="app-card-links" aria-label="App links">
+              {project.links.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={link.label}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ProjectLinkIcon link={link} />
+                </a>
+              ))}
+            </nav>
+          )}
+        </footer>
       </div>
     </div>
   )
