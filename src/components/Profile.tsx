@@ -17,7 +17,7 @@ export default function Profile() {
           Essandoh <span className="squiggle">Prince</span> Takyi
         </h1>
         <p className="profile-tagline">
-          Product, <b>Design</b> <i>And</i> Engineering
+          Product <b>Design</b> <i>And</i> Engineering
         </p>
 
         <div className="tab-toggle">

@@ -98,19 +98,19 @@ void main() {
   float along = dot(diff, dirVel);
   vec2  perp  = diff - along * dirVel;
 
-  // ── Gentle domain nudge — a light touch, not a lens. Kept small so
-  // it can't compress the noise field into ring/coil artifacts ──────
-  float nudgeFalloff = exp(-(length(perp) * 1.8 + max(along, 0.0) * 1.8 + max(-along, 0.0) * 0.7));
-  vec2 translate = vel * nudgeFalloff * uMouseStr * 0.9;
+  // ── Fluid indent — an elongated dent pushed along the cursor's path,
+  // like a toad's kick displacing pond water: short ahead, long behind.
+  // This is the dominant shape, not a rotation, so it reads as fluid
+  // being scooped/dragged rather than spun ──────────────────────────
+  float dentFalloff = exp(-(length(perp) * 2.0 + max(along, 0.0) * 2.4 + max(-along, 0.0) * 0.55));
+  vec2 translate = vel * dentFalloff * uMouseStr * 1.3;
 
-  // ── Stir curl — one soft hook trailing the cursor, like a finger
-  // dragged through liquid. Bounded angle + tight radius so it reads
-  // as a single curl, never a multi-wrap ring/coil. This only warps
-  // *where* the existing marble samples from, so the swirl is made of
-  // the same palette colors — motion, not a painted-on color patch ──
-  float curlFalloff = exp(-length(diff) * 1.5) * uMouseStr;
-  float curlAngle = curlFalloff * 2.4;
-  float sa = sin(curlAngle), ca = cos(curlAngle);
+  // ── Tip curl — a small, tight vortex only right at the cursor point,
+  // like water curling off the leading edge of the displacement. Kept
+  // to a tiny radius so it can never spread into a ring/coil ────────
+  float tipFalloff = exp(-length(diff) * 3.4) * uMouseStr;
+  float tipAngle = tipFalloff * 2.6;
+  float sa = sin(tipAngle), ca = cos(tipAngle);
   vec2 curled = mat2(ca, -sa, sa, ca) * diff;
 
   p = mUv + curled + translate;
@@ -120,11 +120,10 @@ void main() {
 
   vec3 col = pal(f);
 
-  // ── Faint warm breath inside the curl — barely-there, so the swirl
-  // still reads as "the marble itself moving" rather than a new color ──
-  vec3 warm = vec3(0.97, 0.86, 0.78);
-  float warmth = curlFalloff * smoothstep(0.3, 0.9, curlFalloff);
-  col = mix(col, warm, clamp(warmth * 0.22, 0.0, 0.18));
+  // ── Warm trough — fills the indent with the same low-opacity glow
+  // seen in the reference, so it reads as displaced fluid, not paint ──
+  vec3 warm = vec3(0.98, 0.80, 0.64);
+  col = mix(col, warm, clamp(dentFalloff * uMouseStr * 0.5, 0.0, 0.4));
 
   float vig = length(uv - 0.5) * 0.55;
   col = mix(col, vec3(0.969, 0.965, 0.984), vig * vig * 0.5);

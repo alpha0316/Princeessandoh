@@ -39,11 +39,7 @@
 }
 
 .profile-name .squiggle {
-  text-decoration: underline;
-  text-decoration-style: wavy;
-  text-decoration-color: #0b0b0c;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 6px;
+  color: inherit;
 }
 
 .profile-tagline {
@@ -126,7 +122,8 @@
 }
 
 .project-grid--mobile .project-card {
-  aspect-ratio: 9 / 16;
+  width: 470px;
+  height: 640px;
 }
 
 /* ---------- dock ---------- */

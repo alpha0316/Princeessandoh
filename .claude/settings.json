@@ -56,7 +56,8 @@
       "Bash(node shot8.mjs)",
       "Bash(node shot9.mjs)",
       "Bash(node shot10.mjs)",
-      "Bash(node shot11.mjs)"
+      "Bash(node shot11.mjs)",
+      "Bash(node shot12.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"
