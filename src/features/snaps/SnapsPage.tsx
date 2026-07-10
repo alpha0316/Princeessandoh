@@ -2,22 +2,6 @@ import { useState } from 'react'
 import avatarImg from '/avatar.png'
 import DockNav from '../../components/DockNav'
 
-type SnapItem = {
-  title: string
-  image: string
-  alt: string
-}
-
-const imageModules = import.meta.glob('../../assets/Work/*.*', { eager: true, query: '?url', import: 'default' })
-
-const images: Record<string, string> = {}
-for (const [key, val] of Object.entries(imageModules)) {
-  if (typeof val === 'string' && /\.(jpg|jpeg|png)$/i.test(key)) {
-    const name = key.split('/').pop() || ''
-    images[name] = val
-  }
-}
-
 const TITLES: Record<string, string> = {
   'IMG_1120.PNG': 'Event Poster Exploration',
   'IMG_0759.jpg': 'Fashion Storyboard',
@@ -56,13 +40,13 @@ const TITLES: Record<string, string> = {
   'Screenshot 2025-12-12 at 12.39.21 PM.PNG': 'Process',
 }
 
-const snaps: SnapItem[] = Object.entries(images).map(([name, src]) => {
-  return {
-    title: TITLES[name] || name.replace(/\.[^.]+$/, ''),
-    image: src as string,
-    alt: TITLES[name] || 'Design work',
-  }
-})
+const FILE_NAMES = Object.keys(TITLES)
+
+const snaps = FILE_NAMES.map((name) => ({
+  title: TITLES[name],
+  image: `/snaps/${encodeURI(name)}`,
+  alt: TITLES[name],
+}))
 
 type SnapsPageProps = {
   onNavigate: (page: string) => void
