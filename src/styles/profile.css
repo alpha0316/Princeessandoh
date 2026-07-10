@@ -486,8 +486,16 @@
 
   .project-grid--mobile {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 20px;
+    justify-items: center;
+  }
+
+  .project-grid--mobile .project-card {
+    width: 360px;
+    max-width: 100%;
+    min-width: 0;
+    aspect-ratio: 360 / 630;
   }
 
   .dock-nav {

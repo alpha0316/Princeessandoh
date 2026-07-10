@@ -81,7 +81,9 @@
       "Bash(sips -c 900 390 layout-mobile-390.png --out mobile-top.png)",
       "Bash(sips -c 900 390 -p 900 0 layout-mobile-390.png --out mobile-second.png)",
       "Bash(node shot30.mjs)",
-      "Bash(node shot31.mjs)"
+      "Bash(node shot31.mjs)",
+      "Bash(node shot32.mjs)",
+      "Bash(node shot33.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"
