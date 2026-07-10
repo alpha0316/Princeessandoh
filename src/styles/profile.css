@@ -527,6 +527,16 @@
     aspect-ratio: 1 / 1;
   }
 
+  .project-grid--web .app-card-slide {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .project-grid--web .app-card-slide img {
+    object-fit: cover;
+    object-position: top left;
+  }
+
   .dock-nav {
     bottom: 1.5vh;
   }

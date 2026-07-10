@@ -66,7 +66,10 @@ export default function ProjectCard({
   }, [project.images.length])
 
   const goTo = useCallback(
-    (i: number) => setIndex(Math.max(0, Math.min(project.images.length - 1, i))),
+    (i: number) => {
+      const len = project.images.length
+      setIndex(((i % len) + len) % len)
+    },
     [project.images.length],
   )
 
@@ -77,9 +80,7 @@ export default function ProjectCard({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     const raw = e.touches[0].clientX - touchStartX.current
-    const atStart = index === 0 && raw > 0
-    const atEnd = index === project.images.length - 1 && raw < 0
-    setDragPx(atStart || atEnd ? raw / 3 : raw)
+    setDragPx(raw)
   }
 
   const handleTouchEnd = () => {

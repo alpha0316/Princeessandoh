@@ -117,7 +117,14 @@
       "Bash(grep -n \"project-overlay-close,\\\\|project-overlay-sidebar-toggle\\\\|project-overlay-close {\\\\|project-overlay-sidebar {\\\\|project-overlay-panel\\\\|project-overlay-stage {\" src/styles/profile.css)",
       "Bash(grep -n \"font-family\" src/styles/*.css src/index.css)",
       "Bash(grep -rn \"h1\\\\s*{\\\\|h2\\\\s*{\\\\|h1,\\\\|h2,\" src/styles/*.css)",
-      "Bash(xargs -I{} echo {})"
+      "Bash(xargs -I{} echo {})",
+      "Bash(git fetch *)",
+      "Bash(grep -rln \"serviceWorker\\\\|service-worker\\\\|sw.js\\\\|workbox\\\\|vite-plugin-pwa\" src public *.config.* package.json)",
+      "Bash(cat index.html)",
+      "Bash(cat vite.config.ts)",
+      "Bash(curl -s -H \"Cache-Control: no-cache\" -H \"Pragma: no-cache\" \"https://princeessandoh.netlify.app/?cachebust=$\\(date +%s\\)\")",
+      "Bash(curl -sI \"https://princeessandoh.netlify.app/\")",
+      "Bash(curl -s \"https://princeessandoh.netlify.app/assets/index-CyX--8DE.js\" -o /tmp/prod_bundle.js)"
     ],
     "additionalDirectories": [
       "/tmp"
