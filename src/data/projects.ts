@@ -20,8 +20,8 @@ export const projects: Project[] = [
     ],
     links: [
       { type: 'web', url: '#', label: 'Website' },
-      { type: 'x', url: '#', label: 'X' },
-      { type: 'appstore', url: '#', label: 'App Store' },
+      // { type: 'x', url: '#', label: 'X' },
+      // { type: 'appstore', url: '#', label: 'App Store' },
     ],
     platform: 'mobile',
   },
