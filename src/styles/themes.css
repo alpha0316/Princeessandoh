@@ -1,7 +1,7 @@
 .theme-light {
   --bg: #f4f3f8;
   --text: #000000;
-  --text-muted: rgba(0,0,0,0.4);
+  --text-muted: rgba(0,0,0,0.6);
   --border: rgba(0,0,0,0.08);
   --card-bg: #fff;
   --card-shadow: rgba(20, 20, 30, 0.04);

@@ -35,7 +35,7 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
 
   return (
     <nav aria-label="Creative platform navigation" className={`dock-nav ${className}`}>
-      {navItems.map((item, index) => {
+      {navItems.filter(item => !(item.label === 'Profile' && !import.meta.env.DEV)).map((item, index) => {
         const isActive = item.label === activeLabel
 
         if (item.type === 'image') {
@@ -47,6 +47,8 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
           )
         }
 
+        const itemIcon = item.icon
+
         return (
           <button
             key={`${item.label}-${index}`}
@@ -56,7 +58,9 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
             className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
             onClick={() => handleClick(item)}
           >
-            {item.icon}
+            {item.label === 'Paint Brush' ? <PaintBrushDuotone className="dock-nav-icon" filled={isActive} /> :
+             item.label === 'Images' ? <ImagesDuotone className="dock-nav-icon" filled={isActive} /> :
+             itemIcon}
           </button>
         )
       })}
