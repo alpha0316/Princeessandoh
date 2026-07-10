@@ -7,7 +7,7 @@ import '../styles/profile.css'
 
 type Tab = 'mobile' | 'web'
 
-export default function Profile() {
+export default function Profile({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const [tab, setTab] = useState<Tab>('mobile')
   const cardCount = tab === 'mobile' ? 6 : 4
   const tabProjects = projects.filter((p) => p.platform === tab)
@@ -70,7 +70,7 @@ export default function Profile() {
         ))}
       </main>
 
-      <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} />
+      <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} activeLabel="Paint Brush" onNavigate={onNavigate} />
     </div>
   )
 }

@@ -7,16 +7,16 @@ import { MingcutePinterestFill } from './nav-icons/MingcutePinterestFill'
 import { PaintBrushDuotone } from './nav-icons/PaintBrushDuotone'
 
 type NavItem =
-  | { type: 'active-icon'; label: string; icon: ReactNode }
-  | { type: 'image'; label: string; src: string }
-  | { type: 'icon'; label: string; icon: ReactNode }
+  | { type: 'active-icon'; label: string; icon: ReactNode; page: string }
+  | { type: 'image'; label: string; src: string; href?: string; page?: string }
+  | { type: 'icon'; label: string; icon: ReactNode; href?: string; page?: string }
 
-const navItems: NavItem[] = [
-  { type: 'active-icon', label: 'Paint Brush', icon: <PaintBrushDuotone className="dock-nav-icon" /> },
-  { type: 'image', label: 'X', src: frame1000003409 },
-  { type: 'icon', label: 'Pinterest', icon: <MingcutePinterestFill className="dock-nav-icon" /> },
-  { type: 'image', label: 'Behance', src: frame1000003410 },
-  { type: 'icon', label: 'Images', icon: <ImagesDuotone className="dock-nav-icon" /> },
+const navItems: (NavItem & { href?: string })[] = [
+  { type: 'active-icon', label: 'Paint Brush', icon: <PaintBrushDuotone className="dock-nav-icon" />, page: 'home' },
+  { type: 'image', label: 'X', src: frame1000003409, href: 'https://x.com/pr_alphaa/status/2057928528956449230?s=20' },
+  { type: 'icon', label: 'Pinterest', icon: <MingcutePinterestFill className="dock-nav-icon" />, href: 'https://pin.it/40FtwCncU' },
+  { type: 'image', label: 'Behance', src: frame1000003410, href: 'https://www.behance.net/princeessandoh1' },
+  { type: 'icon', label: 'Images', icon: <ImagesDuotone className="dock-nav-icon" />, page: 'snaps' },
   {
     type: 'icon',
     label: 'Profile',
@@ -24,13 +24,24 @@ const navItems: NavItem[] = [
   },
 ]
 
-export default function DockNav({ className = '' }: { className?: string }) {
+export default function DockNav({ className = '', activeLabel = 'Paint Brush', onNavigate }: { className?: string; activeLabel?: string; onNavigate?: (page: string) => void }) {
+  const handleClick = (item: NavItem & { href?: string }) => {
+    if (item.page && onNavigate) {
+      onNavigate(item.page)
+    } else if (item.href) {
+      window.open(item.href, '_blank', 'noopener,noreferrer')
+    }
+  }
+
   return (
     <nav aria-label="Creative platform navigation" className={`dock-nav ${className}`}>
       {navItems.map((item, index) => {
+        const isActive = item.label === activeLabel
+
         if (item.type === 'image') {
           return (
-            <button key={`${item.label}-${index}`} type="button" aria-label={item.label} className="dock-nav-item">
+            <button key={`${item.label}-${index}`} type="button" aria-label={item.label} className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
+              onClick={() => handleClick(item)}>
               <img className="dock-nav-icon" alt="" src={item.src} />
             </button>
           )
@@ -41,8 +52,9 @@ export default function DockNav({ className = '' }: { className?: string }) {
             key={`${item.label}-${index}`}
             type="button"
             aria-label={item.label}
-            aria-current={item.type === 'active-icon' ? 'page' : undefined}
-            className={`dock-nav-item ${item.type === 'active-icon' ? 'is-active' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
+            className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
+            onClick={() => handleClick(item)}
           >
             {item.icon}
           </button>

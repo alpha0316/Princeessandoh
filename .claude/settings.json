@@ -83,7 +83,22 @@
       "Bash(node shot30.mjs)",
       "Bash(node shot31.mjs)",
       "Bash(node shot32.mjs)",
-      "Bash(node shot33.mjs)"
+      "Bash(node shot33.mjs)",
+      "Bash(mv \"Somu/Home.svg\" \"Somu/Home.png\")",
+      "Bash(mv \"Somu/Pro Plan.svg\" \"Somu/Pro Plan.png\")",
+      "Bash(mv \"GiftPal/Onboarding.svg\" \"GiftPal/Onboarding.png\")",
+      "Bash(node verify.mjs)",
+      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/verify.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)",
+      "Bash(rm -rf node_modules/.tmp)",
+      "Bash(node webtab.mjs)",
+      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/webtab.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)",
+      "Bash(node webfill.mjs)",
+      "Bash(node uwata.mjs)",
+      "Bash(rm -rf /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/node_modules /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.mjs /private/tmp/claude-501/-Users-essandoh-Documents-Playground-shuttle-portfolio/62019469-46b4-48f3-9e1c-9c97d23cabe0/scratchpad/*.png)",
+      "Bash(node parallax.mjs)",
+      "Bash(node loading.mjs)",
+      "Bash(node loading2.mjs)",
+      "Bash(node loading3.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"

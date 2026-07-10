@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import ProjectLinkIcon from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
-const AUTO_ADVANCE_MS = 6000
+const AUTO_ADVANCE_MS = 45000
 const DOT_LIMIT = 7
 const SWIPE_COMMIT_RATIO = 0.22
 
@@ -11,8 +11,12 @@ let uid = 0
 export default function ProjectCard({ project }: { project: Project }) {
   const [index, setIndex] = useState(0)
   const [hovered, setHovered] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [parallaxY, setParallaxY] = useState(0)
   const intervalRef = useRef<number | undefined>(undefined)
   const initDelayRef = useRef((uid++ * 1.3 + Math.random() * 2) % 30 * 1000)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const cardIndex = useRef(uid++)
 
   const screenRef = useRef<HTMLDivElement>(null)
   const [frameWidth, setFrameWidth] = useState(0)
@@ -28,6 +32,40 @@ export default function ProjectCard({ project }: { project: Project }) {
   }, [])
 
   useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true)
+      },
+      { threshold: 0.1 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect()
+      const center = rect.top + rect.height / 2
+      const viewportCenter = window.innerHeight / 2
+      const offset = (center - viewportCenter) * 0.06
+      setParallaxY(offset)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    if (!canHover) return
+
     const timer = setTimeout(() => {
       intervalRef.current = window.setInterval(() => {
         setIndex((i) => (i + 1) % project.images.length)
@@ -51,8 +89,6 @@ export default function ProjectCard({ project }: { project: Project }) {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     const raw = e.touches[0].clientX - touchStartX.current
-    // Rubber-band resistance past the first/last slide, so it never feels
-    // like it's stuck — just gets progressively harder to pull.
     const atStart = index === 0 && raw > 0
     const atEnd = index === project.images.length - 1 && raw < 0
     setDragPx(atStart || atEnd ? raw / 3 : raw)
@@ -67,10 +103,6 @@ export default function ProjectCard({ project }: { project: Project }) {
   }
 
   const handleEnter = () => {
-    // Touch devices can fire a synthetic mouseenter on tap with no matching
-    // mouseleave (mobile Safari/Chrome's "sticky hover"), which would leave
-    // the overlay — and its backdrop blur — stuck on. Only real hover-capable
-    // pointers (mouse/trackpad) should trigger the preview.
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       setHovered(true)
     }
@@ -85,8 +117,23 @@ export default function ProjectCard({ project }: { project: Project }) {
   const showSwipeTrack = project.images.length > DOT_LIMIT
   const trackOffset = -index * frameWidth + dragPx
 
+  // Entrance offset (slides up from 28px on first reveal) and the ongoing
+  // scroll parallax offset are combined into one transform so they never
+  // fight each other — a gentle overshoot easing gives the reveal its
+  // "bounce" while keeping the continuous scroll-follow smooth.
+  const revealOffset = visible ? 0 : 28
+
   return (
-    <div className="app-card" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+    <div
+      ref={cardRef}
+      className={`app-card ${visible ? 'app-card--visible' : ''}`}
+      style={{
+        transform: `translateY(${parallaxY + revealOffset}px)`,
+        transition: 'transform 0.5s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.6s ease',
+      }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
       {showDots && (
         <div className="app-card-indicators" role="tablist" aria-label="Preview position">
           {project.images.map((_, i) => (
@@ -125,12 +172,16 @@ export default function ProjectCard({ project }: { project: Project }) {
             className="app-card-track"
             style={{
               transform: `translateX(${trackOffset}px)`,
-              transition: dragging ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+              transition: dragging ? 'none' : 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
             }}
           >
             {project.images.map((src, i) => (
               <div key={i} className="app-card-slide">
-                <img src={src} alt={`${project.name} screenshot ${i + 1}`} />
+                <img
+                  src={src}
+                  alt={`${project.name} screenshot ${i + 1}`}
+                  style={project.imagePosition ? { objectPosition: project.imagePosition } : undefined}
+                />
               </div>
             ))}
           </div>

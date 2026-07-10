@@ -1,18 +1,24 @@
-import { useState, useEffect } from 'react'
+import { Suspense, lazy, useState, useEffect } from 'react'
 import './styles/app.css'
 import './styles/themes.css'
 import FluidBackground from './components/FluidBackground'
 import Starfield from './components/Starfield'
 import WeatherOverlay, { type Weather } from './components/WeatherOverlay'
 import Profile from './components/Profile'
+import LoadingScreen from './components/LoadingScreen'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { useWeather } from './hooks/useWeather'
+
+const SnapsPage = lazy(() => import('./features/snaps/SnapsPage'))
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
 
+type Page = 'home' | 'snaps'
+
 function AppContent() {
   const isDev = import.meta.env.DEV
+  const [page, setPage] = useState<Page>('home')
   const [manualWeather, setManualWeather] = useState<Weather>('sunny')
   const { weather: detectedWeather } = useWeather()
   const weather = isDev ? manualWeather : detectedWeather
@@ -27,6 +33,17 @@ function AppContent() {
       ;(DeviceMotionEvent as any).requestPermission().then(() => {})
     }
   }, [])
+
+  if (page === 'snaps') {
+    return (
+      <div className={`theme-${theme}`}>
+        <FluidBackground />
+        <Suspense fallback={null}>
+          <SnapsPage onNavigate={(p: string) => setPage(p as Page)} />
+        </Suspense>
+      </div>
+    )
+  }
 
   return (
     <div className={`theme-${theme}`}>
@@ -63,7 +80,8 @@ function AppContent() {
           </button>}
         </div>
       </nav>
-      <Profile />
+      <Profile onNavigate={(page: string) => setPage(page as Page)} />
+      <LoadingScreen />
     </div>
   )
 }

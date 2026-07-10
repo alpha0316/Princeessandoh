@@ -13,9 +13,9 @@ export const projects: Project[] = [
     name: 'Somu',
     description: 'Digital Groups Saving App',
     images: [
-      asset('Somu/Home.svg'),
+      asset('Somu/Home.png'),
       asset('Somu/Group Page.svg'),
-      asset('Somu/Pro Plan.svg'),
+      asset('Somu/Pro Plan.png'),
     ],
     links: [
       { type: 'web', url: '#', label: 'Website' },
@@ -29,7 +29,7 @@ export const projects: Project[] = [
     name: 'GiftPal',
     description: 'A beautiful unboxing moment — every gift arrives as a delightful surprise.',
     images: [
-      asset('GiftPal/Onboarding.svg'),
+      asset('GiftPal/Onboarding.png'),
       asset('GiftPal/Swipe.svg'),
       asset('GiftPal/Add Note.svg'),
     ],
@@ -43,6 +43,7 @@ export const projects: Project[] = [
     images: [
       asset('Uzeka/Onboarding.svg'),
       asset('Uzeka/Vendor.svg'),
+      asset('Uzeka/Web App.svg'),
     ],
     links: [],
     platform: 'mobile',
@@ -82,5 +83,58 @@ export const projects: Project[] = [
     ],
     links: [],
     platform: 'mobile',
+  },
+  {
+    id: 'somu-web',
+    name: 'Somu',
+    description: 'Digital Groups Saving App',
+    images: [
+      asset('Somu/Web/Home.svg'),
+      asset('Somu/Web/Dashboard.svg'),
+      asset('Somu/Web/Explore.svg'),
+    ],
+    links: [
+      { type: 'web', url: '#', label: 'Website' },
+      { type: 'x', url: '#', label: 'X' },
+      { type: 'appstore', url: '#', label: 'App Store' },
+    ],
+    platform: 'web',
+  },
+  {
+    id: 'doryne',
+    name: 'Doryne',
+    description: 'On-demand errand delivery built for students.',
+    images: [
+      asset('Doryne/Landing Page.svg'),
+      asset('Doryne/Map.svg'),
+      asset('Doryne/Orders.svg'),
+    ],
+    links: [],
+    platform: 'web',
+  },
+  {
+    id: 'nnib',
+    name: 'NNIB',
+    description: 'Operational dashboard for policies, claims, and underwriting.',
+    images: [
+      asset('NNIB/IMG_1579.jpg'),
+      asset('NNIB/IMG_1597.jpg'),
+      asset('NNIB/IMG_1598.jpg'),
+    ],
+    links: [],
+    platform: 'web',
+  },
+  {
+    id: 'uwata',
+    name: 'Uwata',
+    description: 'AI-assisted invoicing — start from scratch, a screenshot, or a voice note.',
+    images: [
+      asset('Uwata/Auth.svg'),
+      asset('Uwata/Start From Scratch.svg'),
+      asset('Uwata/Type Invoice.svg'),
+    ],
+    links: [],
+    platform: 'web',
+    imagePosition: 'top left',
   },
 ]

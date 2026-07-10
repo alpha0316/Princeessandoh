@@ -128,6 +128,15 @@
   height: 100%;
   overflow: hidden;
   cursor: pointer;
+  opacity: 0;
+  /* transform is driven entirely from JS (see ProjectCard.tsx) — it
+     combines the scroll parallax offset with the entrance reveal offset
+     into a single value, so nothing here should set transform itself or
+     the two would fight over specificity. */
+}
+
+.app-card--visible {
+  opacity: 1;
 }
 
 .app-card-indicators {
@@ -215,6 +224,19 @@
   height: 100%;
   object-fit: contain;
   image-rendering: auto;
+}
+
+/* Web screenshots bleed edge-to-edge and fill the frame, cropping toward
+   the top (the header/hero content) rather than letterboxing like the
+   phone frames do — phone mockups stay fully visible via .app-card-slide
+   img's default object-fit:contain above. */
+.project-grid--web .app-card-slide {
+  padding: 0;
+}
+
+.project-grid--web .app-card-slide img {
+  object-fit: cover;
+  object-position: top;
 }
 
 .app-card-placeholder {

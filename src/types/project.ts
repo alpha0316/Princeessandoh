@@ -20,4 +20,8 @@ export type Project = {
   images: string[]
   links: ProjectLink[]
   platform: 'mobile' | 'web'
+  /** CSS object-position for web screenshots (which crop with object-fit:
+   * cover) — e.g. 'top left' to preserve a sidebar instead of the default
+   * top-center crop. Ignored for mobile phone frames (object-fit: contain). */
+  imagePosition?: string
 }
