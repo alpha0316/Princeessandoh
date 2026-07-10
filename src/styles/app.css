@@ -1,2 +1,18 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;min-height:100%;overflow-x:clip;background:#f4f3f8}
+
+/* Frosted-glass support for the full-screen surfaces (loading screen,
+   project detail overlay). They can't use backdrop-filter: Chromium's
+   backdrop snapshot on macOS excludes accelerated WebGL canvas layers, so
+   the marble background sampled as blank white (Safari was fine). Instead
+   the glass surfaces toggle .glass-active on <body> and we blur the real
+   content directly — a plain filter works on canvases in every engine.
+   The blur lives on each element itself (not a shared ancestor) so their
+   own fixed-position anchoring is unaffected. */
+body.glass-active .fluid-bg {
+  filter: blur(18px) saturate(140%);
+}
+
+body.glass-active .profile-page {
+  filter: blur(18px);
+}

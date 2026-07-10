@@ -551,9 +551,10 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  /* No backdrop-filter here — the page content underneath is blurred
+     directly via body.glass-active (see app.css) because Chromium's
+     backdrop-filter can't sample the WebGL marble canvas. */
   background-color: rgba(250, 250, 250, 0.8);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
   animation: project-overlay-in 0.2s ease;
   /* This portals to document.body, outside .profile-page — the only place
      the site's font stack is declared — so without this it falls back to

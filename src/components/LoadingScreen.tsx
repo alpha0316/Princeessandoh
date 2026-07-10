@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { projects } from '../data/projects'
+import { acquireGlass, releaseGlass } from '../lib/glass'
 import '../styles/loading.css'
 
 const SIGNATURE = '@pr_alphaa'
@@ -27,6 +28,15 @@ export default function LoadingScreen() {
   useEffect(() => {
     hasPlayed = true
   }, [])
+
+  // Blur the page content behind the splash via body.glass-active (see
+  // app.css) — lifted as soon as the exit fade starts so the content
+  // sharpens while the veil dissolves.
+  useEffect(() => {
+    if (done || exiting) return
+    acquireGlass()
+    return releaseGlass
+  }, [done, exiting])
 
   // Preload every image the page will need (avatar, rocket, all project
   // screenshots) and tie the typewriter's completion to real load progress

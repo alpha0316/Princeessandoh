@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { CaretRight, SidebarSimple, X } from '@phosphor-icons/react'
 import { useTheme } from '../context/ThemeContext'
+import { acquireGlass, releaseGlass } from '../lib/glass'
 import type { Project } from '../types/project'
 
 const WHEEL_STEP_COOLDOWN_MS = 700
@@ -44,8 +45,10 @@ export default function ProjectOverlay({
   useEffect(() => {
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    acquireGlass()
     return () => {
       document.body.style.overflow = prevOverflow
+      releaseGlass()
     }
   }, [])
 

@@ -206,6 +206,7 @@ export default function FluidBackground() {
   return (
     <canvas
       ref={canvasRef}
+      className="fluid-bg"
       style={{
         position: 'fixed',
         top: 0,

@@ -5,9 +5,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* No backdrop-filter here — the page content underneath is blurred
+     directly via body.glass-active (see app.css) because Chromium's
+     backdrop-filter can't sample the WebGL marble canvas. */
   background: rgba(246, 245, 250, 0.72);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
   transition: opacity 0.5s ease;
 }
 
