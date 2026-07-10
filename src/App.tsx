@@ -58,9 +58,13 @@ function AppContent() {
         position: 'fixed', top: 0, left: 0, right: 0,
         padding: '32px 56px',
         display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
-        zIndex: 20, pointerEvents: 'all', gap: 18,
+        // pointer-events: none on the full-width band, restored on the
+        // button group — otherwise this invisible strip sits above
+        // .profile-page (z 20 vs 1) and swallows clicks meant for the
+        // sticky tab toggle parked under it while scrolled.
+        zIndex: 20, pointerEvents: 'none', gap: 18,
       }}>
-        <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 18, alignItems: 'center', pointerEvents: 'all' }}>
           {isDev && WEATHERS.filter(w => !(isNight && w === 'sunny')).map(w => (
             <button key={w} onClick={() => setManualWeather(w)} style={{
               fontFamily: FONT, fontSize: 9, letterSpacing: '0.16em',
