@@ -99,7 +99,25 @@
       "Bash(node loading.mjs)",
       "Bash(node loading2.mjs)",
       "Bash(node loading3.mjs)",
-      "Bash(node mobile-rocket.mjs)"
+      "Bash(node mobile-rocket.mjs)",
+      "Bash(git mv *)",
+      "Bash(sips -g pixelWidth -g pixelHeight \"public/v2-svg/Uzeka/Vendor.png\")",
+      "Bash(sips -s format png \"public/v2-svg/Uzeka/Vendor.png\" --out /tmp/vendor_test.png)",
+      "Bash(lsof -i :5173 -sTCP:LISTEN)",
+      "Bash(curl -s -o /dev/null -w \"OLD .svg -> %{http_code}\\\\n\" \"http://localhost:5173/v2-svg/Uzeka/Vendor.svg\")",
+      "Bash(curl -s -o /dev/null -w \"NEW .png -> %{http_code}\\\\n\" \"http://localhost:5173/v2-svg/Uzeka/Vendor.png\")",
+      "Bash(curl -s \"http://localhost:5173/v2-svg/Uzeka/Vendor.png\" -o /tmp/dl_vendor.png -w \"%{http_code} %{size_download}\\\\n\")",
+      "Bash(curl -s \"http://localhost:5173/v2-svg/Uzeka/Vendor.svg\")",
+      "Bash(npx eslint *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npm init *)",
+      "Bash(node verify_overlay.mjs)",
+      "Bash(grep -n \"project-overlay-close,\\\\|project-overlay-sidebar-toggle\\\\|project-overlay-close {\\\\|project-overlay-sidebar {\\\\|project-overlay-panel\\\\|project-overlay-stage {\" src/styles/profile.css)",
+      "Bash(grep -n \"font-family\" src/styles/*.css src/index.css)",
+      "Bash(grep -rn \"h1\\\\s*{\\\\|h2\\\\s*{\\\\|h1,\\\\|h2,\" src/styles/*.css)",
+      "Bash(xargs -I{} echo {})"
     ],
     "additionalDirectories": [
       "/tmp"

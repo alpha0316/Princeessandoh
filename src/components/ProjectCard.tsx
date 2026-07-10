@@ -8,15 +8,20 @@ const SWIPE_COMMIT_RATIO = 0.22
 
 let uid = 0
 
-export default function ProjectCard({ project }: { project: Project }) {
+export default function ProjectCard({
+  project,
+  onOpen,
+}: {
+  project: Project
+  /** Desktop-only: opens the full detail overlay at the currently shown screenshot. */
+  onOpen?: (initialIndex: number) => void
+}) {
   const [index, setIndex] = useState(0)
   const [hovered, setHovered] = useState(false)
   const [visible, setVisible] = useState(false)
-  const [parallaxY, setParallaxY] = useState(0)
   const intervalRef = useRef<number | undefined>(undefined)
   const initDelayRef = useRef((uid++ * 1.3 + Math.random() * 2) % 30 * 1000)
   const cardRef = useRef<HTMLDivElement>(null)
-  const cardIndex = useRef(uid++)
 
   const screenRef = useRef<HTMLDivElement>(null)
   const [frameWidth, setFrameWidth] = useState(0)
@@ -43,23 +48,6 @@ export default function ProjectCard({ project }: { project: Project }) {
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const el = cardRef.current
-    if (!el) return
-
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect()
-      const center = rect.top + rect.height / 2
-      const viewportCenter = window.innerHeight / 2
-      const offset = (center - viewportCenter) * 0.06
-      setParallaxY(offset)
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
@@ -113,14 +101,18 @@ export default function ProjectCard({ project }: { project: Project }) {
     setIndex(0)
   }
 
+  const handleClick = () => {
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      onOpen?.(index)
+    }
+  }
+
   const showDots = project.images.length > 1 && project.images.length <= DOT_LIMIT
   const showSwipeTrack = project.images.length > DOT_LIMIT
   const trackOffset = -index * frameWidth + dragPx
 
-  // Entrance offset (slides up from 28px on first reveal) and the ongoing
-  // scroll parallax offset are combined into one transform so they never
-  // fight each other — a gentle overshoot easing gives the reveal its
-  // "bounce" while keeping the continuous scroll-follow smooth.
+  // Entrance offset slides the card up from 28px on first reveal, with a
+  // gentle overshoot easing for the "bounce".
   const revealOffset = visible ? 0 : 28
 
   return (
@@ -128,11 +120,12 @@ export default function ProjectCard({ project }: { project: Project }) {
       ref={cardRef}
       className={`app-card ${visible ? 'app-card--visible' : ''}`}
       style={{
-        transform: `translateY(${parallaxY + revealOffset}px)`,
+        transform: `translateY(${revealOffset}px)`,
         transition: 'transform 0.5s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.6s ease',
       }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
+      onClick={handleClick}
     >
       {showDots && (
         <div className="app-card-indicators" role="tablist" aria-label="Preview position">

@@ -24,4 +24,6 @@ export type Project = {
    * cover) — e.g. 'top left' to preserve a sidebar instead of the default
    * top-center crop. Ignored for mobile phone frames (object-fit: contain). */
   imagePosition?: string
+  /** Bullet points shown in the desktop detail overlay's sidebar panel. */
+  features?: string[]
 }

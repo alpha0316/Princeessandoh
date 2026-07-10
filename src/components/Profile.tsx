@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { DeviceMobile, Monitor } from '@phosphor-icons/react'
 import ProjectCard from './ProjectCard'
+import ProjectOverlay from './ProjectOverlay'
 import DockNav from './DockNav'
 import { projects } from '../data/projects'
+import type { Project } from '../types/project'
 import '../styles/profile.css'
 
 type Tab = 'mobile' | 'web'
@@ -13,6 +15,7 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
   const tabProjects = projects.filter((p) => p.platform === tab)
   const emptyCount = Math.max(0, cardCount - tabProjects.length)
   const [dockHidden, setDockHidden] = useState(false)
+  const [openProject, setOpenProject] = useState<{ project: Project; index: number } | null>(null)
   const lastScrollY = useRef(0)
   const dockTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
@@ -62,7 +65,10 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
       <main className={`project-grid project-grid--${tab}`}>
         {tabProjects.map((project) => (
           <div key={project.id} className="project-card">
-            <ProjectCard project={project} />
+            <ProjectCard
+              project={project}
+              onOpen={(index) => setOpenProject({ project, index })}
+            />
           </div>
         ))}
         {Array.from({ length: emptyCount }).map((_, i) => (
@@ -71,6 +77,14 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
       </main>
 
       <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} activeLabel="Paint Brush" onNavigate={onNavigate} />
+
+      {openProject && (
+        <ProjectOverlay
+          project={openProject.project}
+          initialIndex={openProject.index}
+          onClose={() => setOpenProject(null)}
+        />
+      )}
     </div>
   )
 }

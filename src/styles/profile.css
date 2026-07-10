@@ -520,7 +520,291 @@
     aspect-ratio: 360 / 630;
   }
 
+  .project-grid--web .project-card {
+    width: 360px;
+    max-width: 100%;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+  }
+
   .dock-nav {
     bottom: 1.5vh;
+  }
+}
+
+/* ---------- project detail overlay (desktop only) ---------- */
+.project-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: rgba(250, 250, 250, 0.8);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  animation: project-overlay-in 0.2s ease;
+  /* This portals to document.body, outside .profile-page — the only place
+     the site's font stack is declared — so without this it falls back to
+     the browser's default serif font. */
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+@keyframes project-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.project-overlay-dots {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+.project-overlay-dots::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 1) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(circle 260px at var(--spot-x, 50%) var(--spot-y, 50%), black 0%, transparent 70%);
+  mask-image: radial-gradient(circle 260px at var(--spot-x, 50%) var(--spot-y, 50%), black 0%, transparent 70%);
+}
+
+.project-overlay-close {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 6;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--card-bg, #fff);
+  color: var(--text, #0b0b0c);
+  box-shadow: 0 4px 14px var(--card-shadow, rgba(20, 20, 30, 0.14));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Single element that morphs from a small circular toggle into the full
+   detail card — width/height/border-radius/padding all transition together
+   so opening/closing reads as one continuous expand/collapse, not a
+   separate button plus a panel that pops in. */
+.project-overlay-panel {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 6;
+  width: 36px;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 4px 14px var(--card-shadow, rgba(20, 20, 30, 0.14));
+  overflow: hidden;
+  /* Two-row grid instead of a fixed height — the body row animates between
+     0fr (collapsed) and 1fr (open), which lets the panel's height hug
+     however much the body content actually needs instead of stretching to
+     a fixed size when there's no features list. */
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition:
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.35s ease,
+    padding 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.project-overlay-panel.is-open {
+  width: 340px;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px var(--card-shadow, rgba(20, 20, 30, 0.18));
+  grid-template-rows: auto 1fr;
+}
+
+.project-overlay-panel-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.project-overlay-panel.is-open .project-overlay-panel-head-row {
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.project-overlay-panel-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text, #0b0b0c);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.project-overlay-panel-toggle {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--text, #0b0b0c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.project-overlay-panel-body {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.project-overlay-panel.is-open .project-overlay-panel-body {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s ease 0.15s;
+}
+
+.project-overlay-panel-header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+}
+
+.project-overlay-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.project-overlay-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.project-overlay-panel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.project-overlay-panel-name {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text, #0b0b0c);
+}
+
+.project-overlay-panel-desc {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--text-muted, #8a8a90);
+}
+
+.project-overlay-features-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--text, #0b0b0c);
+}
+
+.project-overlay-features ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-overlay-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted, #4a4a50);
+}
+
+.project-overlay-features li svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.project-overlay-stage {
+  position: relative;
+  max-width: min(90vw, 900px);
+  max-height: 86vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-overlay-stage--web {
+  max-width: min(94vw, 1300px);
+}
+
+.project-overlay-media {
+  max-width: 100%;
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  animation: project-overlay-media-in 0.25s ease;
+}
+
+@keyframes project-overlay-media-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.project-overlay-indicators {
+  position: fixed;
+  top: 50%;
+  right: 32px;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-overlay-dot {
+  width: 4px;
+  height: 20px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: var(--text-muted, rgba(0, 0, 0, 0.5));
+  cursor: pointer;
+  transition: height 0.2s ease, background 0.2s ease;
+}
+
+.project-overlay-dot.is-active {
+  height: 32px;
+  background: var(--text, #111);
+}
+
+@media (max-width: 900px) {
+  .project-overlay {
+    display: none;
   }
 }

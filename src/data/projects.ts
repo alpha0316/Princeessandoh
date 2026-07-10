@@ -12,6 +12,7 @@ export const projects: Project[] = [
     id: 'somu',
     name: 'Somu',
     description: 'Digital Groups Saving App',
+    logo: asset('Somu/SomuLogo.png'),
     images: [
       asset('Somu/Home.png'),
       asset('Somu/Group Page.svg'),
@@ -28,6 +29,7 @@ export const projects: Project[] = [
     id: 'giftpal',
     name: 'GiftPal',
     description: 'A beautiful unboxing moment — every gift arrives as a delightful surprise.',
+    logo: asset('GiftPal/GiftPal Logo.png'),
     images: [
       asset('GiftPal/Onboarding.png'),
       asset('GiftPal/Swipe.svg'),
@@ -42,7 +44,7 @@ export const projects: Project[] = [
     description: 'Discover events around you and find your next ticket in seconds.',
     images: [
       asset('Uzeka/Onboarding.svg'),
-      asset('Uzeka/Vendor.svg'),
+      asset('Uzeka/Vendor.png'),
       asset('Uzeka/Web App.svg'),
     ],
     links: [],
@@ -64,6 +66,7 @@ export const projects: Project[] = [
     id: 'shuttle-app',
     name: 'Shuttle App',
     description: 'Real-time campus shuttle tracking for Ghanaian universities.',
+    logo: asset('Shuttle App/Shuttle App Logo.png'),
     images: [
       asset('Shuttle App/Track.svg'),
       asset('Shuttle App/Grid.svg'),
@@ -76,6 +79,7 @@ export const projects: Project[] = [
     id: 'gas-app',
     name: 'GasApp',
     description: 'Your hassle-free solution for convenient LPG refills.',
+    logo: asset('Gas App/Gas App Logo.png'),
     images: [
       asset('Gas App/Onboarding.svg'),
       asset('Gas App/Options.svg'),
@@ -88,9 +92,10 @@ export const projects: Project[] = [
     id: 'somu-web',
     name: 'Somu',
     description: 'Digital Groups Saving App',
+    logo: asset('Somu/SomuLogo.png'),
     images: [
-      asset('Somu/Web/Home.svg'),
-      asset('Somu/Web/Dashboard.svg'),
+      asset('Somu/Web/Home.png'),
+      asset('Somu/Web/Dashboard.png'),
       asset('Somu/Web/Explore.svg'),
     ],
     links: [
@@ -104,10 +109,11 @@ export const projects: Project[] = [
     id: 'doryne',
     name: 'Doryne',
     description: 'On-demand errand delivery built for students.',
+    logo: asset('Doryne/Doryne Logo.png'),
     images: [
-      asset('Doryne/Landing Page.svg'),
+      asset('Doryne/Landing Page.png'),
       asset('Doryne/Map.svg'),
-      asset('Doryne/Orders.svg'),
+      asset('Doryne/Orders.png'),
     ],
     links: [],
     platform: 'web',
@@ -130,8 +136,8 @@ export const projects: Project[] = [
     description: 'AI-assisted invoicing — start from scratch, a screenshot, or a voice note.',
     images: [
       asset('Uwata/Auth.svg'),
-      asset('Uwata/Start From Scratch.svg'),
-      asset('Uwata/Type Invoice.svg'),
+      asset('Uwata/Start From Scratch.png'),
+      asset('Uwata/Type Invoice.png'),
     ],
     links: [],
     platform: 'web',
