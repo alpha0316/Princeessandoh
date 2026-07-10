@@ -20,7 +20,9 @@ export default function LoadingScreen() {
   const [exiting, setExiting] = useState(false)
   const [done, setDone] = useState(hasPlayed)
   const [avatarStyle, setAvatarStyle] = useState<CSSProperties>({})
+  const [rocketShift, setRocketShift] = useState(0)
   const avatarRef = useRef<HTMLImageElement>(null)
+  const textRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     hasPlayed = true
@@ -82,6 +84,19 @@ export default function LoadingScreen() {
     }
   }, [])
 
+  // Once fully typed, shift the row left by half the text's width (+ half
+  // the gap) so the rocket lands centered instead of getting pushed off
+  // the right edge on narrow screens — the CSS only applies this below
+  // the mobile breakpoint, so desktop keeps the whole group centered.
+  useEffect(() => {
+    if (!showRocket) return
+    const textEl = textRef.current
+    if (textEl) {
+      const gap = 14
+      setRocketShift(-(textEl.offsetWidth + gap) / 2)
+    }
+  }, [showRocket])
+
   useEffect(() => {
     if (!showRocket) return
     const timer = setTimeout(() => {
@@ -115,8 +130,11 @@ export default function LoadingScreen() {
     <div className={`loading-screen ${exiting ? 'is-exiting' : ''}`} aria-hidden="true">
       <div className="loading-content">
         <img ref={avatarRef} className="loading-avatar" src="/avatar.png" alt="" style={avatarStyle} />
-        <div className={`loading-signature ${exiting ? 'is-fading' : ''}`}>
-          <span className="loading-signature-text">
+        <div
+          className={`loading-signature ${exiting ? 'is-fading' : ''} ${showRocket ? 'is-centering-rocket' : ''}`}
+          style={{ '--rocket-shift': `${rocketShift}px` } as CSSProperties}
+        >
+          <span ref={textRef} className="loading-signature-text">
             {SIGNATURE.slice(0, charsShown)}
             {!showRocket && <span className="loading-cursor" />}
           </span>

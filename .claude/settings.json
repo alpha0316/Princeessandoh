@@ -98,7 +98,8 @@
       "Bash(node parallax.mjs)",
       "Bash(node loading.mjs)",
       "Bash(node loading2.mjs)",
-      "Bash(node loading3.mjs)"
+      "Bash(node loading3.mjs)",
+      "Bash(node mobile-rocket.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"

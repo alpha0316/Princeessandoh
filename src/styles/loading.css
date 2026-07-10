@@ -87,3 +87,14 @@
     transform: translate(0, 0) scale(1);
   }
 }
+
+/* On narrow screens the full "@pr_alphaa 🚀" row is wider than the
+   viewport, so centering the whole group pushes the rocket off the right
+   edge. Once typing finishes, shift the row left so the rocket itself
+   ends up centered instead. */
+@media (max-width: 768px) {
+  .loading-signature.is-centering-rocket {
+    transform: translateX(var(--rocket-shift, 0px));
+    transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
