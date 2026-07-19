@@ -10,11 +10,12 @@ import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { useWeather } from './hooks/useWeather'
 
 const SnapsPage = lazy(() => import('./features/snaps/SnapsPage'))
+const AboutPage = lazy(() => import('./features/about/AboutPage'))
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
 
-type Page = 'home' | 'snaps'
+type Page = 'home' | 'snaps' | 'about'
 
 function AppContent() {
   const isDev = import.meta.env.DEV
@@ -40,6 +41,17 @@ function AppContent() {
         <FluidBackground />
         <Suspense fallback={null}>
           <SnapsPage onNavigate={(p: string) => setPage(p as Page)} />
+        </Suspense>
+      </div>
+    )
+  }
+
+  if (page === 'about') {
+    return (
+      <div className={`theme-${theme}`}>
+        <FluidBackground />
+        <Suspense fallback={null}>
+          <AboutPage onNavigate={(p: string) => setPage(p as Page)} />
         </Suspense>
       </div>
     )

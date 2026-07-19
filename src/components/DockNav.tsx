@@ -21,6 +21,7 @@ const navItems: (NavItem & { href?: string })[] = [
     type: 'icon',
     label: 'Profile',
     icon: <img className="dock-nav-avatar" alt="" src={image1} />,
+    page: 'about',
   },
 ]
 
