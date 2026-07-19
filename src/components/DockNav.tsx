@@ -35,7 +35,7 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
 
   return (
     <nav aria-label="Creative platform navigation" className={`dock-nav ${className}`}>
-      {navItems.filter(item => !(item.label === 'Profile' && !import.meta.env.DEV)).map((item, index) => {
+      {navItems.map((item, index) => {
         const isActive = item.label === activeLabel
 
         if (item.type === 'image') {

@@ -1,6 +1,21 @@
 import { useEffect, useRef } from 'react'
 import { mouse, decayMouse, initMouseTracking } from '../stores/mouse'
 
+// ── Cursor interaction tunables (DotField-style scatter, in fluid form) ──
+// World units: the viewport height spans ≈ 2.2 units in shader space.
+const RADIUS = 0.55      // cursor influence radius
+const PUSH = 0.22        // how far the fluid pattern is shoved away from the cursor
+const BASE_VIVID = 1.0   // vein intensity when idle (1 = the untouched marble look)
+const HOVER_VIVID = 1.5  // vein intensity near the cursor (>1 deepens the veins)
+const EASE = 0.1         // smoothing for cursor follow + settle-back (lower = more lag)
+
+// ── Bow-wave shape — like a boat through water, the influence is not a
+// circle: short and intense ahead of travel, a long soft wake behind.
+const FRONT = 0.65       // reach ahead of travel, as a fraction of RADIUS (the bow)
+const BACK = 2.1         // reach behind travel (the trailing wake)
+const SIDE = 1.0         // lateral reach
+const BOW = 0.9          // extra push strength at the leading edge (the collision)
+
 const VS = `
 attribute vec2 aPos;
 varying vec2 vUv;
@@ -15,8 +30,9 @@ varying vec2 vUv;
 uniform vec2  uRes;
 uniform float uTime;
 uniform vec2  uMouse;
-uniform vec2  uMouseVel;
-uniform float uMouseStr;
+uniform float uHover;
+uniform vec2  uVel;
+uniform float uAniso;
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -91,39 +107,42 @@ void main() {
 
   vec2 mUv  = vec2(uMouse.x - 0.5, -(uMouse.y - 0.5)) * vec2(aspect, 1.0) * 2.2;
   vec2 diff = p - mUv;
+  float dist = length(diff);
 
-  // ── Direction of travel, decomposed into along/across the stroke ──
-  vec2 vel    = uMouseVel * vec2(1.0, -1.0);
-  vec2 dirVel = vel / (length(vel) + 0.0001);
-  float along = dot(diff, dirVel);
-  vec2  perp  = diff - along * dirVel;
+  // ── Bow-wave scatter — the influence region is stretched along the
+  // cursor's direction of travel: compressed ahead (the bow, where the
+  // collision happens) and drawn out behind (the wake). uAniso fades
+  // the shape back to a plain circle when the pointer is still ──────
+  vec2 vel = vec2(uVel.x * aspect, -uVel.y) * 2.2;
+  vec2 travel = vel / (length(vel) + 0.0001);
+  float along = dot(diff, travel);
+  float across = length(diff - along * travel);
+  float reach = along > 0.0 ? ${FRONT.toFixed(4)} : ${BACK.toFixed(4)};
+  float dAniso = length(vec2(across / ${SIDE.toFixed(4)}, along / reach));
+  float dEff = mix(dist, dAniso, uAniso);
 
-  // ── Fluid indent — an elongated dent pushed along the cursor's path,
-  // like a toad's kick displacing pond water: short ahead, long behind.
-  // This is the dominant shape, not a rotation, so it reads as fluid
-  // being scooped/dragged rather than spun ──────────────────────────
-  float dentFalloff = exp(-(length(perp) * 2.0 + max(along, 0.0) * 2.4 + max(-along, 0.0) * 0.55));
-  vec2 translate = vel * dentFalloff * uMouseStr * 1.3;
-
-  // ── Tip curl — a small, tight vortex only right at the cursor point,
-  // like water curling off the leading edge of the displacement. Kept
-  // to a tiny radius so it can never spread into a ring/coil ────────
-  float tipFalloff = exp(-length(diff) * 3.4) * uMouseStr;
-  float tipAngle = tipFalloff * 2.6;
-  float sa = sin(tipAngle), ca = cos(tipAngle);
-  vec2 curled = mat2(ca, -sa, sa, ca) * diff;
-
-  p = mUv + curled + translate;
+  float falloff = 0.0;
+  if (dEff < ${RADIUS.toFixed(4)}) {
+    float t = 1.0 - dEff / ${RADIUS.toFixed(4)};
+    falloff = t * t * (3.0 - 2.0 * t);
+  }
+  // Push radially away, hitting harder on the leading edge — the water
+  // parting at the bow — and easing off into the trailing wake.
+  vec2 dir = diff / max(dist, 0.001);
+  float bow = 1.0 + ${BOW.toFixed(4)} * uAniso * clamp(along / ${RADIUS.toFixed(4)}, 0.0, 1.0);
+  p -= dir * ${PUSH.toFixed(4)} * falloff * bow * uHover;
 
   float f = fluid(p * 1.05);
   f = smoothstep(0.08, 0.92, f);
 
   vec3 col = pal(f);
 
-  // ── Warm trough — fills the indent with the same low-opacity glow
-  // seen in the reference, so it reads as displaced fluid, not paint ──
-  vec3 warm = vec3(0.98, 0.80, 0.64);
-  col = mix(col, warm, clamp(dentFalloff * uMouseStr * 0.5, 0.0, 0.4));
+  // ── Proximity vividness — the opacity boost from the dot-field
+  // reference, mapped to vein intensity: the marble deepens near the
+  // cursor and relaxes back to its idle look as uHover eases out ────
+  vec3 quiet = vec3(0.969, 0.965, 0.984);
+  float vivid = ${BASE_VIVID.toFixed(4)} + (${HOVER_VIVID.toFixed(4)} - ${BASE_VIVID.toFixed(4)}) * falloff * uHover;
+  col = clamp(mix(quiet, col, vivid), 0.0, 1.0);
 
   float vig = length(uv - 0.5) * 0.55;
   col = mix(col, vec3(0.969, 0.965, 0.984), vig * vig * 0.5);
@@ -171,8 +190,9 @@ export default function FluidBackground() {
     const uRes = gl.getUniformLocation(prog, 'uRes')
     const uTime = gl.getUniformLocation(prog, 'uTime')
     const uMouse = gl.getUniformLocation(prog, 'uMouse')
-    const uMouseVel = gl.getUniformLocation(prog, 'uMouseVel')
-    const uMouseStr = gl.getUniformLocation(prog, 'uMouseStr')
+    const uHover = gl.getUniformLocation(prog, 'uHover')
+    const uVel = gl.getUniformLocation(prog, 'uVel')
+    const uAniso = gl.getUniformLocation(prog, 'uAniso')
 
     const resize = () => {
       canvas.width = window.innerWidth
@@ -183,15 +203,39 @@ export default function FluidBackground() {
     window.addEventListener('resize', resize)
     const stopMouseTracking = initMouseTracking()
 
+    // Eased cursor state — the shader always receives the smoothed values,
+    // so the scatter lags gently behind the pointer and settles back on its
+    // own once the cursor leaves (uHover eases toward 0).
+    const eased = { x: mouse.nx, y: mouse.ny, hover: 0, vx: 0, vy: 0 }
+    let pointerInside = false
+    const onEnter = () => { pointerInside = true }
+    const onLeave = () => { pointerInside = false }
+    window.addEventListener('pointermove', onEnter)
+    document.documentElement.addEventListener('pointerleave', onLeave)
+    window.addEventListener('blur', onLeave)
+
     let id: number
     const loop = (now: number) => {
       id = requestAnimationFrame(loop)
       decayMouse()
+      // mouse.strength keeps the effect alive on mobile (tilt/shake input),
+      // where there is no hovering pointer.
+      const hoverTarget = Math.max(pointerInside ? 1 : 0, Math.min(mouse.strength, 1))
+      eased.hover += (hoverTarget - eased.hover) * EASE
+      eased.x += (mouse.nx - eased.x) * EASE
+      eased.y += (mouse.ny - eased.y) * EASE
+      eased.vx += (mouse.vx - eased.vx) * EASE
+      eased.vy += (mouse.vy - eased.vy) * EASE
+      // Anisotropy tracks travel speed: still pointer = circular influence,
+      // moving pointer = bow-wave oval stretched along its path.
+      const speed = Math.hypot(eased.vx, eased.vy)
+      const aniso = Math.min(speed / 0.4, 1)
       gl.uniform2f(uRes, canvas.width, canvas.height)
       gl.uniform1f(uTime, now * 0.001)
-      gl.uniform2f(uMouse, mouse.nx, mouse.ny)
-      gl.uniform2f(uMouseVel, mouse.vx, mouse.vy)
-      gl.uniform1f(uMouseStr, mouse.strength)
+      gl.uniform2f(uMouse, eased.x, eased.y)
+      gl.uniform1f(uHover, eased.hover)
+      gl.uniform2f(uVel, eased.vx, eased.vy)
+      gl.uniform1f(uAniso, aniso)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     }
     id = requestAnimationFrame(loop)
@@ -199,6 +243,9 @@ export default function FluidBackground() {
     return () => {
       cancelAnimationFrame(id)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('pointermove', onEnter)
+      document.documentElement.removeEventListener('pointerleave', onLeave)
+      window.removeEventListener('blur', onLeave)
       stopMouseTracking()
     }
   }, [])
