@@ -209,6 +209,32 @@
   touch-action: pan-y;
 }
 
+.app-card-case-study-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%) scale(0.94);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  color: #0b0b0c;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.app-card-case-study-hint.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 .app-card-slide {
   flex-shrink: 0;
   width: 100%;
@@ -336,6 +362,7 @@
 }
 
 .app-card-links a {
+  position: relative;
   width: 24px;
   height: 24px;
   color: #fff;
@@ -348,6 +375,31 @@
 
 .app-card-links a:hover {
   opacity: 1;
+}
+
+.app-card-link-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #0b0b0c;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.app-card-links a:hover .app-card-link-tooltip,
+.app-card-links a:focus-visible .app-card-link-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .app-card-link-icon {
@@ -410,13 +462,13 @@
   cursor: pointer;
   padding: 0;
   position: relative;
-  overflow: hidden;
 }
 
 .dock-nav-item::after {
   content: '';
   position: absolute;
   inset: 0;
+  overflow: hidden;
   border-radius: 32px;
   background: linear-gradient(
     90deg,
@@ -435,6 +487,29 @@
 .dock-nav-item:hover {
   color: var(--text, #0b0b0c);
   opacity: 1;
+}
+
+.dock-nav-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dock-nav-item:hover .dock-nav-tooltip,
+.dock-nav-item:focus-visible .dock-nav-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .dock-nav-item.is-active {

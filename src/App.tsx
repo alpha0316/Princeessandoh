@@ -6,16 +6,18 @@ import Starfield from './components/Starfield'
 import WeatherOverlay, { type Weather } from './components/WeatherOverlay'
 import Profile from './components/Profile'
 import LoadingScreen from './components/LoadingScreen'
+import IconCredit from './components/IconCredit'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { useWeather } from './hooks/useWeather'
 
 const SnapsPage = lazy(() => import('./features/snaps/SnapsPage'))
 const AboutPage = lazy(() => import('./features/about/AboutPage'))
+const UzekaPage = lazy(() => import('./features/uzeka/UzekaPage'))
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
 
-type Page = 'home' | 'snaps' | 'about'
+type Page = 'home' | 'snaps' | 'about' | 'uzeka'
 
 function AppContent() {
   const isDev = import.meta.env.DEV
@@ -42,6 +44,7 @@ function AppContent() {
         <Suspense fallback={null}>
           <SnapsPage onNavigate={(p: string) => setPage(p as Page)} />
         </Suspense>
+        <IconCredit dark={isNight} />
       </div>
     )
   }
@@ -53,7 +56,19 @@ function AppContent() {
         <Suspense fallback={null}>
           <AboutPage onNavigate={(p: string) => setPage(p as Page)} />
         </Suspense>
+        <IconCredit dark={isNight} />
       </div>
+    )
+  }
+
+  if (page === 'uzeka') {
+    return (
+      <>
+        <Suspense fallback={null}>
+          <UzekaPage onNavigate={(p: string) => setPage(p as Page)} />
+        </Suspense>
+        <IconCredit dark />
+      </>
     )
   }
 
@@ -98,6 +113,7 @@ function AppContent() {
       </nav>
       <Profile onNavigate={(page: string) => setPage(page as Page)} />
       <LoadingScreen />
+      <IconCredit dark={isNight} />
     </div>
   )
 }

@@ -67,7 +67,11 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
           <div key={project.id} className="project-card">
             <ProjectCard
               project={project}
-              onOpen={(index) => setOpenProject({ project, index })}
+              onOpen={(index) =>
+                project.id === 'uzeka' && onNavigate
+                  ? onNavigate('uzeka')
+                  : setOpenProject({ project, index })
+              }
             />
           </div>
         ))}

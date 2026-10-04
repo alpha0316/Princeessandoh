@@ -1,0 +1,646 @@
+.uzeka-page {
+  position: relative;
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+.uzeka-hero-screen {
+  position: relative;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- liquid-glass buttons ---------- */
+.uzeka-glass-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.uzeka-glass-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.uzeka-back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 30;
+  width: 40px;
+  height: 40px;
+}
+
+.uzeka-back:hover {
+  transform: translateX(-2px);
+}
+
+.uzeka-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #34c759;
+  box-shadow: 0 0 0 2px rgba(244, 244, 244, 0.2);
+}
+
+/* ---------- product-details panel: a single element that morphs from the
+   small glass status dot into the full white detail card ---------- */
+.uzeka-panel {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 30;
+  width: 36px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition:
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.35s ease,
+    padding 0.35s ease,
+    background 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.uzeka-panel.is-open {
+  width: min(340px, calc(100vw - 48px));
+  padding: 22px;
+  border-radius: 20px;
+  background: #fff;
+  border-color: transparent;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  grid-template-rows: auto 1fr;
+}
+
+.uzeka-panel-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.uzeka-panel.is-open .uzeka-panel-head-row {
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.uzeka-panel-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b0b0c;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.uzeka-panel-toggle {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #0b0b0c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.uzeka-panel-body {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.uzeka-panel.is-open .uzeka-panel-body {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s ease 0.15s;
+}
+
+.uzeka-panel-header {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.uzeka-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.uzeka-panel-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.uzeka-panel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.uzeka-panel-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b0b0c;
+}
+
+.uzeka-panel-desc {
+  font-size: 13px;
+  line-height: 1.35;
+  color: #8a8a90;
+}
+
+.uzeka-panel-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9a9aa0;
+  margin-bottom: 10px;
+}
+
+.uzeka-panel-chapters {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.uzeka-panel-chapters ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.uzeka-panel-chapters button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: none;
+  padding: 7px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0b0b0c;
+  cursor: pointer;
+  text-align: left;
+}
+
+.uzeka-panel-chapter-index {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: #34c759;
+  color: #04170a;
+}
+
+.uzeka-panel-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.uzeka-panel-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0b0b0c;
+  text-decoration: none;
+}
+
+.uzeka-panel-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- centered copy ---------- */
+.uzeka-cover-content {
+  position: relative;
+  z-index: 1;
+  width: min(647px, 86vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  text-align: center;
+}
+
+.uzeka-cover-icon.tilt-card {
+  width: 81px;
+  height: 81px;
+  border-radius: 28px;
+}
+
+.uzeka-cover-icon .tilt-card-inner {
+  box-shadow: 0 0 0 0.5px rgba(235, 119, 156, 0.4), 0 12px 32px rgba(235, 119, 156, 0.12);
+}
+
+.uzeka-cover-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.uzeka-cover-title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.uzeka-cover-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 44ch;
+}
+
+.uzeka-cover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.uzeka-cover-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.uzeka-cover-meta-muted {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+.uzeka-cover-meta-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.uzeka-cover-meta-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: block;
+}
+
+.uzeka-cover-meta-stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uzeka-cover-meta-icon--stacked {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.uzeka-cover-meta-icon--crop {
+  position: relative;
+  overflow: hidden;
+  background: #242427;
+}
+
+.uzeka-cover-meta-icon--crop img {
+  position: absolute;
+  width: 110.5px;
+  height: 110.5px;
+  left: -41.3px;
+  top: -17.7px;
+}
+
+.uzeka-scroll-cue {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+}
+
+.uzeka-scroll-chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.uzeka-scroll-chevrons i {
+  width: 10px;
+  height: 10px;
+  border-right: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.6);
+  transform: rotate(45deg);
+  margin-top: -4px;
+  animation: uzeka-chevron-bounce 1.6s ease-in-out infinite;
+}
+
+.uzeka-scroll-chevrons i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes uzeka-chevron-bounce {
+  0%, 100% { opacity: 0.3; transform: translateY(0) rotate(45deg); }
+  50% { opacity: 1; transform: translateY(4px) rotate(45deg); }
+}
+
+/* ---------- edge-peeking phone frames (static, always visible) ---------- */
+.uzeka-edge-screens {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.uzeka-edge-screens--flashlight {
+  -webkit-mask-image: radial-gradient(circle 260px at var(--spot-x, 50%) var(--spot-y, 50%), black 0%, black 55%, transparent 100%);
+  mask-image: radial-gradient(circle 260px at var(--spot-x, 50%) var(--spot-y, 50%), black 0%, black 55%, transparent 100%);
+}
+
+.uzeka-edge-screen.tilt-card {
+  position: absolute;
+  width: clamp(130px, 15.5vw, 225px);
+  border-radius: clamp(14px, 1.6vw, 24px);
+  pointer-events: auto;
+}
+
+.uzeka-edge-screen .tilt-card-inner {
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.uzeka-flashlight-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.uzeka-edge--onboarding {
+  left: clamp(20px, 3.5vw, 60px);
+  top: clamp(120px, 20.5vh, 180px);
+}
+
+.uzeka-edge--vendor {
+  left: clamp(260px, 20.8vw, 340px);
+  top: clamp(-340px, -35.9vh, -220px);
+}
+
+.uzeka-edge--event {
+  right: clamp(240px, 21vw, 320px);
+  top: clamp(-300px, -30vh, -180px);
+}
+
+.uzeka-edge--web {
+  right: clamp(-10px, 2vw, 40px);
+  top: clamp(100px, 17.3vh, 160px);
+}
+
+@media (max-width: 900px) {
+  /* Mobile drops the absolute, overlapping desktop composition for a
+     normal top-to-bottom stack: the two phones sit at the very top (same
+     DOM order as desktop — no reordering needed), still hidden until the
+     flashlight (now touch-driven) reveals them, then the copy follows. */
+  .uzeka-edge-screens {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 17vh;
+    min-height: 120px;
+    max-height: 170px;
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+
+  .uzeka-edge--vendor,
+  .uzeka-edge--event {
+    display: none;
+  }
+
+  .uzeka-edge--onboarding {
+    left: 6%;
+    top: -70px;
+  }
+
+  .uzeka-edge--web {
+    right: 6%;
+    left: auto;
+    top: -70px;
+  }
+
+  .uzeka-edge-screen.tilt-card {
+    width: 34%;
+  }
+}
+
+/* ---------- bottom wordmark ---------- */
+/* Fixed, viewport-capped width with each letter sized by flex-basis (ratio
+   comes in as the --ratio custom property on each letter) — the word can
+   never grow past the container, so U and A can't clip off the ends. */
+.uzeka-wordmark {
+  position: absolute;
+  left: 50%;
+  bottom: -6vw;
+  transform: translateX(-50%);
+  width: min(1100px, 92vw);
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(4px, 1.2vw, 16px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Pass-through on desktop — the track exists only so mobile has something
+   to animate without duplicating markup per breakpoint. */
+.uzeka-wordmark-track {
+  display: contents;
+}
+
+.uzeka-wordmark--dim img,
+.uzeka-wordmark-letter.tilt-card {
+  flex: var(--ratio, 1) 1 0;
+  aspect-ratio: var(--ratio, 1);
+  min-width: 0;
+}
+
+.uzeka-wordmark--dim img {
+  display: block;
+  width: 100%;
+}
+
+.uzeka-wordmark--dim {
+  opacity: 0.1;
+}
+
+.uzeka-wordmark-letter.tilt-card {
+  pointer-events: auto;
+}
+
+.uzeka-wordmark-letter .tilt-card-stroke,
+.uzeka-wordmark-letter .tilt-card-shine {
+  display: none;
+}
+
+/* Higher specificity than ".uzeka-wordmark--dim img" so the duplicate copy
+   (there for the mobile marquee loop) actually stays hidden on desktop. */
+.uzeka-wordmark--dim .uzeka-wordmark-letter--dup {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  /* One screen, no scrolling: fixed to the real viewport height (100dvh
+     accounts for mobile browser chrome better than 100vh) with everything
+     below sized to fit inside it. */
+  .uzeka-hero-screen {
+    height: 100vh;
+    height: 100dvh;
+    min-height: auto;
+    overflow: hidden;
+    justify-content: flex-start;
+    padding: 76px 20px 20px;
+    gap: 12px;
+  }
+
+  /* Spacing/sizing below matches the design spec's own values (81px icon,
+     32/20px gaps, 40px title, 16px meta) — same numbers as desktop, just
+     reflowed, so mobile isn't a shrunk-down reinterpretation. */
+  .uzeka-cover-content {
+    gap: 32px;
+  }
+
+  .uzeka-flashlight-hint {
+    position: static;
+    margin: 0;
+    font-size: 11px;
+  }
+
+  .uzeka-wordmark--bright {
+    display: none;
+  }
+
+  .uzeka-scroll-cue {
+    display: none;
+  }
+
+  .uzeka-cover-copy {
+    gap: 20px;
+  }
+
+  .uzeka-cover-title {
+    font-size: 40px;
+  }
+
+  .uzeka-cover-subtitle {
+    font-size: 14px;
+  }
+
+  .uzeka-cover-meta {
+    row-gap: 6px;
+  }
+
+  /* The dim layer becomes the only wordmark on mobile: a normal-flow block
+     (not the desktop absolute overlay) holding an infinitely-scrolling
+     marquee instead of a fixed, fitted word. */
+  .uzeka-wordmark--dim {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: 100%;
+    overflow: hidden;
+    opacity: 1;
+    display: block;
+  }
+
+  .uzeka-wordmark-track {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    width: max-content;
+    animation: uzeka-marquee 16s linear infinite;
+  }
+
+  .uzeka-wordmark--dim img {
+    flex: none;
+    width: auto;
+    height: 56px;
+  }
+
+  .uzeka-wordmark--dim .uzeka-wordmark-letter--dup {
+    display: block;
+  }
+
+  @keyframes uzeka-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}

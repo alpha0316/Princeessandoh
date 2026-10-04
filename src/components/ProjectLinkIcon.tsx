@@ -1,6 +1,18 @@
 import { AppleLogo, GooglePlayLogo, Globe } from '@phosphor-icons/react'
 import { XIcon } from './SocialIcons'
-import type { ProjectLink } from '../types/project'
+import type { ProjectLink, ProjectLinkType } from '../types/project'
+
+const tooltipByType: Record<ProjectLinkType, string> = {
+  web: 'Visit Website',
+  x: 'View on X',
+  appstore: 'View App',
+  playstore: 'View App',
+  custom: 'View App',
+}
+
+export function getProjectLinkTooltip(link: ProjectLink): string {
+  return tooltipByType[link.type]
+}
 
 export default function ProjectLinkIcon({ link, size = 24 }: { link: ProjectLink; size?: number }) {
   switch (link.type) {

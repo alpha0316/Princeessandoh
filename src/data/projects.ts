@@ -9,6 +9,35 @@ const asset = (path: string) => `/v2-svg/${path}`
 // label, icon? }) per app once they're ready. `custom` needs its own `icon`.
 export const projects: Project[] = [
   {
+    id: 'uzeka',
+    name: 'Uzeka',
+    description: 'Discover events around you and find your next ticket in seconds.',
+    images: [
+      asset('Uzeka/Onboarding.svg'),
+      asset('Uzeka/Vendor.png'),
+      asset('Uzeka/Web App.svg'),
+    ],
+    links: [
+      { type: 'web', url: 'https://web-v2.uzeka.app/', label: 'Website' },
+      { type: 'appstore', url: 'https://apps.apple.com/gh/app/uzeka/id1611958098', label: 'App Store' },
+    ],
+    platform: 'mobile',
+  },
+  {
+    id: 'gears',
+    name: 'Gears',
+    description: 'Find trusted mechanics, detailers, auto shops, and fuel stations near you.',
+    images: [
+      asset('Gears/Home.svg'),
+      asset('Gears/Bookmarks.svg'),
+      asset('Gears/Business Details Page.svg'),
+    ],
+    links: [
+      { type: 'web', url: 'https://www.gears.live/', label: 'Website' },
+    ],
+    platform: 'mobile',
+  },
+  {
     id: 'somu',
     name: 'Somu',
     description: 'Digital Groups Saving App',
@@ -34,18 +63,6 @@ export const projects: Project[] = [
       asset('GiftPal/Onboarding.png'),
       asset('GiftPal/Swipe.svg'),
       asset('GiftPal/Add Note.svg'),
-    ],
-    links: [],
-    platform: 'mobile',
-  },
-  {
-    id: 'uzeka',
-    name: 'Uzeka',
-    description: 'Discover events around you and find your next ticket in seconds.',
-    images: [
-      asset('Uzeka/Onboarding.svg'),
-      asset('Uzeka/Vendor.png'),
-      asset('Uzeka/Web App.svg'),
     ],
     links: [],
     platform: 'mobile',

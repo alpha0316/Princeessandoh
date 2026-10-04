@@ -13,7 +13,7 @@ type NavItem =
 
 const navItems: (NavItem & { href?: string })[] = [
   { type: 'active-icon', label: 'Paint Brush', icon: <PaintBrushDuotone className="dock-nav-icon" />, page: 'home' },
-  { type: 'image', label: 'X', src: frame1000003409, href: 'https://x.com/pr_alphaa/status/2057928528956449230?s=20' },
+  { type: 'image', label: 'X', src: frame1000003409, href: 'https://x.com/pr_alphaa/status/2106354775113539896?s=20' },
   { type: 'icon', label: 'Pinterest', icon: <MingcutePinterestFill className="dock-nav-icon" />, href: 'https://pin.it/40FtwCncU' },
   { type: 'image', label: 'Behance', src: frame1000003410, href: 'https://www.behance.net/princeessandoh1' },
   { type: 'icon', label: 'Images', icon: <ImagesDuotone className="dock-nav-icon" />, page: 'snaps' },
@@ -43,6 +43,7 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
           return (
             <button key={`${item.label}-${index}`} type="button" aria-label={item.label} className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
               onClick={() => handleClick(item)}>
+              <span className="dock-nav-tooltip">{item.label}</span>
               <img className="dock-nav-icon" alt="" src={item.src} />
             </button>
           )
@@ -59,6 +60,7 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
             className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
             onClick={() => handleClick(item)}
           >
+            <span className="dock-nav-tooltip">{item.label}</span>
             {item.label === 'Paint Brush' ? <PaintBrushDuotone className="dock-nav-icon" filled={isActive} /> :
              item.label === 'Images' ? <ImagesDuotone className="dock-nav-icon" filled={isActive} /> :
              itemIcon}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import ProjectLinkIcon from './ProjectLinkIcon'
+import ProjectLinkIcon, { getProjectLinkTooltip } from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
 const AUTO_ADVANCE_MS = 45000
@@ -182,6 +182,10 @@ export default function ProjectCard({
         ) : (
           <div className="app-card-placeholder">{project.name.charAt(0)}</div>
         )}
+
+        {project.id === 'uzeka' && (
+          <span className={`app-card-case-study-hint ${hovered ? 'is-visible' : ''}`}>View Case Study</span>
+        )}
       </div>
 
       <div className={`app-card-overlay ${hovered ? 'is-visible' : ''}`} aria-hidden={!hovered}>
@@ -201,9 +205,10 @@ export default function ProjectCard({
                   href={link.url}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={link.label}
+                  aria-label={getProjectLinkTooltip(link)}
                   onClick={(e) => e.stopPropagation()}
                 >
+                  <span className="app-card-link-tooltip">{getProjectLinkTooltip(link)}</span>
                   <ProjectLinkIcon link={link} />
                 </a>
               ))}
