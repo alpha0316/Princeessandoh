@@ -28,6 +28,7 @@ export default function ProjectCard({
   const touchStartX = useRef(0)
   const [dragPx, setDragPx] = useState(0)
   const [dragging, setDragging] = useState(false)
+  const didSwipeRef = useRef(false)
 
   useEffect(() => {
     const measure = () => setFrameWidth(screenRef.current?.clientWidth ?? 0)
@@ -84,9 +85,11 @@ export default function ProjectCard({
   }
 
   const handleTouchEnd = () => {
-    if (Math.abs(dragPx) > frameWidth * SWIPE_COMMIT_RATIO) {
+    const swiped = Math.abs(dragPx) > frameWidth * SWIPE_COMMIT_RATIO
+    if (swiped) {
       goTo(index + (dragPx < 0 ? 1 : -1))
     }
+    didSwipeRef.current = swiped
     setDragPx(0)
     setDragging(false)
   }
@@ -103,7 +106,12 @@ export default function ProjectCard({
   }
 
   const handleClick = () => {
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    if (didSwipeRef.current) {
+      didSwipeRef.current = false
+      return
+    }
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    if (canHover || project.id === 'uzeka') {
       onOpen?.(index)
     }
   }
