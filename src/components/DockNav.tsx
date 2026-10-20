@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
+import { CodeSimple, House } from '@phosphor-icons/react'
 import frame1000003409 from './nav-icons/frame-1000003409.svg'
 import frame1000003410 from './nav-icons/frame-1000003410.svg'
 import { ImagesDuotone } from './nav-icons/ImagesDuotone'
 import image1 from './nav-icons/image-1.png'
 import { MingcutePinterestFill } from './nav-icons/MingcutePinterestFill'
-import { PaintBrushDuotone } from './nav-icons/PaintBrushDuotone'
 
 type NavItem =
   | { type: 'active-icon'; label: string; icon: ReactNode; page: string }
@@ -12,7 +12,8 @@ type NavItem =
   | { type: 'icon'; label: string; icon: ReactNode; href?: string; page?: string }
 
 const navItems: (NavItem & { href?: string })[] = [
-  { type: 'active-icon', label: 'Paint Brush', icon: <PaintBrushDuotone className="dock-nav-icon" />, page: 'home' },
+  { type: 'active-icon', label: 'Home', icon: <House className="dock-nav-icon" weight="bold" />, page: 'home' },
+  { type: 'icon', label: 'Components', icon: <CodeSimple className="dock-nav-icon" weight="bold" />, page: 'components' },
   { type: 'image', label: 'X', src: frame1000003409, href: 'https://x.com/pr_alphaa/status/2106354775113539896?s=20' },
   { type: 'icon', label: 'Pinterest', icon: <MingcutePinterestFill className="dock-nav-icon" />, href: 'https://pin.it/40FtwCncU' },
   { type: 'image', label: 'Behance', src: frame1000003410, href: 'https://www.behance.net/princeessandoh1' },
@@ -25,7 +26,7 @@ const navItems: (NavItem & { href?: string })[] = [
   },
 ]
 
-export default function DockNav({ className = '', activeLabel = 'Paint Brush', onNavigate }: { className?: string; activeLabel?: string; onNavigate?: (page: string) => void }) {
+export default function DockNav({ className = '', activeLabel = 'Home', onNavigate }: { className?: string; activeLabel?: string; onNavigate?: (page: string) => void }) {
   const handleClick = (item: NavItem & { href?: string }) => {
     if (item.page && onNavigate) {
       onNavigate(item.page)
@@ -61,7 +62,7 @@ export default function DockNav({ className = '', activeLabel = 'Paint Brush', o
             onClick={() => handleClick(item)}
           >
             <span className="dock-nav-tooltip">{item.label}</span>
-            {item.label === 'Paint Brush' ? <PaintBrushDuotone className="dock-nav-icon" filled={isActive} /> :
+            {item.label === 'Home' ? <House className="dock-nav-icon" weight={isActive ? 'fill' : 'regular'} /> :
              item.label === 'Images' ? <ImagesDuotone className="dock-nav-icon" filled={isActive} /> :
              itemIcon}
           </button>

@@ -47,7 +47,9 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
           Essandoh <span className="squiggle">Prince</span> Takyi
         </h1>
         <p className="profile-tagline">
-          Product <b>Design</b> <i>And</i> <b>Engineering</b>
+          Product <b>Design</b> <i>&</i> <b> <span style={{
+            fontFamily :'"JetBrains Mono", monospace',
+          }}>Engineering</span></b>
         </p>
       </header>
 
@@ -68,8 +70,8 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
             <ProjectCard
               project={project}
               onOpen={(index) =>
-                project.id === 'uzeka' && onNavigate
-                  ? onNavigate('uzeka')
+                (project.id === 'uzeka' || project.id === 'gas-app') && onNavigate
+                  ? onNavigate(project.id)
                   : setOpenProject({ project, index })
               }
             />
@@ -80,7 +82,7 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
         ))}
       </main>
 
-      <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} activeLabel="Paint Brush" onNavigate={onNavigate} />
+      <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} activeLabel="Home" onNavigate={onNavigate} />
 
       {openProject && (
         <ProjectOverlay

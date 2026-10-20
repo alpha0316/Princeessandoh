@@ -1,0 +1,282 @@
+.gasapp-page {
+  position: relative;
+  min-height: 100vh;
+  background: #f5f5f2;
+  color: #0b0b0c;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* ---------- glass chrome (back button, top pill, tab bar) ---------- */
+.gasapp-glass-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: #0b0b0c;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.gasapp-glass-btn:hover {
+  background: #fff;
+}
+
+.gasapp-back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 30;
+  width: 40px;
+  height: 40px;
+}
+
+.gasapp-back:hover {
+  transform: translateX(-2px);
+}
+
+.gasapp-topnav {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 999px;
+  background: #0b0b0c;
+  color: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.gasapp-topnav-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.gasapp-topnav-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- hero ---------- */
+.gasapp-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(32px, 6vw, 96px);
+  padding: 120px 56px 140px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.gasapp-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  max-width: 480px;
+}
+
+.gasapp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(47, 110, 255, 0.08);
+  color: #2f6eff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gasapp-title {
+  margin: 0;
+  font-size: clamp(32px, 4.4vw, 48px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.gasapp-title-muted {
+  color: rgba(11, 11, 12, 0.4);
+}
+
+.gasapp-subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(11, 11, 12, 0.55);
+  max-width: 48ch;
+}
+
+.gasapp-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgba(11, 11, 12, 0.5);
+}
+
+.gasapp-meta-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(11, 11, 12, 0.25);
+}
+
+/* ---------- phone + live shadow ---------- */
+.gasapp-phone-wrap {
+  position: relative;
+  width: clamp(220px, 24vw, 300px);
+  display: flex;
+  justify-content: center;
+}
+
+.gasapp-phone.tilt-card {
+  width: 100%;
+  border-radius: 38px;
+  animation: gasapp-float 6s ease-in-out infinite;
+}
+
+.gasapp-phone .tilt-card-inner {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* A blurred, flattened ellipse standing in for the hero screenshot's
+   drop-shadow image — animated out of phase with the phone's float so it
+   contracts/fades as the phone "lifts" and spreads/deepens as it "settles",
+   the way a real contact shadow would. */
+.gasapp-phone-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  width: 78%;
+  height: 46px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(11, 11, 12, 0.28) 0%, rgba(11, 11, 12, 0.12) 55%, transparent 75%);
+  filter: blur(6px);
+  border-radius: 50%;
+  z-index: -1;
+  animation: gasapp-shadow-breathe 6s ease-in-out infinite;
+}
+
+@keyframes gasapp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes gasapp-shadow-breathe {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+  50% { transform: translateX(-50%) scale(0.8); opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gasapp-phone.tilt-card,
+  .gasapp-phone-shadow {
+    animation: none;
+  }
+}
+
+/* ---------- bottom tab bar ---------- */
+.gasapp-tabbar {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 999px;
+  background: #0b0b0c;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+
+.gasapp-tabbar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gasapp-tabbar-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.gasapp-tabbar-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.gasapp-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gasapp-tab.is-active {
+  background: #fff;
+  color: #0b0b0c;
+}
+
+@media (max-width: 900px) {
+  .gasapp-hero {
+    flex-direction: column-reverse;
+    padding: 100px 24px 160px;
+    gap: 36px;
+    text-align: center;
+  }
+
+  .gasapp-copy {
+    align-items: center;
+    max-width: 100%;
+  }
+
+  .gasapp-phone-wrap {
+    width: clamp(180px, 50vw, 240px);
+  }
+
+  .gasapp-tabbar-tabs .gasapp-tab span,
+  .gasapp-tab {
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+}

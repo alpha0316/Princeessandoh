@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { X } from '@phosphor-icons/react'
 import ProjectLinkIcon, { getProjectLinkTooltip } from '../../components/ProjectLinkIcon'
 import { projects } from '../../data/projects'
+import { LineIcon } from './UzekaIcons'
 
 export type Chapter = { id: string; label: string }
 
@@ -26,7 +26,7 @@ export default function UzekaDetailsPanel({ chapters, appIcon }: { chapters: Cha
           aria-label={open ? 'Hide product details' : 'Show product details'}
           onClick={() => setOpen((v) => !v)}
         >
-          {open ? <X size={16} weight="bold" /> : <span className="uzeka-status-dot" />}
+          {open ? <LineIcon name="close" size={16} /> : <span className="uzeka-status-dot" />}
         </button>
       </div>
 

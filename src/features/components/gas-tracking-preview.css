@@ -1,0 +1,116 @@
+.components-card--gas-tracking .components-card-scene { align-items: flex-end; }
+
+.gas-tracking-phone {
+  container-type: inline-size;
+  position: relative;
+  width: auto;
+  height: 114%;
+  aspect-ratio: 9 / 19.5;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.88);
+  border-radius: clamp(18px, 2vw, 26px);
+  background: #fff;
+  box-shadow: 0 18px 42px rgba(19,22,28,.3), inset 0 0 0 1px rgba(18,24,32,.06);
+  color: #111315;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  bottom: 24px;
+}
+.gas-tracking-screen { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+
+.gas-tracking-map { position: absolute; z-index: 0; inset: 18% 0 0; overflow: hidden; background-color: #eef0ef; }
+.gas-map-route { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; }
+.gas-map-route path { fill: none; stroke: #1882ff; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 3 2.8; opacity: .7; }
+.gas-map-rider { position: absolute; z-index: 4; width: 34px; height: 34px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; background: rgba(77,83,90,.72); color: #fff; box-shadow: 0 0 0 14px rgba(47,54,62,.12), 0 4px 12px rgba(20,28,39,.26); transform: translate(-50%,-50%); transition: left .8s cubic-bezier(.2,.8,.25,1), top .8s cubic-bezier(.2,.8,.25,1); }
+.gas-map-rider svg { width: 17px; height: 17px; transform: rotate(-24deg); }
+
+.gas-tracking-header { position: absolute; z-index: 5; top: 7%; right: 0; left: 0; height: 11%; padding: 0 4%; display: grid; grid-template-columns: 34px 1fr 34px; align-items: center; background: rgba(255,255,255,.98); }
+.gas-tracking-header button { width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 11px; background: #f2f3f4; color: #61666b; }
+.gas-tracking-header strong { overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: 3.9cqw; font-weight: 700; }
+
+.gas-tracking-sheet { position: absolute; z-index: 6; right: 4%; bottom: 5%; left: 4%; height: 40%; padding: 1.5cqw 0 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(0,0,0,.05); border-radius: 19px; outline: 1px solid rgba(0,0,0,.035); background: #fafafa; box-shadow: 0 12px 28px rgba(29,37,44,.16); transition: height .42s cubic-bezier(.2,.8,.2,1); }
+.gas-tracking-sheet.is-collapsed { height: 9%; }
+.gas-sheet-customer { height: 13.2cqw; min-height: 0; flex: 0 0 13.2cqw; padding: 0 3cqw; display: flex; align-items: center; gap: 2cqw; }
+.gas-sheet-customer-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.gas-sheet-customer-copy strong { overflow: hidden; font-size: 4cqw; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.gas-sheet-customer-copy small { color: rgba(0,0,0,.6); font-size: 3.3cqw; }
+.gas-sheet-tip { color: #34c759; font-size: 3.8cqw; font-weight: 500; white-space: nowrap; }
+.gas-sheet-toggle { width: 25px; height: 28px; display: grid; place-items: center; border: 0; background: transparent; color: rgba(0,0,0,.62); transition: transform .3s ease; }
+.gas-tracking-sheet.is-collapsed .gas-sheet-toggle { transform: rotate(180deg); }
+.gas-sheet-content { min-height: 0; flex: 1; margin: 0 1.5cqw; padding: 2cqw; display: flex; flex-direction: column; gap: 2cqw; overflow: hidden; border: 1px solid rgba(0,0,0,.05); border-radius: 12px; background: #fff; box-shadow: 0 1px 4px rgba(12,12,13,.08); }
+.gas-sheet-cylinder-row { min-height: 0; flex: 0 0 9cqw; display: flex; align-items: center; gap: 2.5cqw; font-size: 3.8cqw; }
+.gas-sheet-cylinder-icon { width: 7.2cqw; height: 7.2cqw; display: grid; place-items: center; border-radius: 2.4cqw; background: #fafafa; }
+.gas-sheet-cylinder-icon img { width: 10px; height: 16px; object-fit: contain; }
+.gas-sheet-cylinder-row > strong { margin-left: auto; font-size: 4.3cqw; font-weight: 650; }
+.gas-sheet-contact-row { min-height: 0; flex: 0 0 auto; display: flex; align-items: center; gap: 2.5cqw; padding-top: 2cqw; border-top: 1px solid rgba(0,0,0,.05); }
+.gas-sheet-contact-row .gas-sheet-customer-copy { gap: 2px; }
+.gas-sheet-call { width: 7.2cqw; height: 7.2cqw; flex: 0 0 7.2cqw; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f4f4f4; color: #52555a; }
+.gas-sheet-call svg { width: 13px; height: 13px; }
+.gas-sheet-timeline { min-height: 0; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.gas-sheet-step { min-height: 10cqw; display: flex; align-items: center; gap: 2.2cqw; }
+.gas-sheet-step--green { min-height: 14cqw; align-items: flex-start; }
+.gas-sheet-step--blue { min-height: 14cqw; align-items: flex-start; }
+.gas-sheet-step-icon { width: 7.2cqw; height: 7.2cqw; flex: 0 0 7.2cqw; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: #2886ff; color: white; }
+.gas-sheet-step-icon svg { width: 16px; height: 16px; }
+.gas-sheet-step--green .gas-sheet-step-icon { background: #52b922; }
+.gas-sheet-step--green.is-active .gas-sheet-step-icon { background: #31c759; }
+.gas-sheet-step-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.gas-sheet-step-copy strong, .gas-sheet-step--compact > strong { overflow: hidden; font-size: 3.2cqw; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.gas-sheet-step-copy small { color: rgba(0,0,0,.6); font-size: 2.8cqw; }
+.gas-sheet-progress { height: 5px; display: block; overflow: hidden; border-radius: 24px; background: #f4f4f4; }
+.gas-sheet-progress b { height: 100%; display: block; border-radius: inherit; background: #52b922; transition: width .5s ease; }
+.gas-sheet-step--blue .gas-sheet-progress b { background: #0085ff; }
+.gas-sheet-step--compact { gap: 8px; }
+.gas-sheet-status-pill { padding: 4px 8px; border-radius: 20px; background: #fafafa; color: #92969a; font-size: 2.6cqw; white-space: nowrap; }
+.gas-sheet-status-pill.is-active { color: #52b922; }
+.gas-sheet-connector { width: 7.2cqw; height: 4.8cqw; flex: 0 0 4.8cqw; border-left: 1px dotted #52b922; margin-left: 3.5cqw; }
+.gas-sheet-connector--blue { border-left-color: #0085ff; }
+.gas-tracking-sheet.is-collapsed .gas-sheet-content { display: none; }
+
+.gas-tracking-home-indicator { position: absolute; z-index: 9; bottom: 1.4%; left: 50%; width: 29%; height: 4px; transform: translateX(-50%); border-radius: 4px; background: #101113; }
+.gas-tracking-modal-backdrop, .gas-tracking-complete-backdrop { position: absolute; z-index: 7; inset: 7% 0 3%; display: flex; align-items: flex-end; justify-content: center; padding: 8% 4%; background: rgba(23,27,32,.22); backdrop-filter: blur(2px); }
+.gas-tracking-order-modal, .gas-tracking-complete-modal { position: relative; width: 100%; padding: 14px 11px 10px; border-radius: 17px; background: #fff; box-shadow: 0 12px 30px rgba(0,0,0,.22); text-align: center; }
+.gas-tracking-modal-close { position: absolute; top: 7px; right: 7px; width: 22px; height: 22px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f2f3f4; color: #60656b; }
+.gas-tracking-order-modal h2, .gas-tracking-complete-modal h2 { margin: 0; font-size: 4cqw; }
+.gas-tracking-order-modal > p, .gas-tracking-complete-modal > p { margin: 5px 0 8px; color: #73777b; font-size: 2.8cqw; }
+.gas-tracking-request-customer, .gas-tracking-request-info, .gas-tracking-request-cylinder { padding: 7px; border: 1px solid #f0f1f2; text-align: left; font-size: 3cqw; }
+.gas-tracking-request-customer { display: flex; justify-content: space-between; border-radius: 9px 9px 0 0; }
+.gas-tracking-request-customer span { display: flex; flex-direction: column; gap: 2px; }
+.gas-tracking-request-customer small { color: #878b8e; font-size: 2.5cqw; }
+.gas-tracking-request-customer b { color: #31bd59; }
+.gas-tracking-request-info { display: flex; flex-direction: column; gap: 7px; border-top: 0; color: #757a7e; }
+.gas-tracking-request-row { display: flex; align-items: center; gap: 5px; }
+.gas-tracking-request-row b, .gas-tracking-request-cylinder b { margin-left: auto; color: #2b2d31; }
+.gas-tracking-request-divider { height: 1px; background: #f0f1f2; }
+.gas-tracking-request-address { display: flex; flex-direction: column; gap: 3px; }
+.gas-tracking-request-label { color: #9a9ea2; font-size: 2.4cqw; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+.gas-tracking-request-address-row { display: flex; align-items: center; gap: 5px; color: #2b2d31; font-weight: 500; }
+.gas-tracking-request-link { margin-left: auto; color: #147cff; font-size: 2.7cqw; font-weight: 600; white-space: nowrap; }
+.gas-tracking-request-cylinder { display: flex; align-items: center; gap: 7px; border-top: 0; border-radius: 0 0 9px 9px; }
+.gas-tracking-request-actions { display: flex; gap: 7px; margin-top: 9px; }
+.gas-tracking-request-actions button, .gas-tracking-complete-modal > button { min-height: 31px; flex: 1; border: 1px solid #eceef0; border-radius: 18px; background: white; color: #f34b59; font-size: 3cqw; font-weight: 650; }
+.gas-tracking-request-actions button + button { border-color: #28bf59; background: #30c45e; color: white; }
+.gas-tracking-queue-toast { position: absolute; z-index: 8; top: 45%; left: 50%; padding: 8px 12px; transform: translateX(-50%); border-radius: 20px; background: #23272a; color: #fff; font-size: 3cqw; white-space: nowrap; }
+.gas-tracking-complete-backdrop { align-items: center; background: rgba(0,0,0,.22); }
+.gas-tracking-complete-modal { padding-top: 17px; }
+.gas-tracking-complete-modal > svg { color: #2ac95b; }
+.gas-tracking-earnings { padding: 10px 6px; border-radius: 11px; background: #f8f8f8; }
+.gas-tracking-earnings > strong { display: block; color: #22c85a; font-size: 6cqw; }
+.gas-tracking-earnings > small { display: block; margin: 3px 0 10px; color: #83878b; font-size: 2.8cqw; }
+.gas-tracking-earnings > div { display: grid; grid-template-columns: repeat(3,1fr); }
+.gas-tracking-earnings span { display: flex; flex-direction: column; gap: 3px; }
+.gas-tracking-earnings span b { font-size: 3.5cqw; }
+.gas-tracking-earnings span small { color: #878b8f; font-size: 2.7cqw; }
+.gas-tracking-complete-modal > button { width: 100%; margin-top: 9px; border: 0; background: #050505; color: white; }
+
+.components-card--live:hover .gas-map-rider { transition: none; }
+@keyframes gas-tracking-fade { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 440px) {
+  .gas-tracking-phone { height: 118%; }
+  .gas-tracking-sheet { bottom: 5%; height: 40%; }
+  .gas-sheet-customer { height: 13.2cqw; min-height: 0; flex-basis: 13.2cqw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gas-map-rider, .gas-tracking-sheet, .gas-sheet-progress b { transition: none; }
+}

@@ -1,17 +1,64 @@
-import { useRef, useState } from 'react'
-import { ArrowLeft } from '@phosphor-icons/react'
+import { useEffect, useRef, useState } from 'react'
 import TiltCard from '../../components/TiltCard'
 import UzekaDetailsPanel, { type Chapter } from './UzekaDetailsPanel'
+import { LineIcon, TicketGlyph } from './UzekaIcons'
 import './uzeka.css'
 
 // Each case-study chapter gets its own section id here — the details panel
 // reads straight from this list, so adding Design/Engineering/etc. later is
 // just appending an entry and giving that section the matching id.
-const CHAPTERS: Chapter[] = [{ id: 'uzeka-overview', label: 'Overview' }]
+const CHAPTERS: Chapter[] = [
+  { id: 'uzeka-overview', label: 'Overview' },
+  { id: 'uzeka-shape', label: 'The shape of it' },
+  { id: 'uzeka-traction', label: 'Traction' },
+  { id: 'uzeka-ground-conditions', label: 'Ground conditions' },
+]
 
 const asset = (path: string) => `/v2-svg/Uzeka/${path}`
 
 const APP_ICON = asset('Other Product Logos/uzeka main logo.svg')
+const PRODUCT_SHOWCASE = [
+  {
+    id: 'events',
+    name: 'Events app',
+    audience: 'Consumer · iOS & Android',
+    description: 'Discovery, checkout, tickets and transfers. Where someone decides where to spend their Saturday night.',
+    logo: APP_ICON,
+    logoCrop: false,
+    src: asset('Web App.svg'),
+    alt: 'Uzeka Events app case study, showing event discovery and ticket booking',
+  },
+  {
+    id: 'scanner',
+    name: 'Scanner app',
+    audience: 'Gate staff · Access control',
+    description: 'Four outcomes, under a second each, often on a borrowed phone with patchy signal.',
+    logo: asset('Other Product Logos/Screenshot 2026-03-02 at 5.43.39 PM 1.svg'),
+    logoCrop: true,
+    src: asset('Scanner.png'),
+    alt: 'Uzeka Scanner app case study, showing event access and product stock controls',
+  },
+  {
+    id: 'vendor',
+    name: 'Vendor app',
+    audience: 'Agents · At the gate',
+    description: 'Selling tickets and products face to face, standing up, often at night, with a queue building.',
+    logo: asset('Other Product Logos/Uzeka_Logo-03 1.svg'),
+    logoCrop: false,
+    src: asset('Vendor.png'),
+    alt: 'Uzeka Vendor app case study, showing mobile product sales controls',
+  },
+  {
+    id: 'web',
+    name: 'Web platform',
+    audience: 'Organisers & admin',
+    description: 'Settlement, selling points, advertising and the operational view behind all three apps.',
+    logo: asset('Other Product Logos/Vendor 2.svg'),
+    logoCrop: false,
+    src: asset('Webapp.svg'),
+    alt: 'Uzeka Web platform case study, showing event organiser dashboard',
+  },
+]
 const PRODUCT_ICONS = [
   { src: asset('Other Product Logos/Vendor 2.svg') },
   { src: asset('Other Product Logos/Uzeka_Logo-03 1.svg') },
@@ -20,6 +67,32 @@ const PRODUCT_ICONS = [
   // tight to it so it isn't a speck next to the other two full-bleed icons.
   { src: asset('Other Product Logos/Screenshot 2026-03-02 at 5.43.39 PM 1.svg'), crop: true },
 ]
+
+function AnimatedNumber({ target, decimals = 0, started }: { target: number; decimals?: number; started: boolean }) {
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    if (!started) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target)
+      return
+    }
+
+    const startTime = performance.now()
+    let frame = 0
+    const animate = (now: number) => {
+      const progress = Math.min((now - startTime) / 1500, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setValue(target * eased)
+      if (progress < 1) frame = window.requestAnimationFrame(animate)
+    }
+
+    frame = window.requestAnimationFrame(animate)
+    return () => window.cancelAnimationFrame(frame)
+  }, [started, target])
+
+  return <>{value.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</>
+}
 
 function BriefcaseIcon() {
   return (
@@ -64,8 +137,49 @@ const EDGE_SCREENS: Screen[] = [
 
 export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const [canHover] = useState(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+  const [activeProduct, setActiveProduct] = useState(0)
+  const [showcasePaused, setShowcasePaused] = useState(false)
+  const [inspectedProduct, setInspectedProduct] = useState<string | null>(null)
+  const [carouselRestart, setCarouselRestart] = useState(0)
+  const [tractionStarted, setTractionStarted] = useState(false)
+  const [lightChapterOnScreen, setLightChapterOnScreen] = useState(false)
+  const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const pageRef = useRef<HTMLDivElement>(null)
   const revealRef = useRef<HTMLDivElement>(null)
+  const tractionRef = useRef<HTMLElement>(null)
+  const groundConditionsRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const sections = [tractionRef.current, groundConditionsRef.current].filter((section): section is HTMLElement => Boolean(section))
+    if (!sections.length) return
+    if (!('IntersectionObserver' in window)) {
+      setTractionStarted(true)
+      setLightChapterOnScreen(true)
+      return
+    }
+
+    const visibleSections = new Set<Element>()
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) visibleSections.add(entry.target)
+        else visibleSections.delete(entry.target)
+      })
+      const visible = visibleSections.size > 0
+      setLightChapterOnScreen(visible)
+      if (visibleSections.has(tractionRef.current as HTMLElement)) setTractionStarted(true)
+    }, { threshold: 0.18 })
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (showcasePaused || reducedMotion) return
+    const timeout = window.setTimeout(() => {
+      setActiveProduct((current) => (current + 1) % PRODUCT_SHOWCASE.length)
+      setInspectedProduct(null)
+    }, 7000)
+    return () => window.clearTimeout(timeout)
+  }, [activeProduct, showcasePaused, reducedMotion, carouselRestart])
 
   const updateSpot = (clientX: number, clientY: number) => {
     if (!revealRef.current) return
@@ -85,14 +199,14 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
 
   return (
     <div
-      className="uzeka-page"
+      className={`uzeka-page${lightChapterOnScreen ? ' is-traction-active' : ''}`}
       ref={pageRef}
       onMouseMove={handleMouseMove}
       onTouchStart={handleTouchMove}
       onTouchMove={handleTouchMove}
     >
       <button className="uzeka-back uzeka-glass-btn" aria-label="Back to projects" onClick={() => onNavigate?.('home')}>
-        <ArrowLeft size={18} weight="bold" />
+        <LineIcon name="arrow-left" size={18} />
       </button>
       <UzekaDetailsPanel chapters={CHAPTERS} appIcon={APP_ICON} />
 
@@ -117,7 +231,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
           </div>
         </div>
         <p className="uzeka-flashlight-hint">
-          {canHover ? 'Move your cursor to light up the product' : 'Touch and drag to light up the product'}
+          {/* {canHover ? 'Move your cursor to light up the product' : 'Touch and drag to light up the product'} */}
         </p>
 
         <div className="uzeka-cover-content">
@@ -133,7 +247,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
 
             <div className="uzeka-cover-meta">
               <span className="uzeka-cover-meta-item">
-                <BriefcaseIcon />
+                <LineIcon name="briefcase" size={20} className="uzeka-cover-meta-icon" />
                 Product Design
               </span>
               <span className="uzeka-cover-meta-dot" />
@@ -188,6 +302,189 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
           </div>
         </div>
       </div>
+
+      <section className="uzeka-chapter" id="uzeka-shape" aria-labelledby="uzeka-shape-title">
+        <div className="uzeka-chapter-inner">
+          <header className="uzeka-chapter-intro">
+            <p className="uzeka-chapter-kicker"><span>01</span> The shape of it</p>
+            <h2 id="uzeka-shape-title">Four products asking the same question</h2>
+            <p className="uzeka-chapter-lede">
+              Uzeka sells event tickets in Angola. By the time I joined it had grown into four separate products,
+              built at different times, that no longer agreed with each other about the one thing that mattered most.
+            </p>
+            <p className="uzeka-chapter-secondary">
+              Each surface puts a different person in a different place. Someone at home on a Thursday choosing what
+              to do on Saturday. An agent at the gate with a queue in front of them. An organiser the next morning,
+              working out what they actually earned.
+            </p>
+          </header>
+
+          <div
+            className={`uzeka-showcase${showcasePaused ? ' is-paused' : ''}`}
+            onMouseEnter={() => canHover && setShowcasePaused(true)}
+            onMouseLeave={() => setShowcasePaused(false)}
+            onFocus={() => setShowcasePaused(true)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setShowcasePaused(false)
+            }}
+            aria-label="Four Uzeka products"
+          >
+            <div className="uzeka-showcase-content" aria-live="polite">
+              {PRODUCT_SHOWCASE.map((product, index) => (
+                <article className={`uzeka-product-slide${activeProduct === index ? ' is-active' : ''}`} key={product.id} aria-hidden={activeProduct !== index}>
+                  <div className="uzeka-product-copy">
+                    {product.logoCrop ? (
+                      <span className="uzeka-product-brand uzeka-product-brand--crop" aria-hidden="true">
+                        <img src={product.logo} alt="" />
+                      </span>
+                    ) : (
+                      <img className="uzeka-product-brand" src={product.logo} alt="" />
+                    )}
+                    <div className="uzeka-product-copy-text">
+                      <h3>{product.name}</h3>
+                      <p className="uzeka-product-audience">{product.audience}</p>
+                      <p className="uzeka-product-description">{product.description}</p>
+                    </div>
+                  </div>
+                  <div className={`uzeka-product-visual uzeka-product-visual--${product.id}${inspectedProduct === product.id ? ' is-inspected' : ''}`}>
+                    <img src={product.src} alt={product.alt} draggable={false} />
+                    {(product.id === 'events' || product.id === 'vendor') && (
+                      <button
+                        className="uzeka-product-inspect"
+                        type="button"
+                        aria-pressed={inspectedProduct === product.id}
+                        onClick={() => setInspectedProduct((current) => current === product.id ? null : product.id)}
+                      >
+                        {inspectedProduct === product.id ? 'Reset view' : 'Explore screen'}
+                      </button>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <nav className="uzeka-product-controls" aria-label="Choose a Uzeka product">
+              {PRODUCT_SHOWCASE.map((product, index) => (
+                <button
+                  key={`${product.id}-${activeProduct === index ? carouselRestart : 0}`}
+                  type="button"
+                  className={activeProduct === index ? 'is-active' : ''}
+                  aria-pressed={activeProduct === index}
+                  onClick={() => {
+                    setActiveProduct(index)
+                    setInspectedProduct(null)
+                    setCarouselRestart((current) => current + 1)
+                  }}
+                >
+                  <span className="uzeka-product-control-index">0{index + 1}</span>
+                  <span>{product.name}</span>
+                </button>
+              ))}
+            </nav>
+
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="uzeka-chapter uzeka-chapter--traction"
+        id="uzeka-traction"
+        aria-labelledby="uzeka-traction-title"
+        ref={tractionRef}
+      >
+        <div className="uzeka-chapter-inner uzeka-traction-inner">
+          <header className="uzeka-chapter-intro uzeka-traction-intro">
+            <p className="uzeka-chapter-kicker"><span>02</span> Traction</p>
+            <h2 id="uzeka-traction-title">What the platform has already done</h2>
+            <p className="uzeka-chapter-lede">
+              This is not a concept piece. Uzeka was live and processing real money before any of this work started —
+              which set the constraint for all of it: nothing could break what was already running.
+            </p>
+          </header>
+
+          <div className="uzeka-traction-total" aria-label="2.0 billion kwanzas gross volume">
+            <strong><AnimatedNumber target={2} decimals={1} started={tractionStarted} /></strong>
+            <span>bn Kz</span>
+          </div>
+          <p className="uzeka-traction-caption">
+            Gross volume processed to date, across <AnimatedNumber target={56363} started={tractionStarted} /> tickets issued
+          </p>
+
+          <div className="uzeka-traction-grid">
+            <article className="uzeka-traction-card uzeka-traction-card--blue">
+              <span className="uzeka-traction-icon"><TicketGlyph size={16} /></span>
+              <div><p>Tickets issued</p><strong><AnimatedNumber target={56363} started={tractionStarted} /></strong></div>
+            </article>
+            <article className="uzeka-traction-card uzeka-traction-card--green">
+              <span className="uzeka-traction-icon"><LineIcon name="credit-card" size={16} /></span>
+              <div><p>Last 12 months</p><strong><AnimatedNumber target={933} started={tractionStarted} /><small>M Kz</small></strong></div>
+            </article>
+            <article className="uzeka-traction-card uzeka-traction-card--orange">
+              <span className="uzeka-traction-icon"><LineIcon name="pin" size={16} /></span>
+              <div><p>Last 30 days</p><strong><AnimatedNumber target={39.6} decimals={1} started={tractionStarted} /><small>M Kz</small></strong></div>
+            </article>
+            <article className="uzeka-traction-card uzeka-traction-card--pink">
+              <span className="uzeka-traction-icon"><LineIcon name="users" size={16} /></span>
+              <div><p>New users</p><strong><AnimatedNumber target={1297} started={tractionStarted} /></strong></div>
+            </article>
+          </div>
+
+          <p className="uzeka-traction-note">
+            The spikes are the shape of the business. Two days — 2 September and 11 September — account for more than a
+            quarter of the month’s volume between them. Event commerce arrives in bursts tied to specific nights, which
+            is exactly why a settlement screen cannot assume a steady trickle, and why a notification system has to group
+            hundreds of sales into one message.
+          </p>
+        </div>
+      </section>
+
+      <section
+        className="uzeka-chapter uzeka-chapter--ground"
+        id="uzeka-ground-conditions"
+        aria-labelledby="uzeka-ground-title"
+        ref={groundConditionsRef}
+      >
+        <div className="uzeka-chapter-inner uzeka-ground-inner">
+          <header className="uzeka-chapter-intro uzeka-ground-intro">
+            <p className="uzeka-chapter-kicker"><span>03</span> Ground conditions</p>
+            <h2 id="uzeka-ground-title">Three facts about Angola that shaped everything</h2>
+            <p className="uzeka-chapter-lede">
+              Most ticketing products are designed where card payments are instant and cash is an edge case. In Luanda neither is true, and pretending otherwise produces a product that works in a demo and fails at a gate.
+            </p>
+          </header>
+
+          <div className="uzeka-ground-layout">
+            <div className="uzeka-ground-facts">
+              <article className="uzeka-ground-fact">
+                <span className="uzeka-ground-fact-icon is-blue"><LineIcon name="bank" size={18} /></span>
+                <div><h3>Cash is normal, not an exception</h3><p>A street market or a door-sales party may take almost nothing electronically. Any model that treats cash as a rounding error will mis-state what half of the events on the platform actually earned.</p></div>
+              </article>
+              <article className="uzeka-ground-fact">
+                <span className="uzeka-ground-fact-icon is-pink"><LineIcon name="clock" size={18} /></span>
+                <div><h3>Paying is not instant</h3><p>Alongside Multicaixa Express, people pay by reference — taking a code to an ATM or banking app, sometimes an hour later, sometimes never. The gap between “order placed” and “money arrived” is the longest unmanaged stretch in the entire product.</p></div>
+              </article>
+              <article className="uzeka-ground-fact">
+                <span className="uzeka-ground-fact-icon is-green"><LineIcon name="translate" size={18} /></span>
+                <div><h3>Everything is in Portuguese</h3><p>Words run roughly 20% longer than in English. Tight line heights and narrow buttons that survive an English mockup break on contact with real copy — which is why push titles here never lead with the event name.</p></div>
+              </article>
+            </div>
+
+            <div className="uzeka-ground-visual" role="img" aria-label="Luanda at dusk, representing the conditions that shaped Uzeka">
+              <div className="uzeka-ground-visual-top"><span>LUANDA, ANGOLA</span><span>08°50′S 13°14′E</span></div>
+              <div className="uzeka-ground-insight">
+                <span className="uzeka-ground-insight-icon"><LineIcon name="credit-card" size={17} /></span>
+                <p>Sales this week</p><strong>Kz 721,000</strong><span className="uzeka-ground-sparkline" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /></span>
+              </div>
+              <div className="uzeka-ground-stock">
+                <span className="uzeka-ground-stock-thumb">₳</span>
+                <div><strong>Coca Cola</strong><small>Kz 1,500 · Drinks</small></div>
+                <b>12</b>
+              </div>
+              <span className="uzeka-ground-caption">Built for the way events actually work.</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

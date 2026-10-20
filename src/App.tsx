@@ -13,11 +13,13 @@ import { useWeather } from './hooks/useWeather'
 const SnapsPage = lazy(() => import('./features/snaps/SnapsPage'))
 const AboutPage = lazy(() => import('./features/about/AboutPage'))
 const UzekaPage = lazy(() => import('./features/uzeka/UzekaPage'))
+const GasAppPage = lazy(() => import('./features/gasapp/GasAppPage'))
+const ComponentsPage = lazy(() => import('./features/components/ComponentsPage'))
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
 
-type Page = 'home' | 'snaps' | 'about' | 'uzeka'
+type Page = 'home' | 'snaps' | 'about' | 'uzeka' | 'gas-app' | 'components'
 
 function AppContent() {
   const isDev = import.meta.env.DEV
@@ -67,8 +69,30 @@ function AppContent() {
         <Suspense fallback={null}>
           <UzekaPage onNavigate={(p: string) => setPage(p as Page)} />
         </Suspense>
-        <IconCredit dark />
       </>
+    )
+  }
+
+  if (page === 'gas-app') {
+    return (
+      <>
+        <Suspense fallback={null}>
+          <GasAppPage onNavigate={(p: string) => setPage(p as Page)} />
+        </Suspense>
+        <IconCredit />
+      </>
+    )
+  }
+
+  if (page === 'components') {
+    return (
+      <div className={`theme-${theme}`}>
+        <FluidBackground />
+        <Suspense fallback={null}>
+          <ComponentsPage onNavigate={(p: string) => setPage(p as Page)} />
+        </Suspense>
+        <IconCredit dark={isNight} />
+      </div>
     )
   }
 

@@ -3,8 +3,47 @@
   min-height: 100vh;
   background: #000;
   color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
+
+.uzeka-chapter--ground {
+  color: #151518;
+  border-top: 0;
+  background: #f8f8f8;
+}
+.uzeka-chapter--ground .uzeka-chapter-kicker { color: #77777a; }
+.uzeka-chapter--ground .uzeka-chapter-kicker span { color: #1599ef; }
+.uzeka-chapter--ground .uzeka-chapter-intro { width: min(760px, 100%); margin-bottom: 28px; }
+.uzeka-chapter--ground .uzeka-chapter-intro h2 { max-width: 650px; color: #080809; }
+.uzeka-chapter--ground .uzeka-chapter-lede { max-width: 720px; color: #454549; }
+.uzeka-ground-inner { width: min(980px, 100%); }
+.uzeka-ground-layout { display: grid; grid-template-columns: minmax(0, 1.42fr) minmax(280px, 0.9fr); gap: 18px; align-items: stretch; }
+.uzeka-ground-facts { display: flex; flex-direction: column; justify-content: center; gap: 21px; padding: 25px 26px; border: 1px solid rgba(20, 20, 24, 0.07); border-radius: 24px; background: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04); }
+.uzeka-ground-fact { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 16px; align-items: start; }
+.uzeka-ground-fact-icon { display: grid; width: 20px; height: 20px; place-items: center; margin-top: 1px; }
+.uzeka-ground-fact-icon.is-blue { color: #2499e8; }
+.uzeka-ground-fact-icon.is-pink { color: #ed3472; }
+.uzeka-ground-fact-icon.is-green { color: #30bf5c; }
+.uzeka-ground-fact h3 { margin: 0 0 5px; color: #17171a; font-size: 15px; line-height: 1.3; font-weight: 600; }
+.uzeka-ground-fact p { margin: 0; color: #858589; font-size: 12px; line-height: 1.65; }
+.uzeka-ground-visual { position: relative; min-height: 355px; overflow: hidden; border-radius: 22px; isolation: isolate; background: #222 url('/bgs/bg%202.png') center 58% / cover no-repeat; }
+.uzeka-ground-visual::before { position: absolute; z-index: -1; inset: 0; content: ''; background: linear-gradient(180deg, rgba(12, 11, 19, 0.06) 0%, rgba(10, 8, 15, 0.08) 38%, rgba(7, 7, 10, 0.75) 100%); }
+.uzeka-ground-visual-top { position: absolute; inset: 17px 17px auto; display: flex; justify-content: space-between; color: rgba(255, 255, 255, 0.82); font-size: 9px; letter-spacing: 0.12em; text-shadow: 0 1px 8px rgba(0,0,0,.5); }
+.uzeka-ground-insight { position: absolute; top: 22%; right: -18px; width: 175px; min-height: 139px; padding: 15px; border: 1px solid rgba(255,255,255,.6); border-radius: 17px; background: rgba(255,255,255,.94); box-shadow: 0 14px 35px rgba(0,0,0,.18); transform: rotate(4deg); }
+.uzeka-ground-insight-icon { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 8px; background: #299ce8; color: #fff; }
+.uzeka-ground-insight p { margin: 13px 0 4px; color: #8a8a8d; font-size: 12px; }
+.uzeka-ground-insight strong { color: #151518; font-size: 17px; }
+.uzeka-ground-sparkline { display: flex; height: 16px; align-items: end; gap: 4px; margin-top: 8px; }
+.uzeka-ground-sparkline i { width: 8px; height: 40%; border-radius: 3px 3px 0 0; background: #5ab4ee; }
+.uzeka-ground-sparkline i:nth-child(2n) { height: 70%; }
+.uzeka-ground-sparkline i:nth-child(3n) { height: 100%; }
+.uzeka-ground-stock { position: absolute; right: 15px; bottom: 45px; left: 15px; display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 14px; background: rgba(255,255,255,.96); box-shadow: 0 12px 30px rgba(0,0,0,.2); }
+.uzeka-ground-stock-thumb { display: grid; width: 33px; height: 33px; place-items: center; border-radius: 9px; background: #f0f0f1; color: #ed3472; font-weight: 700; }
+.uzeka-ground-stock div { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+.uzeka-ground-stock strong { overflow: hidden; color: #343438; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.uzeka-ground-stock small { color: #319de6; font-size: 9px; }
+.uzeka-ground-stock b { padding: 5px 9px; border: 1px solid #eee; border-radius: 20px; color: #28282a; font-size: 12px; }
+.uzeka-ground-caption { position: absolute; right: 16px; bottom: 16px; left: 16px; color: rgba(255,255,255,.9); font-size: 10px; letter-spacing: .04em; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
 
 .uzeka-hero-screen {
   position: relative;
@@ -49,6 +88,19 @@
 
 .uzeka-back:hover {
   transform: translateX(-2px);
+}
+
+.uzeka-page.is-traction-active .uzeka-back {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+  color: #171719;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
+}
+
+.uzeka-page.is-traction-active .uzeka-panel:not(.is-open) {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
 }
 
 .uzeka-status-dot {
@@ -470,9 +522,9 @@
     position: relative;
     inset: auto;
     width: 100%;
-    height: 17vh;
-    min-height: 120px;
-    max-height: 170px;
+    height: 24vh;
+    min-height: 170px;
+    max-height: 215px;
     margin-bottom: 0;
     overflow: hidden;
   }
@@ -483,14 +535,14 @@
   }
 
   .uzeka-edge--onboarding {
-    left: 6%;
-    top: -70px;
+    left: 5.6%;
+    top: -9vh;
   }
 
   .uzeka-edge--web {
-    right: 6%;
+    right: 6.1%;
     left: auto;
-    top: -70px;
+    top: -9vh;
   }
 
   .uzeka-edge-screen.tilt-card {
@@ -552,6 +604,534 @@
   display: none;
 }
 
+/* ---------- chapter 01: one ecosystem, four working contexts ---------- */
+.uzeka-chapter {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 60px 40px 20px;
+  background:
+    radial-gradient(ellipse at 84% 72%, rgba(40, 105, 143, 0.09), transparent 35%),
+    #050505;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.uzeka-chapter-inner {
+  width: min(944px, 100%);
+  margin: 0 auto;
+}
+
+.uzeka-chapter-intro {
+  width: min(690px, 100%);
+  margin: 0 0 25px;
+}
+
+.uzeka-chapter-kicker {
+  margin: 0 0 16px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.uzeka-chapter-kicker span {
+  color: #77c8ef;
+  letter-spacing: 0;
+  margin-right: 5px;
+}
+
+.uzeka-chapter-intro h2 {
+  max-width: 590px;
+  margin: 0 0 16px;
+  font-size: clamp(32px, 3.6vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+
+.uzeka-chapter-lede,
+.uzeka-chapter-secondary {
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.uzeka-chapter-secondary {
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.uzeka-chapter--traction {
+  color: #101012;
+  border-top: 0;
+  background: linear-gradient(180deg, #fff 0%, #fff 88%, #f4f4f4 100%);
+}
+
+.uzeka-chapter--traction .uzeka-chapter-kicker {
+  color: #77777a;
+}
+
+.uzeka-chapter--traction .uzeka-chapter-kicker span {
+  color: #1599ef;
+}
+
+.uzeka-chapter--traction .uzeka-chapter-intro h2 {
+  max-width: 700px;
+  color: #080809;
+}
+
+.uzeka-chapter--traction .uzeka-chapter-lede {
+  max-width: 720px;
+  color: #39393c;
+}
+
+.uzeka-traction-inner {
+  padding: 16px 0;
+}
+
+.uzeka-traction-intro {
+  margin-bottom: 40px;
+}
+
+.uzeka-traction-total {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: #050506;
+}
+
+.uzeka-traction-total strong {
+  font-size: clamp(58px, 6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.uzeka-traction-total > span {
+  color: #858589;
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.uzeka-traction-caption {
+  margin: 8px 0 18px;
+  color: #454549;
+  font-size: 16px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.uzeka-traction-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.uzeka-traction-card {
+  display: flex;
+  min-height: 160px;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid;
+  border-radius: 20px;
+  padding: 18px 16px 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.uzeka-traction-card--blue {
+  border-color: rgba(64, 155, 242, 0.18);
+  background: linear-gradient(145deg, rgba(75, 164, 246, 0.09), rgba(255, 255, 255, 0.9));
+  --metric-color: #37a3ef;
+}
+
+.uzeka-traction-card--green {
+  border-color: rgba(78, 216, 106, 0.22);
+  background: linear-gradient(145deg, rgba(117, 227, 112, 0.1), rgba(255, 255, 255, 0.9));
+  --metric-color: #4ccc78;
+}
+
+.uzeka-traction-card--orange {
+  border-color: rgba(255, 173, 54, 0.22);
+  background: linear-gradient(145deg, rgba(255, 191, 83, 0.12), rgba(255, 255, 255, 0.9));
+  --metric-color: #ff9c4a;
+}
+
+.uzeka-traction-card--pink {
+  border-color: rgba(240, 74, 127, 0.2);
+  background: linear-gradient(145deg, rgba(239, 84, 133, 0.1), rgba(255, 255, 255, 0.9));
+  --metric-color: #e7447b;
+}
+
+.uzeka-traction-icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--metric-color);
+  color: #fff;
+}
+
+.uzeka-traction-card p {
+  margin: 0 0 5px;
+  color: #929296;
+  font-size: 14px;
+}
+
+.uzeka-traction-card strong {
+  color: #353538;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.uzeka-traction-card small {
+  margin-left: 2px;
+  color: #9a9a9d;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.uzeka-traction-note {
+  margin: 48px 0 0;
+  color: #88888c;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.uzeka-showcase {
+  position: relative;
+  width: min(937px, 100%);
+  height: clamp(350px, 47.3vh, 460px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
+  isolation: isolate;
+}
+
+.uzeka-showcase::before {
+  position: absolute;
+  z-index: 5;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--uzeka-orbit-angle, 0deg), transparent 0deg 282deg, rgba(235, 119, 156, 0.12) 300deg, rgba(235, 119, 156, 0.92) 324deg, rgba(255, 197, 219, 0.7) 333deg, rgba(235, 119, 156, 0.12) 344deg, transparent 360deg);
+  content: '';
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 4px rgba(235, 119, 156, 0.75)) drop-shadow(0 0 12px rgba(235, 119, 156, 0.3));
+  animation: uzeka-orbit 7s linear infinite;
+}
+
+@property --uzeka-orbit-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes uzeka-orbit {
+  to { --uzeka-orbit-angle: 360deg; }
+}
+
+.uzeka-showcase-content {
+  position: absolute;
+  inset: 0;
+}
+
+.uzeka-product-slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 700ms ease, visibility 700ms ease;
+}
+
+.uzeka-product-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.uzeka-product-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 11px;
+  padding: 32px 0 32px 32px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.uzeka-product-brand {
+  display: block;
+  flex: 0 0 auto;
+  width: 81px;
+  height: 80px;
+  margin-bottom: 0;
+  /* border: 0.5px solid rgba(235, 119, 156, 0.4); */
+  border-radius: 24px;
+  /* box-shadow: 0 0 0 0.5px rgba(235, 119, 156, 0.4), 0 12px 32px rgba(235, 119, 156, 0.12); */
+}
+
+.uzeka-product-brand--crop {
+  position: relative;
+  overflow: hidden;
+  background: #242427;
+}
+
+.uzeka-product-brand--crop img {
+  position: absolute;
+  top: -51px;
+  left: -119px;
+  width: 320px;
+  height: 320px;
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.uzeka-product-copy h3 {
+  margin: 0;
+  font-size: 28px;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+.uzeka-product-copy-text {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.uzeka-product-audience {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.uzeka-product-description {
+  max-width: 38ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.uzeka-product-visual {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+
+.uzeka-product-visual img {
+  position: absolute;
+  top: 7.6%;
+  left: 16%;
+  width: 68%;
+  height: auto;
+  max-width: none;
+  border-radius: 29px;
+  filter: none;
+  box-shadow: none;
+}
+
+.uzeka-product-visual--scanner img,
+.uzeka-product-visual--vendor img {
+  top: 8.1%;
+  left: 19.8%;
+  width: 60.2%;
+  border-radius: 24px;
+}
+
+.uzeka-product-visual--web img {
+  top: 8.4%;
+  left: 11.2%;
+  width: 88.8%;
+  border-radius: 24px;
+}
+
+.uzeka-product-visual--events,
+.uzeka-product-visual--scanner,
+.uzeka-product-visual--vendor {
+  perspective: 1000px;
+}
+
+.uzeka-product-slide.is-active .uzeka-product-visual--events img,
+.uzeka-product-slide.is-active .uzeka-product-visual--scanner img,
+.uzeka-product-slide.is-active .uzeka-product-visual--vendor img {
+  animation: uzeka-phone-frame-flip 750ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  backface-visibility: hidden;
+  transform-origin: center;
+}
+
+@keyframes uzeka-phone-frame-flip {
+  from {
+    opacity: 0.35;
+    transform: rotateY(-82deg) scale(var(--screen-scale, 1));
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0deg) scale(var(--screen-scale, 1));
+  }
+}
+
+.uzeka-product-inspect {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: rgba(16, 16, 18, 0.74);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.uzeka-product-visual:hover .uzeka-product-inspect,
+.uzeka-product-inspect:focus-visible,
+.uzeka-product-visual.is-inspected .uzeka-product-inspect {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.uzeka-product-inspect:hover {
+  background: rgba(40, 40, 44, 0.9);
+}
+
+.uzeka-product-visual img {
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.uzeka-product-visual.is-inspected img {
+  --screen-scale: 1.16;
+  transform-origin: 76% 56%;
+}
+
+.uzeka-product-controls {
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 9px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(5, 5, 5, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.uzeka-product-controls button {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.uzeka-product-controls button:hover,
+.uzeka-product-controls button:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.uzeka-product-controls button.is-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.uzeka-product-controls button.is-active::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  content: '';
+  animation: uzeka-product-meter 7s linear forwards;
+}
+
+.uzeka-product-controls button.is-active .uzeka-product-control-index,
+.uzeka-product-controls button.is-active > span:last-child {
+  position: relative;
+  z-index: 1;
+}
+
+.uzeka-showcase.is-paused .uzeka-product-controls button.is-active::before {
+  animation-play-state: paused;
+}
+
+@keyframes uzeka-product-meter {
+  to { width: 100%; }
+}
+
+.uzeka-product-control-index {
+  color: #85bfe6;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uzeka-product-slide,
+  .uzeka-product-inspect,
+  .uzeka-product-controls button,
+  .uzeka-product-visual img {
+    transition: none;
+  }
+
+  .uzeka-product-slide.is-active .uzeka-product-visual--events img,
+  .uzeka-product-slide.is-active .uzeka-product-visual--scanner img,
+  .uzeka-product-slide.is-active .uzeka-product-visual--vendor img {
+    animation: none;
+  }
+
+  .uzeka-product-controls button.is-active::before {
+    animation: none;
+    width: 100%;
+  }
+}
+
 @media (max-width: 900px) {
   /* One screen, no scrolling: fixed to the real viewport height (100dvh
      accounts for mobile browser chrome better than 100vh) with everything
@@ -562,7 +1142,7 @@
     min-height: auto;
     overflow: hidden;
     justify-content: flex-start;
-    padding: 76px 20px 20px;
+    padding: 20px 20px 20px;
     gap: 12px;
   }
 
@@ -613,8 +1193,8 @@
     transform: none;
     width: 100%;
     overflow: hidden;
-    opacity: 1;
     display: block;
+    margin-top: auto;
   }
 
   .uzeka-wordmark-track {
@@ -635,6 +1215,142 @@
     display: block;
   }
 
+  .uzeka-chapter {
+    min-height: 100vh;
+    min-height: 100svh;
+    align-items: flex-start;
+    padding: 74px 20px 32px;
+  }
+
+  .uzeka-chapter-intro {
+    margin-bottom: 20px;
+  }
+
+  .uzeka-chapter-kicker {
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+
+  .uzeka-chapter-intro h2 {
+    max-width: 520px;
+    margin-bottom: 12px;
+    font-size: clamp(29px, 8vw, 36px);
+  }
+
+  .uzeka-chapter-lede,
+  .uzeka-chapter-secondary {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .uzeka-chapter-lede { margin-bottom: 9px; }
+
+  .uzeka-chapter--traction {
+    align-items: center;
+    padding: 76px 20px 40px;
+  }
+
+  .uzeka-traction-inner { padding: 0; }
+
+  .uzeka-traction-intro { margin-bottom: 26px; }
+
+  .uzeka-traction-total strong { font-size: 58px; }
+
+  .uzeka-traction-total > span { font-size: 24px; }
+
+  .uzeka-traction-caption {
+    margin: 7px 0 16px;
+    font-size: 13px;
+  }
+
+  .uzeka-traction-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+  .uzeka-traction-card {
+    min-height: 132px;
+    border-radius: 16px;
+    padding: 14px 12px;
+  }
+
+  .uzeka-traction-card p { font-size: 12px; }
+
+  .uzeka-traction-card strong { font-size: 16px; }
+
+  .uzeka-traction-card small { font-size: 10px; }
+
+  .uzeka-traction-note {
+    margin-top: 26px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .uzeka-showcase {
+    height: clamp(430px, 60vh, 560px);
+    border-radius: 24px;
+  }
+
+  .uzeka-product-slide {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 45% 55%;
+  }
+
+  .uzeka-product-copy {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 20px 22px 16px;
+    background: linear-gradient(180deg, #0b0b0c 75%, rgba(11, 11, 12, 0.93));
+  }
+
+  .uzeka-product-brand {
+    width: 43px;
+    height: 43px;
+    margin-bottom: 0;
+    border-radius: 14px;
+  }
+
+  .uzeka-product-brand--crop img {
+    top: -27px;
+    left: -63px;
+    width: 170px;
+    height: 170px;
+  }
+
+  .uzeka-product-copy h3 {
+    margin-bottom: 0;
+    font-size: 25px;
+  }
+
+  .uzeka-product-copy-text { gap: 7px; }
+
+  .uzeka-product-audience {
+    margin-bottom: 0;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+  }
+
+  .uzeka-product-description {
+    max-width: 44ch;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .uzeka-product-inspect {
+    opacity: 1;
+    transform: none;
+  }
+
+  .uzeka-product-controls {
+    gap: 2px;
+    padding: 7px 6px;
+  }
+
+  .uzeka-product-controls button {
+    gap: 0;
+    padding: 9px 4px;
+    font-size: 10px;
+  }
+
+  .uzeka-product-control-index { display: none; }
+
   @keyframes uzeka-marquee {
     from {
       transform: translateX(0);
@@ -643,4 +1359,50 @@
       transform: translateX(-50%);
     }
   }
+}
+
+@media (max-width: 900px) {
+  .uzeka-ground-inner { padding: 0; }
+  .uzeka-chapter--ground { align-items: flex-start; padding: 74px 20px 34px; }
+  .uzeka-chapter--ground .uzeka-chapter-intro { margin-bottom: 20px; }
+  .uzeka-ground-layout { grid-template-columns: 1fr; gap: 14px; }
+  .uzeka-ground-facts { gap: 16px; padding: 18px; border-radius: 19px; }
+  .uzeka-ground-fact { gap: 11px; }
+  .uzeka-ground-fact h3 { font-size: 13px; }
+  .uzeka-ground-fact p { font-size: 11px; line-height: 1.55; }
+  .uzeka-ground-visual { min-height: 310px; background-position: center 58%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uzeka-showcase::before { animation: none; opacity: 0.45; }
+}
+
+/* Ground conditions follows the light editorial chapter treatment in the reference. */
+.uzeka-chapter.uzeka-chapter--ground {
+  color: #171719;
+  background: #fff;
+  border-top: 0;
+}
+.uzeka-chapter.uzeka-chapter--ground .uzeka-chapter-kicker { color: #858589; }
+.uzeka-chapter.uzeka-chapter--ground .uzeka-chapter-intro h2 { color: #080809; }
+.uzeka-chapter.uzeka-chapter--ground .uzeka-chapter-lede { color: #39393c; }
+.uzeka-ground-inner { width: min(944px, 100%); }
+.uzeka-ground-layout { grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 16px; }
+.uzeka-ground-facts { min-height: 330px; justify-content: flex-start; gap: 20px; padding: 22px 18px; border-radius: 24px; }
+.uzeka-ground-fact { grid-template-columns: 22px minmax(0, 1fr); gap: 14px; }
+.uzeka-ground-fact h3 { font-size: 14px; }
+.uzeka-ground-fact p { font-size: 11px; line-height: 1.65; }
+.uzeka-ground-visual { min-height: 330px; background-image: linear-gradient(180deg, rgba(8, 8, 12, .06), rgba(8, 8, 12, .12) 44%, rgba(8, 8, 12, .52)), url('/bgs/bg%202.png'); }
+.uzeka-ground-visual::before { display: none; }
+
+@media (max-width: 900px) {
+  .uzeka-ground-inner { padding: 0; }
+  .uzeka-chapter.uzeka-chapter--ground { align-items: flex-start; padding: 74px 20px 34px; }
+  .uzeka-chapter.uzeka-chapter--ground .uzeka-chapter-intro { margin-bottom: 20px; }
+  .uzeka-ground-layout { grid-template-columns: 1fr; gap: 14px; }
+  .uzeka-ground-facts { min-height: unset; gap: 16px; padding: 18px; border-radius: 19px; }
+  .uzeka-ground-fact { gap: 11px; }
+  .uzeka-ground-fact h3 { font-size: 13px; }
+  .uzeka-ground-fact p { font-size: 11px; line-height: 1.55; }
+  .uzeka-ground-visual { min-height: 310px; background-position: center 58%; }
 }

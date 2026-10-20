@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { CaretRight, SidebarSimple, X } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, SidebarSimple, X } from '@phosphor-icons/react'
 import { useTheme } from '../context/ThemeContext'
 import { acquireGlass, releaseGlass } from '../lib/glass'
 import type { Project } from '../types/project'
@@ -29,7 +29,7 @@ export default function ProjectOverlay({
     dotsRef.current?.style.setProperty('--spot-y', `${e.clientY}px`)
   }
 
-  const goTo = (i: number) => setIndex(Math.max(0, Math.min(project.images.length - 1, i)))
+  const goTo = (i: number) => setIndex((i + project.images.length) % project.images.length)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -134,6 +134,14 @@ export default function ProjectOverlay({
         className={`project-overlay-stage ${project.platform === 'web' ? 'project-overlay-stage--web' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
+        {project.images.length > 1 && <>
+          <button className="project-overlay-arrow project-overlay-arrow--previous" onClick={() => goTo(index - 1)} aria-label="Show previous image">
+            <CaretLeft size={22} weight="bold" />
+          </button>
+          <button className="project-overlay-arrow project-overlay-arrow--next" onClick={() => goTo(index + 1)} aria-label="Show next image">
+            <CaretRight size={22} weight="bold" />
+          </button>
+        </>}
         <img
           key={index}
           className="project-overlay-media"

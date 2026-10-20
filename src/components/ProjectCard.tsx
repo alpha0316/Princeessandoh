@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import ProjectLinkIcon, { getProjectLinkTooltip } from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
@@ -111,7 +112,7 @@ export default function ProjectCard({
       return
     }
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    if (canHover || project.id === 'uzeka') {
+    if (canHover || project.id === 'uzeka' || project.id === 'gas-app') {
       onOpen?.(index)
     }
   }
@@ -191,10 +192,37 @@ export default function ProjectCard({
           <div className="app-card-placeholder">{project.name.charAt(0)}</div>
         )}
 
-        {project.id === 'uzeka' && (
+        {(project.id === 'uzeka' || project.id === 'gas-app') && (
           <span className={`app-card-case-study-hint ${hovered ? 'is-visible' : ''}`}>View Case Study</span>
         )}
       </div>
+
+      {project.images.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="app-card-arrow app-card-arrow--previous"
+            onClick={(e) => {
+              e.stopPropagation()
+              goTo(index - 1)
+            }}
+            aria-label="Show previous screenshot"
+          >
+            <CaretLeft size={14} weight="bold" />
+          </button>
+          <button
+            type="button"
+            className="app-card-arrow app-card-arrow--next"
+            onClick={(e) => {
+              e.stopPropagation()
+              goTo(index + 1)
+            }}
+            aria-label="Show next screenshot"
+          >
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </>
+      )}
 
       <div className={`app-card-overlay ${hovered ? 'is-visible' : ''}`} aria-hidden={!hovered}>
         <footer className="app-card-footer">
