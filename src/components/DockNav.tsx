@@ -42,7 +42,7 @@ export default function DockNav({ className = '', activeLabel = 'Home', onNaviga
 
         if (item.type === 'image') {
           return (
-            <button key={`${item.label}-${index}`} type="button" aria-label={item.label} className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
+            <button key={`${item.label}-${index}`} type="button" aria-label={item.label} className={`dock-nav-item dock-nav-item--${item.label.toLowerCase()} ${isActive ? 'is-active' : ''}`}
               onClick={() => handleClick(item)}>
               <span className="dock-nav-tooltip">{item.label}</span>
               <img className="dock-nav-icon" alt="" src={item.src} />
@@ -58,7 +58,7 @@ export default function DockNav({ className = '', activeLabel = 'Home', onNaviga
             type="button"
             aria-label={item.label}
             aria-current={isActive ? 'page' : undefined}
-            className={`dock-nav-item ${isActive ? 'is-active' : ''}`}
+            className={`dock-nav-item dock-nav-item--${item.label.toLowerCase()} ${isActive ? 'is-active' : ''}`}
             onClick={() => handleClick(item)}
           >
             <span className="dock-nav-tooltip">{item.label}</span>

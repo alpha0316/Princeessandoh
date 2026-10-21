@@ -15,6 +15,10 @@ type GasMapProps = {
   zoom?: number
   marker?: [number, number]
   markers?: GasMapMarker[]
+  /** A road route using [latitude, longitude] positions. */
+  route?: [number, number][]
+  /** A moving rider position using [latitude, longitude]. */
+  rider?: [number, number]
 }
 
 function makePinEl(color: string) {
@@ -26,11 +30,21 @@ function makePinEl(color: string) {
   return el
 }
 
-export default function GasMap({ center, zoom = 15, marker, markers }: GasMapProps) {
+function makeRiderEl() {
+  const el = document.createElement('span')
+  el.className = 'gas-map-live-rider'
+  el.setAttribute('aria-hidden', 'true')
+  el.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><circle cx="5" cy="17" r="2.7"/><circle cx="19" cy="17" r="2.7"/><path d="m7.7 17 3.1-6h4.3l3.9 6M10.8 11l-2-3m6.3 3 2.1-3M10 14h6.5"/><circle class="rider-head" cx="14" cy="6" r="2"/></svg>'
+  return el
+}
+
+export default function GasMap({ center, zoom = 15, marker, markers, route, rider }: GasMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
+  const riderMarkerRef = useRef<maplibregl.Marker | null>(null)
   const allMarkers: GasMapMarker[] = markers ?? (marker ? [{ position: marker }] : [])
   const markerKey = allMarkers.map((m) => `${m.position[0]},${m.position[1]},${m.color ?? ''}`).join('|')
+  const routeKey = route?.map(([lat, lng]) => `${lat},${lng}`).join('|') ?? ''
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -62,6 +76,55 @@ export default function GasMap({ center, zoom = 15, marker, markers }: GasMapPro
     return () => { markerInstances.forEach((m) => m.remove()) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markerKey])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !route?.length) return
+    const addRoute = () => {
+      if (map.getSource('delivery-route')) return
+      map.addSource('delivery-route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'LineString', coordinates: route.map(([lat, lng]) => [lng, lat]) },
+        },
+      })
+      map.addLayer({
+        id: 'delivery-route-casing', type: 'line', source: 'delivery-route',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#ffffff', 'line-width': 7, 'line-opacity': 0.92 },
+      })
+      map.addLayer({
+        id: 'delivery-route-line', type: 'line', source: 'delivery-route',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#2581ff', 'line-width': 3.5, 'line-dasharray': [1.1, 1.45], 'line-opacity': 0.95 },
+      })
+    }
+    if (map.isStyleLoaded()) addRoute()
+    else map.once('load', addRoute)
+    return () => { map.off('load', addRoute) }
+  }, [routeKey])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !rider) return
+    const position: [number, number] = [rider[1], rider[0]]
+    if (!position.every(Number.isFinite)) return
+    if (!riderMarkerRef.current) {
+      // Marker must have coordinates before being attached; addTo triggers its first position update.
+      riderMarkerRef.current = new maplibregl.Marker({ element: makeRiderEl(), anchor: 'center' })
+        .setLngLat(position)
+        .addTo(map)
+      return
+    }
+    riderMarkerRef.current.setLngLat(position)
+  }, [rider?.[0], rider?.[1]])
+
+  useEffect(() => () => {
+    riderMarkerRef.current?.remove()
+    riderMarkerRef.current = null
+  }, [])
 
   return <div className="gas-map-leaflet" ref={containerRef} aria-hidden="true" />
 }

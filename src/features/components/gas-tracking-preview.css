@@ -18,11 +18,7 @@
 }
 .gas-tracking-screen { position: absolute; inset: 0; overflow: hidden; background: #fff; }
 
-.gas-tracking-map { position: absolute; z-index: 0; inset: 18% 0 0; overflow: hidden; background-color: #eef0ef; }
-.gas-map-route { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; }
-.gas-map-route path { fill: none; stroke: #1882ff; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 3 2.8; opacity: .7; }
-.gas-map-rider { position: absolute; z-index: 4; width: 34px; height: 34px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; background: rgba(77,83,90,.72); color: #fff; box-shadow: 0 0 0 14px rgba(47,54,62,.12), 0 4px 12px rgba(20,28,39,.26); transform: translate(-50%,-50%); transition: left .8s cubic-bezier(.2,.8,.25,1), top .8s cubic-bezier(.2,.8,.25,1); }
-.gas-map-rider svg { width: 17px; height: 17px; transform: rotate(-24deg); }
+.gas-tracking-map { position: absolute; z-index: 0; inset: 0; overflow: hidden; background-color: #eef0ef; }
 
 .gas-tracking-header { position: absolute; z-index: 5; top: 7%; right: 0; left: 0; height: 11%; padding: 0 4%; display: grid; grid-template-columns: 34px 1fr 34px; align-items: center; background: rgba(255,255,255,.98); }
 .gas-tracking-header button { width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 11px; background: #f2f3f4; color: #61666b; }
@@ -68,7 +64,7 @@
 .gas-tracking-sheet.is-collapsed .gas-sheet-content { display: none; }
 
 .gas-tracking-home-indicator { position: absolute; z-index: 9; bottom: 1.4%; left: 50%; width: 29%; height: 4px; transform: translateX(-50%); border-radius: 4px; background: #101113; }
-.gas-tracking-modal-backdrop, .gas-tracking-complete-backdrop { position: absolute; z-index: 7; inset: 7% 0 3%; display: flex; align-items: flex-end; justify-content: center; padding: 8% 4%; background: rgba(23,27,32,.22); backdrop-filter: blur(2px); }
+.gas-tracking-modal-backdrop, .gas-tracking-complete-backdrop { position: absolute; z-index: 7; inset: 7% 0 3%; display: flex; align-items: flex-end; justify-content: center; padding: 8% 4%; background: rgba(23,27,32,.24); }
 .gas-tracking-order-modal, .gas-tracking-complete-modal { position: relative; width: 100%; padding: 14px 11px 10px; border-radius: 17px; background: #fff; box-shadow: 0 12px 30px rgba(0,0,0,.22); text-align: center; }
 .gas-tracking-modal-close { position: absolute; top: 7px; right: 7px; width: 22px; height: 22px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f2f3f4; color: #60656b; }
 .gas-tracking-order-modal h2, .gas-tracking-complete-modal h2 { margin: 0; font-size: 4cqw; }
@@ -103,7 +99,11 @@
 .gas-tracking-earnings span small { color: #878b8f; font-size: 2.7cqw; }
 .gas-tracking-complete-modal > button { width: 100%; margin-top: 9px; border: 0; background: #050505; color: white; }
 
-.components-card--live:hover .gas-map-rider { transition: none; }
+.gas-map-live-rider { width: 34px; height: 34px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,.95); border-radius: 50%; background: rgba(49,55,63,.78); box-shadow: 0 0 0 10px rgba(47,54,62,.13), 0 4px 12px rgba(20,28,39,.27); transition: transform .15s ease; }
+.gas-map-live-rider svg { width: 22px; height: 22px; overflow: visible; }
+.gas-map-live-rider svg circle, .gas-map-live-rider svg path { stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.gas-map-live-rider svg .rider-head { fill: #fff; stroke: none; }
+.components-card--live:hover .gas-map-live-rider { transition: none; }
 @keyframes gas-tracking-fade { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 440px) {

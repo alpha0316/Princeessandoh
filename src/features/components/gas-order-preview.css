@@ -19,7 +19,7 @@
 }
 .gas-order-phone--sizes { transform: translateY(0); }
 .gas-order-phone--schedule { transform: translateY(0); }
-.gas-order-phone--location { transform: translateY(-8%); }
+.gas-order-phone--location { transform: translateY(15.6%); }
 .gas-order-screen { position: absolute; inset: 0; overflow: hidden; background: #fbfbfa; }
 .gas-order-stack { position: absolute; z-index: 2; top: 30%; right: 4%; bottom: 4%; left: 4%; display: flex; flex-direction: column; justify-content: flex-end; gap: 7px; transition: transform .55s cubic-bezier(.22,.75,.22,1), opacity .45s ease; }
 .gas-order-phone--sizes .gas-order-stack { transform: translateY(0); opacity: 1; }
@@ -83,21 +83,21 @@
 .gas-location-matches button.is-selected { color: #147cff; background: #f4f9ff; }
 .gas-location-matches p { color: #8b8d91; font-size: 9px; }
 .gas-visual-keyboard {
-  position: absolute; z-index: 5; right: 0; bottom: 0; left: 0; height: 40.5%;
-  padding: 6px 5px 8px; display: flex; flex-direction: column; gap: 4px;
+  position: absolute; z-index: 5; right: 0; bottom: -22%; left: 0; height: 38%;
+  padding: 2.5cqw 2cqw 3cqw; display: flex; flex-direction: column; gap: 1.2cqw;
   background: linear-gradient(180deg, #ebedf0, #dfe2e6); border-top: 1px solid rgba(0,0,0,.05);
   opacity: 0; transform: translateY(24px); transition: transform .45s ease, opacity .4s ease; pointer-events: none;
 }
 .gas-order-phone--location .gas-visual-keyboard { opacity: 1; transform: translateY(0); }
-.gas-keyboard-suggestions { position: relative; display: flex; align-items: center; padding-bottom: 4px; color: #1a1a1a; font-size: clamp(7px, .74vw, 9px); }
+.gas-keyboard-suggestions { position: relative; min-height: 8cqw; display: flex; align-items: center; padding-bottom: 1cqw; color: #1a1a1a; font-size: 2.8cqw; }
 .gas-keyboard-suggestions span { flex: 1; min-width: 0; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .gas-keyboard-suggestions span + span { border-left: 1px solid rgba(0,0,0,.1); }
 .gas-key-row { display: flex; gap: 3px; }
 .gas-key-row--inset { padding: 0 6%; }
 .gas-key {
-  flex: 1; min-width: 0; height: clamp(17px, 3.4vh, 25px); display: grid; place-items: center;
-  border-radius: 5px; background: #fff; box-shadow: 0 1px 0 rgba(20,20,22,.22), 0 1px 1.5px rgba(20,20,22,.1);
-  color: #27292d; font-size: clamp(8px, .9vw, 12px); font-weight: 400; font-style: normal;
+  flex: 1; min-width: 0; height: 11.5cqw; display: grid; place-items: center;
+  border-radius: 1.8cqw; background: #fff; box-shadow: 0 1px 0 rgba(20,20,22,.22), 0 1px 1.5px rgba(20,20,22,.1);
+  color: #27292d; font-size: 5cqw; font-weight: 400; font-style: normal;
 }
 .gas-key--shift, .gas-key--delete { flex: 0 0 11%; background: #adb1b8; color: #16181b; font-size: clamp(7px, .8vw, 10px); box-shadow: 0 1px 0 rgba(20,20,22,.15); }
 .gas-key-row--bottom .gas-key--123, .gas-key-row--bottom .gas-key--globe { flex: 0 0 15%; background: #adb1b8; color: #16181b; font-size: clamp(6px, .68vw, 9px); box-shadow: 0 1px 0 rgba(20,20,22,.15); }

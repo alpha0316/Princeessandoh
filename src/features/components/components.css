@@ -94,6 +94,7 @@
   pointer-events: none;
 }
 .mobile-status-bar > strong { font-size: 4.2cqw; font-weight: 700; letter-spacing: -.025em; }
+.mobile-status-bar--light { color: #fff; }
 .mobile-status-icons { display: flex; align-items: center; gap: 1.2cqw; }
 .mobile-status-icons svg { display: block; color: currentColor; }
 .mobile-status-signal { width: 5cqw; height: 3.35cqw; }
@@ -453,7 +454,7 @@
 }
 
 @media (max-width: 760px) {
-  .components-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .components-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 440px) {

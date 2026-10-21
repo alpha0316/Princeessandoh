@@ -1,10 +1,12 @@
 type MobileStatusBarProps = {
   time?: string
+  light?: boolean
+  className?: string
 }
 
-export default function MobileStatusBar({ time = '9:41' }: MobileStatusBarProps) {
+export default function MobileStatusBar({ time = '9:41', light = false, className = '' }: MobileStatusBarProps) {
   return (
-    <div className="mobile-status-bar" aria-label={`${time}, full signal, Wi-Fi connected, battery full`}>
+    <div className={`mobile-status-bar${light ? ' mobile-status-bar--light' : ''}${className ? ` ${className}` : ''}`} aria-label={`${time}, full signal, Wi-Fi connected, battery full`}>
       <strong>{time}</strong>
       <span className="mobile-status-icons" aria-hidden="true">
         <svg className="mobile-status-signal" viewBox="0 0 18 12" fill="none">

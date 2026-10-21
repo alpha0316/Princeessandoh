@@ -13,7 +13,10 @@ import GasMap from './GasMap'
 import MobileStatusBar from './MobileStatusBar'
 import './gas-order-preview.css'
 
-const MAP_CENTER: [number, number] = [6.6885, -1.6244]
+// Keep the rider's destination marker in the upper portion of the phone, as in
+// the supplied Figma frames, while the map itself continues behind each state.
+const MAP_CENTER: [number, number] = [6.6765, -1.6244]
+const MAP_MARKER: [number, number] = [6.6885, -1.6244]
 
 type Focus = 'sizes' | 'schedule' | 'location'
 
@@ -89,7 +92,7 @@ export default function GasSizesPreview({ isPaused = false }: { isPaused?: boole
   return (
     <div className={`gas-order-phone gas-order-phone--${focus}`} aria-label="Animated LPG refill order preview">
       <div className="gas-order-screen">
-        <GasMap center={MAP_CENTER} marker={MAP_CENTER} />
+        <GasMap center={MAP_CENTER} marker={MAP_MARKER} />
         <MobileStatusBar />
 
         <div className="gas-order-stack" aria-hidden={focus !== 'sizes'}>

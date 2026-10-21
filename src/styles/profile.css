@@ -646,6 +646,14 @@
 
   .dock-nav {
     bottom: 1.5vh;
+    width: min(360px, calc(100vw - 32px));
+  }
+}
+
+@media (max-width: 768px) {
+  .dock-nav-item--pinterest,
+  .dock-nav-item--behance {
+    display: none;
   }
 }
 

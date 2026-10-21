@@ -1,22 +1,34 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, CheckCircle, MapPin, Package, X } from '@phosphor-icons/react'
+import { ArrowLeft, MapPin, Package, SealCheck, X } from '@phosphor-icons/react'
 import GasTrackingBottomSheet, { type DeliveryPreviewStage } from './GasTrackingBottomSheet'
 import GasMap from './GasMap'
-import { RiderIcon } from './gasShared'
 import MobileStatusBar from './MobileStatusBar'
 import './gas-tracking-preview.css'
 
-const STATION: [number, number] = [6.6958, -1.6265]
-const CUSTOMER: [number, number] = [6.6992, -1.6151]
-const MAP_CENTER: [number, number] = [6.6975, -1.6208]
+const STATION: [number, number] = [6.69181, -1.628571]
+const CUSTOMER: [number, number] = [6.688035, -1.623271]
+const MAP_CENTER: [number, number] = [6.68992, -1.62592]
 
-const stages: { id: DeliveryPreviewStage; title: string; left: string; top: string }[] = [
-  { id: 'pickup', title: 'Heading to user location', left: '40%', top: '16%' },
-  { id: 'station', title: 'Heading to filling station', left: '32%', top: '39%' },
-  { id: 'filling', title: 'Filling process', left: '18%', top: '10%' },
-  { id: 'new-order', title: 'Filling process', left: '18%', top: '10%' },
-  { id: 'returning', title: 'Heading to user location', left: '58%', top: '22%' },
-  { id: 'complete', title: 'Delivery complete', left: '60%', top: '22%' },
+// Street route from Total Filling Station, Adum to Harper Road, Adum.
+// The coordinates follow the routed road geometry rather than a straight line.
+const DELIVERY_ROUTE: [number, number][] = [
+  [6.69181, -1.628571], [6.691263, -1.628885], [6.691107, -1.628627],
+  [6.690821, -1.628179], [6.690203, -1.627811], [6.689586, -1.627457],
+  [6.689368, -1.627125], [6.68935, -1.626899], [6.689719, -1.62688],
+  [6.690385, -1.626808], [6.690816, -1.626608], [6.691316, -1.626156],
+  [6.691847, -1.625084], [6.691643, -1.624704], [6.691212, -1.624381],
+  [6.690504, -1.623883], [6.68997, -1.623488], [6.689686, -1.623265],
+  [6.689293, -1.623094], [6.689077, -1.623095], [6.688349, -1.623218],
+  [6.688035, -1.623271],
+]
+
+const stages: { id: DeliveryPreviewStage; title: string }[] = [
+  { id: 'pickup', title: 'Heading to user location' },
+  { id: 'station', title: 'Heading to filling station' },
+  { id: 'filling', title: 'Filling process' },
+  { id: 'new-order', title: 'Filling process' },
+  { id: 'returning', title: 'Heading to user location' },
+  { id: 'complete', title: 'Delivery complete' },
 ]
 
 const stageLength = 4200
@@ -32,6 +44,19 @@ export default function GasTrackingPreview({ isPaused = false }: { isPaused?: bo
   const timeline = { index: Math.floor(cycleElapsed / stageLength), within: cycleElapsed % stageLength }
   const stage = stages[timeline.index]
   const isFinal = stage.id === 'complete'
+  const routeProgress = Math.min(1, timeline.within / stageLength)
+  const movingToCustomer = stage.id === 'pickup' || stage.id === 'returning' || stage.id === 'complete'
+  const stationaryAtStation = stage.id === 'filling' || stage.id === 'new-order'
+  const movement = stationaryAtStation ? 0 : stage.id === 'complete' ? 1 : movingToCustomer ? routeProgress : 1 - routeProgress
+  const routeIndex = movement * (DELIVERY_ROUTE.length - 1)
+  const routeStart = Math.floor(routeIndex)
+  const routeMix = routeIndex - routeStart
+  const routeStartPoint = DELIVERY_ROUTE[routeStart]
+  const routeEndPoint = DELIVERY_ROUTE[Math.min(routeStart + 1, DELIVERY_ROUTE.length - 1)]
+  const riderPoint: [number, number] = [
+    routeStartPoint[0] + (routeEndPoint[0] - routeStartPoint[0]) * routeMix,
+    routeStartPoint[1] + (routeEndPoint[1] - routeStartPoint[1]) * routeMix,
+  ]
   const bottomSheetProgress = stage.id === 'pickup'
     ? (timeline.within / stageLength) * 68
     : stage.id === 'filling' || stage.id === 'new-order'
@@ -71,11 +96,13 @@ export default function GasTrackingPreview({ isPaused = false }: { isPaused?: bo
     <div className="gas-tracking-phone" aria-label="Rider delivery tracking with animated pickup and refill progress">
       <div className="gas-tracking-screen">
         <div className="gas-tracking-map" aria-hidden="true">
-          <GasMap center={MAP_CENTER} zoom={14} markers={[{ position: STATION, color: '#ff8a21' }, { position: CUSTOMER, color: '#31c356' }]} />
-          <svg className="gas-map-route" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d="M18 9 C 24 18, 31 31, 32 39 S 47 27, 60 22" />
-          </svg>
-          <div className={`gas-map-rider gas-map-rider--${stage.id}`} style={{ left: stage.left, top: stage.top }}><RiderIcon /></div>
+          <GasMap
+            center={MAP_CENTER}
+            zoom={16}
+            markers={[{ position: STATION, color: '#ff8a21' }, { position: CUSTOMER, color: '#31c356' }]}
+            route={DELIVERY_ROUTE}
+            rider={riderPoint}
+          />
         </div>
 
         <MobileStatusBar />
@@ -119,7 +146,7 @@ export default function GasTrackingPreview({ isPaused = false }: { isPaused?: bo
 
         {isFinal && !completeDismissed && <div className="gas-tracking-complete-backdrop">
           <section className="gas-tracking-complete-modal" aria-label="Delivery complete">
-            <CheckCircle size={30} weight="fill" /><h2>Delivery Complete!</h2><p>Order #LPG-2841 · Essandoh Prince Takyi</p>
+            <SealCheck size={34} weight="regular" /><h2>Delivery Complete!</h2><p>Order #LPG-2841 · Essandoh Prince Takyi</p>
             <div className="gas-tracking-earnings"><strong>+ ₵ 10</strong><small>Earned From This Delivery</small><div><span><b>3</b><small>Today</small></span><span><b>₵ 470</b><small>Total Earned</small></span><span><b>4.9★</b><small>Rating</small></span></div></div>
             <button onClick={dismissComplete}>Got it</button>
           </section>
