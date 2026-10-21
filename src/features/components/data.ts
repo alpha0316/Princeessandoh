@@ -7,7 +7,7 @@ export type ComponentEntry = {
   /** Scenic card artwork supplied in public/bgs. */
   background: string
   /** Render a live simulated interaction instead of a static screen image. */
-  kind?: 'shift-clock' | 'shift-calendar' | 'gas-sizes' | 'gas-tracking' | 'rider-home'
+  kind?: 'shift-clock' | 'shift-calendar' | 'gas-sizes' | 'gas-tracking' | 'rider-home' | 'product-catalog'
   width: number
   height: number
 }
@@ -60,6 +60,16 @@ export const componentEntries: ComponentEntry[] = [
     image: '',
     background: '/bgs/bg 5.png',
     kind: 'rider-home',
+    width: 1170,
+    height: 1411,
+  },
+  {
+    id: 'gears-product-catalog',
+    title: 'Product Catalog',
+    project: 'GEARS',
+    image: '',
+    background: '/bgs/image 782958.png',
+    kind: 'product-catalog',
     width: 1170,
     height: 1411,
   },

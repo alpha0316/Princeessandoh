@@ -87,7 +87,6 @@
 .gas-tracking-request-actions button, .gas-tracking-complete-modal > button { min-height: 31px; flex: 1; border: 1px solid #eceef0; border-radius: 18px; background: white; color: #f34b59; font-size: 3cqw; font-weight: 650; }
 .gas-tracking-request-actions button + button { border-color: #28bf59; background: #30c45e; color: white; }
 .gas-tracking-queue-toast { position: absolute; z-index: 8; top: 45%; left: 50%; padding: 8px 12px; transform: translateX(-50%); border-radius: 20px; background: #23272a; color: #fff; font-size: 3cqw; white-space: nowrap; }
-.gas-tracking-complete-backdrop { align-items: center; background: rgba(0,0,0,.22); }
 .gas-tracking-complete-modal { padding-top: 17px; }
 .gas-tracking-complete-modal > svg { color: #2ac95b; }
 .gas-tracking-earnings { padding: 10px 6px; border-radius: 11px; background: #f8f8f8; }

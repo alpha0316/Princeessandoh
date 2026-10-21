@@ -5,6 +5,7 @@ import ShiftCalendarPreview from './ShiftCalendarPreview'
 import GasSizesPreview from './GasSizesPreview'
 import GasTrackingPreview from './GasTrackingPreview'
 import RiderHomePreview from './RiderHomePreview'
+import ProductCatalogPreview from './ProductCatalogPreview'
 import { componentEntries } from './data'
 import './components.css'
 
@@ -23,7 +24,7 @@ export default function ComponentsPage({ onNavigate }: { onNavigate?: (page: str
         {componentEntries.map((entry) => (
           <figure
             key={entry.id}
-            className={`components-card${entry.kind && entry.kind !== 'rider-home' ? ' components-card--live' : ''}${entry.kind === 'shift-calendar' ? ' components-card--shift-calendar' : ''}${entry.kind === 'gas-sizes' ? ' components-card--gas-order' : ''}${entry.kind === 'gas-tracking' ? ' components-card--gas-tracking' : ''}${entry.kind === 'rider-home' ? ' components-card--rider-home' : ''}`}
+            className={`components-card${entry.kind && entry.kind !== 'rider-home' ? ' components-card--live' : ''}${entry.kind === 'shift-calendar' ? ' components-card--shift-calendar' : ''}${entry.kind === 'gas-sizes' ? ' components-card--gas-order' : ''}${entry.kind === 'gas-tracking' ? ' components-card--gas-tracking' : ''}${entry.kind === 'rider-home' ? ' components-card--rider-home' : ''}${entry.kind === 'product-catalog' ? ' components-card--product-catalog' : ''}`}
             aria-label={`${entry.title} — ${entry.project}`}
             style={{ backgroundImage: `url("${entry.background}")` }}
             onPointerEnter={(event) => { if (event.pointerType === 'mouse') setHoveredEntry(entry.id) }}
@@ -35,6 +36,7 @@ export default function ComponentsPage({ onNavigate }: { onNavigate?: (page: str
                   : entry.kind === 'gas-sizes' ? <GasSizesPreview isPaused={hoveredEntry === entry.id} />
                     : entry.kind === 'gas-tracking' ? <GasTrackingPreview isPaused={hoveredEntry === entry.id} />
                       : entry.kind === 'rider-home' ? <RiderHomePreview />
+                        : entry.kind === 'product-catalog' ? <ProductCatalogPreview isPaused={hoveredEntry === entry.id} />
                   : <img src={entry.image} alt={`${entry.title} from ${entry.project}`} loading="lazy" draggable={false} />}
             </div>
           </figure>

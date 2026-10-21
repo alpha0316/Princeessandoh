@@ -153,6 +153,27 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
   const settlementRef = useRef<HTMLElement>(null)
   const settlementPayoutScrollRef = useRef<HTMLDivElement>(null)
   const [settlementStarted, setSettlementStarted] = useState(false)
+  const [settlementPaused, setSettlementPaused] = useState(false)
+  const [settlementEventOpen, setSettlementEventOpen] = useState(false)
+  const [activeSettlementTab, setActiveSettlementTab] = useState<'ready' | 'owing' | 'running'>('ready')
+  const [payoutHeadCollapsed, setPayoutHeadCollapsed] = useState(false)
+  const settlementElapsedRef = useRef(0)
+
+  useEffect(() => {
+    const scroller = settlementPayoutScrollRef.current
+    if (!scroller) return
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      window.requestAnimationFrame(() => {
+        setPayoutHeadCollapsed(scroller.scrollTop > 24)
+        ticking = false
+      })
+    }
+    scroller.addEventListener('scroll', onScroll, { passive: true })
+    return () => scroller.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     const sections = [tractionRef.current, groundConditionsRef.current].filter((section): section is HTMLElement => Boolean(section))
@@ -178,26 +199,31 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
   }, [])
 
   useEffect(() => {
-    if (!settlementStarted) return
-    const scrollBehavior: ScrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-    const scrollToBottom = window.setTimeout(() => {
+    if (!settlementStarted || settlementPaused) return
+    const cycleDuration = 17_000
+    const timelineStart = performance.now() - settlementElapsedRef.current
+    let frame = 0
+    const ease = (value: number) => value * value * (3 - 2 * value)
+    const animateScroll = (now: number) => {
+      const elapsed = (now - timelineStart) % cycleDuration
+      settlementElapsedRef.current = elapsed
       const scroller = settlementPayoutScrollRef.current
-      if (scroller) scroller.scrollTo({ top: scroller.scrollHeight - scroller.clientHeight, behavior: scrollBehavior })
-    }, 10_700)
-    const returnToTop = window.setTimeout(() => {
-      settlementPayoutScrollRef.current?.scrollTo({ top: 0, behavior: scrollBehavior })
-    }, 15_600)
-    const loop = window.setInterval(() => {
-      const scroller = settlementPayoutScrollRef.current
-      if (scroller) scroller.scrollTo({ top: scroller.scrollHeight - scroller.clientHeight, behavior: scrollBehavior })
-      window.setTimeout(() => settlementPayoutScrollRef.current?.scrollTo({ top: 0, behavior: scrollBehavior }), 4_900)
-    }, 17_000)
-    return () => {
-      window.clearTimeout(scrollToBottom)
-      window.clearTimeout(returnToTop)
-      window.clearInterval(loop)
+      if (scroller) {
+        const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight)
+        let progress = 0
+        if (elapsed >= 10_700 && elapsed < 13_200) progress = ease((elapsed - 10_700) / 2_500)
+        else if (elapsed >= 13_200 && elapsed < 15_600) progress = 1
+        else if (elapsed >= 15_600 && elapsed < 16_600) progress = 1 - ease((elapsed - 15_600) / 1_000)
+        scroller.scrollTop = maxScroll * progress
+      }
+      frame = window.requestAnimationFrame(animateScroll)
     }
-  }, [settlementStarted])
+    frame = window.requestAnimationFrame(animateScroll)
+    return () => {
+      settlementElapsedRef.current = (performance.now() - timelineStart) % cycleDuration
+      window.cancelAnimationFrame(frame)
+    }
+  }, [settlementStarted, settlementPaused])
 
   useEffect(() => {
     const section = settlementRef.current
@@ -526,7 +552,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
         </div>
       </section>
 
-      <section className={`uzeka-chapter uzeka-chapter--settlement${settlementStarted ? ' is-playing' : ''}`} id="uzeka-settlement" aria-labelledby="uzeka-settlement-title" ref={settlementRef}>
+      <section className={`uzeka-chapter uzeka-chapter--settlement${settlementStarted ? ' is-playing' : ''}${settlementPaused ? ' is-paused' : ''}`} id="uzeka-settlement" aria-labelledby="uzeka-settlement-title" ref={settlementRef}>
         <div className="uzeka-chapter-inner uzeka-settlement-inner">
           <header className="uzeka-chapter-intro uzeka-settlement-intro">
             <p className="uzeka-chapter-kicker"><span>04</span> The core problem</p>
@@ -536,21 +562,36 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
             </p>
           </header>
 
-          <div className="uzeka-settlement-stage" aria-label="Regular settlement flow: the settlement list moves aside as payout details open and scroll into view">
-            <div className="uzeka-settlement-phone uzeka-settlement-phone--list" aria-hidden="true">
+          <div
+            className={`uzeka-settlement-stage${settlementEventOpen ? ' is-manual-detail' : ''}`}
+            aria-label="Regular settlement flow: the settlement list moves aside as payout details open and scroll into view"
+            onPointerEnter={() => setSettlementPaused(true)}
+            onPointerLeave={() => { if (!settlementEventOpen) setSettlementPaused(false) }}
+          >
+            <div className="uzeka-settlement-phone uzeka-settlement-phone--list">
               <MobileStatusBar className="uzeka-settlement-status" />
               <div className="uzeka-settlement-nav"><span>☰</span><b>Settlement</b><span>ⓘ</span></div>
-              <div className="uzeka-settlement-tabs"><b>Ready To Settle <i>1</i></b><span>Owing <i>2</i></span><span>Running <i>1</i></span></div>
-              <div className="uzeka-settlement-event"><span className="uzeka-settlement-ticket">🎤</span><div><b>Afrobeats Takover</b><small>Ended <strong>7th June</strong></small></div><strong className="uzeka-settlement-amount">Kz 736,000 kz<small>Ready To Settle</small></strong></div>
+              <div className="uzeka-settlement-tabs" role="tablist" aria-label="Settlement status">
+                {([['ready', 'Ready To Settle', '1'], ['owing', 'Owing', '2'], ['running', 'Running', '1']] as const).map(([id, label, count]) => <button key={id} type="button" role="tab" aria-selected={activeSettlementTab === id} className={activeSettlementTab === id ? 'is-active' : ''} onClick={() => setActiveSettlementTab(id)}>{label} <i>{count}</i></button>)}
+              </div>
+              <button className="uzeka-settlement-event" type="button" aria-label="Open Afrobeats Takover settlement details" onClick={() => { setSettlementPaused(true); setSettlementEventOpen(true) }}><span className="uzeka-settlement-ticket">🎤</span><span className="uzeka-settlement-event-copy"><b>Afrobeats Takover</b><small>Ended <strong>7th June</strong></small></span><strong className="uzeka-settlement-amount">Kz 736,000 kz<small>{activeSettlementTab === 'ready' ? 'Ready To Settle' : activeSettlementTab === 'owing' ? 'Owing' : 'Running'}</small></strong></button>
             </div>
             <span className="uzeka-settlement-flow" aria-hidden="true"><i /></span>
-            <div className="uzeka-settlement-phone uzeka-settlement-phone--payout" aria-hidden="true">
+            <div className="uzeka-settlement-phone uzeka-settlement-phone--payout">
               <div className="uzeka-settlement-payout-scroll" ref={settlementPayoutScrollRef}>
-                <div className="uzeka-settlement-payout-head">
+                <div className={`uzeka-settlement-payout-head${payoutHeadCollapsed ? ' is-collapsed' : ''}`}>
+                  <div className="uzeka-settlement-brand-marks" aria-hidden="true">
+                    <img className="uzeka-settlement-brand-mark is-left" src={asset('UZEKA/Camada 2.svg')} alt="" />
+                    <img className="uzeka-settlement-brand-mark is-right" src={asset('UZEKA/Camada 1.svg')} alt="" />
+                  </div>
+                  <div className="uzeka-settlement-wordmark" aria-hidden="true">
+                    {WORDMARK_LETTERS.map((letter) => <img key={letter.id} src={letter.src} alt="" />)}
+                  </div>
                   <MobileStatusBar className="uzeka-settlement-status" light />
+                  <button className="uzeka-settlement-back" type="button" aria-label="Back to settlements" onClick={() => { setSettlementEventOpen(false); if (settlementPayoutScrollRef.current) settlementPayoutScrollRef.current.scrollTop = 0 }}><LineIcon name="arrow-left" size={18} /></button>
                   <div className="uzeka-settlement-event-title"><span>🎤</span><div><b>Afrobeats Takover</b><small>7th June · 1K tickets</small></div></div>
                   <div className="uzeka-settlement-payout-total"><strong>4,258,100 <em>Kz</em></strong><small>After the platform fee and collection costs.</small></div>
-                  <button type="button" tabIndex={-1}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2ZM8.47 10.98C8.76 10.69 9.24 10.69 9.53 10.98L11.25 12.7V6.51C11.25 6.1 11.59 5.76 12 5.76C12.41 5.76 12.75 6.1 12.75 6.51V12.7L14.47 10.98C14.76 10.69 15.24 10.69 15.53 10.98C15.82 11.27 15.82 11.75 15.53 12.04L12.53 15.04C12.46 15.11 12.38 15.16 12.29 15.2C12.2 15.24 12.1 15.26 12 15.26C11.9 15.26 11.81 15.24 11.71 15.2C11.62 15.16 11.54 15.11 11.47 15.04L8.47 12.04C8.18 11.75 8.18 11.28 8.47 10.98ZM18.24 17.22C16.23 17.89 14.12 18.23 12 18.23C9.88 18.23 7.77 17.89 5.76 17.22C5.37 17.09 5.16 16.66 5.29 16.27C5.42 15.88 5.84 15.66 6.24 15.8C9.96 17.04 14.05 17.04 17.77 15.8C18.16 15.67 18.59 15.88 18.72 16.27C18.84 16.67 18.63 17.09 18.24 17.22Z" fill="#1791E5"/></svg><span>Request 4,258,100 kz</span></button>
+                  <button className="uzeka-settlement-request" type="button" tabIndex={-1}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2ZM8.47 10.98C8.76 10.69 9.24 10.69 9.53 10.98L11.25 12.7V6.51C11.25 6.1 11.59 5.76 12 5.76C12.41 5.76 12.75 6.1 12.75 6.51V12.7L14.47 10.98C14.76 10.69 15.24 10.69 15.53 10.98C15.82 11.27 15.82 11.75 15.53 12.04L12.53 15.04C12.46 15.11 12.38 15.16 12.29 15.2C12.2 15.24 12.1 15.26 12 15.26C11.9 15.26 11.81 15.24 11.71 15.2C11.62 15.16 11.54 15.11 11.47 15.04L8.47 12.04C8.18 11.75 8.18 11.28 8.47 10.98ZM18.24 17.22C16.23 17.89 14.12 18.23 12 18.23C9.88 18.23 7.77 17.89 5.76 17.22C5.37 17.09 5.16 16.66 5.29 16.27C5.42 15.88 5.84 15.66 6.24 15.8C9.96 17.04 14.05 17.04 17.77 15.8C18.16 15.67 18.59 15.88 18.72 16.27C18.84 16.67 18.63 17.09 18.24 17.22Z" fill="#1791E5"/></svg><span>Request 4,258,100 kz</span></button>
                 </div>
                 <div className="uzeka-settlement-ledger"><p>WHERE THE MONEY IS</p>{[['Reference', 'Held by Uzeka', '5,000,000 Kz'], ['Ekwanza', 'Held by Uzeka', '0'], ['Cash', 'Taken at the door by you', '0'], ['Gift', 'No money changes hands', '0']].map(([name, note, amount]) => <div className="uzeka-settlement-ledger-row" key={name}><span><b>{name}</b><small>{note}</small></span><strong>{amount}</strong></div>)}<p className="uzeka-settlement-reached-title">HOW THAT WAS REACHED</p>{[['Held by Uzeka', 'Reference + Ekwanza sales', '5,000,000 Kz'], ['Platform fee', '900 chargeable × 741 · first 100 free', '−666,900 Kz'], ['Collection cost', '1.5% on electronic sales only', '−75,000 Kz'], ['Available', '', '4,258,100 Kz']].map(([name, note, amount]) => <div className={`uzeka-settlement-ledger-row${name === 'Platform fee' || name === 'Collection cost' ? ' is-fee' : name === 'Available' ? ' is-available' : ''}`} key={name}><span><b>{name}</b><small>{note}</small></span><strong>{amount}</strong></div>)}<div className="uzeka-settlement-ready"><span>✓</span><div><b>Ready To Settle</b><small>The event has ended, so the full available balance can be requested. A standard settlement carries no further fee.</small></div></div></div>
               </div>

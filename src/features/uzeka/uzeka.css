@@ -1397,6 +1397,8 @@
   border-radius: 32px;
   background: #0d0d0d;
 }
+.uzeka-settlement-stage:hover,
+.uzeka-settlement-stage:hover * { cursor: url('/cursors/tap.svg') 4 4, pointer; }
 .uzeka-settlement-phone {
   position: absolute;
   top: 38px;
@@ -1421,31 +1423,53 @@
 .uzeka-settlement-nav span { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid #e9e9e9; border-radius: 12px; color: #353535; }
 .uzeka-settlement-tabs { display: flex; gap: 8px; margin: 8px 0 12px; white-space: nowrap; }
 .uzeka-settlement-tabs > * { display: flex; align-items: center; gap: 5px; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 30px; color: #777; font-size: 12px; }
-.uzeka-settlement-tabs > b { color: #fff; background: #050505; border-color: #050505; }
+.uzeka-settlement-tabs button { cursor: pointer; font-family: inherit; background: #fff; }
+.uzeka-settlement-tabs > .is-active { color: #fff; background: #050505; border-color: #050505; }
 .uzeka-settlement-tabs i { display: grid; width: 16px; height: 16px; place-items: center; border-radius: 50%; background: #f4f4f4; color: #555; font-size: 9px; font-style: normal; }
-.uzeka-settlement-tabs > b i { color: #111; }
+.uzeka-settlement-tabs > .is-active i { color: #111; }
 .uzeka-settlement-event { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #eee; border-radius: 17px; box-shadow: 0 2px 4px #0000000a; font-size: 13px; }
+.uzeka-settlement-event { width: 100%; color: inherit; text-align: left; cursor: pointer; font-family: inherit; background: #fff; }
 .uzeka-settlement-ticket { display: grid; width: 40px; height: 40px; flex: none; place-items: center; border-radius: 11px; background: #e3f1ff; font-size: 17px; }
-.uzeka-settlement-event > div { display: flex; flex: 1; flex-direction: column; gap: 7px; color: #555; }
+.uzeka-settlement-event-copy { display: flex; flex: 1; flex-direction: column; gap: 7px; color: #555; }
 .uzeka-settlement-event small { color: #999; font-size: 11px; }
 .uzeka-settlement-event small strong { color: #222; font-weight: 500; }
 .uzeka-settlement-amount { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; white-space: nowrap; font-size: 12px; }
 .uzeka-settlement-amount small { padding: 4px 8px; border: 1px solid #a0efc5; border-radius: 15px; color: #008d4e; background: #effff6; font-size: 10px; font-weight: 500; }
 .uzeka-settlement-flow { position: absolute; top: 69%; left: 32.4%; width: 14%; height: 1px; background: #777; }
 .uzeka-settlement-flow::after { position: absolute; top: -5px; right: -1px; width: 9px; height: 9px; content: ''; border-top: 1px solid #aaa; border-right: 1px solid #aaa; transform: rotate(45deg); }
-.uzeka-settlement-payout-head { position: sticky; top: 0; z-index: 2; height: 310px; padding: 14px 16px 12px; color: #fff; border-radius: 36px 36px 26px 26px; background: linear-gradient(150deg, #1496e7, #168ce0); }
+.uzeka-settlement-payout-head { position: sticky; top: 0; z-index: 2; isolation: isolate; height: 310px; padding: 14px 16px 12px; overflow: hidden; color: #fff; border-radius: 0 0 24px 24px; background: #1791e5; transition: height .35s ease; }
+.uzeka-settlement-payout-head.is-collapsed { height: 188px; }
+.uzeka-settlement-brand-marks { position: absolute; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; transition: opacity .3s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-brand-marks { opacity: 0; }
+.uzeka-settlement-brand-mark { position: absolute; width: 60px; height: auto; }
+.uzeka-settlement-brand-mark.is-left { top: 126px; left: -19px; transform: rotate(-17.8deg); }
+.uzeka-settlement-brand-mark.is-right { top: 83px; right: 4px; width: 57px; transform: rotate(11.82deg); }
+.uzeka-settlement-wordmark { position: absolute; z-index: 0; right: -5%; left: -5%; top: 223px; display: flex; height: 44px; justify-content: center; align-items: center; gap: 15px; overflow: hidden; opacity: .13; pointer-events: none; transition: opacity .3s ease; }
+.uzeka-settlement-wordmark img { width: auto; height: 100%; flex: 0 0 auto; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-wordmark { opacity: 0; }
 .uzeka-settlement-payout-head .uzeka-settlement-status { position: absolute; top: 12px; right: 16px; left: 16px; color: #fff; }
-.uzeka-settlement-event-title { display: flex; align-items: center; gap: 9px; width: fit-content; margin: 58px auto 12px; }
-.uzeka-settlement-event-title > span { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: #fff; font-size: 18px; }
-.uzeka-settlement-event-title div { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
-.uzeka-settlement-event-title small { color: rgba(255,255,255,.78); font-size: 11px; }
+.uzeka-settlement-back { position: absolute; z-index: 3; top: 52px; left: 16px; display: grid; width: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; color: #fff; background: rgba(255,255,255,.08); }
+.uzeka-settlement-event-title { position: relative; z-index: 1; display: flex; align-items: center; gap: 9px; width: fit-content; margin: 80px auto 12px; transition: margin .35s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-event-title { margin: 38px auto 0; }
+.uzeka-settlement-event-title > span { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: #fff; font-size: 18px; transition: opacity .25s ease, width .25s ease, margin .25s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-event-title > span { width: 0; margin: 0; opacity: 0; overflow: hidden; }
+.uzeka-settlement-event-title div { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; }
+.uzeka-settlement-event-title small { color: rgba(255,255,255,.78); font-size: 11px; transition: opacity .2s ease, height .2s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-event-title small { height: 0; opacity: 0; overflow: hidden; }
 .uzeka-settlement-payout-total { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.uzeka-settlement-payout-total strong { font-size: 32px; letter-spacing: -.04em; }
+.uzeka-settlement-payout-total strong { font-size: 32px; letter-spacing: -.04em; transition: font-size .3s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-payout-total strong { font-size: 22px; }
 .uzeka-settlement-payout-total em { color: #a9d9fb; font-style: normal; font-weight: 400; }
-.uzeka-settlement-payout-total small { color: rgba(255,255,255,.68); font-size: 11px; }
-.uzeka-settlement-payout-head button { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; height: 48px; margin-top: 26px; border: 0; border-radius: 30px; color: #168fe4; background: #fff; font-size: 14px; font-weight: 600; }
-.uzeka-settlement-payout-head button svg { flex: none; width: 21px; height: 21px; }
-.uzeka-settlement-payout-head button span { white-space: nowrap; }
+.uzeka-settlement-payout-total small { color: rgba(255,255,255,.68); font-size: 11px; transition: opacity .2s ease, height .2s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-payout-total small { height: 0; opacity: 0; overflow: hidden; }
+.uzeka-settlement-payout-total,.uzeka-settlement-payout-head .uzeka-settlement-request { position: relative; z-index: 1; }
+.uzeka-settlement-payout-head .uzeka-settlement-request { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; height: 48px; margin-top: 50px; border: 0; border-radius: 24px; color: #1791e5; background: #fff; box-shadow: 0 -16px 32px -4px rgba(255,255,255,.2); font-size: 14px; font-weight: 600; transition: margin-top .35s ease; }
+.uzeka-settlement-payout-head.is-collapsed .uzeka-settlement-request { margin-top: 14px; }
+.uzeka-settlement-payout-head .uzeka-settlement-request svg { flex: none; width: 21px; height: 21px; }
+.uzeka-settlement-payout-head .uzeka-settlement-request span { white-space: nowrap; }
+.uzeka-settlement-stage.is-manual-detail .uzeka-settlement-phone--list { left: 2.45%; top: 118px; opacity: 1; transform: translateX(0) scale(.78); animation: none; }
+.uzeka-settlement-stage.is-manual-detail .uzeka-settlement-phone--payout { left: 50%; top: 38px; opacity: 1; transform: translateX(-50%) scale(1); animation: none; }
+.uzeka-settlement-stage.is-manual-detail .uzeka-settlement-flow { opacity: .85; animation: none; }
 .uzeka-settlement-ledger { padding: 26px 14px; }
 .uzeka-settlement-ledger > p { margin: 0 0 10px; font-size: 14px; }
 .uzeka-settlement-ledger-row { display: flex; justify-content: space-between; align-items: center; min-height: 65px; padding: 10px 14px; border-bottom: 1px solid #ebebeb; background: #fafafa; }
@@ -1469,6 +1493,9 @@
 .uzeka-chapter--settlement.is-playing .uzeka-settlement-phone--list { animation: settlement-list-flow 17s ease-in-out infinite; }
 .uzeka-chapter--settlement.is-playing .uzeka-settlement-phone--payout { animation: settlement-payout-flow 17s ease-in-out infinite; }
 .uzeka-chapter--settlement.is-playing .uzeka-settlement-flow { animation: settlement-arrow-flow 17s ease-in-out infinite; }
+.uzeka-chapter--settlement.is-paused .uzeka-settlement-phone--list,
+.uzeka-chapter--settlement.is-paused .uzeka-settlement-phone--payout,
+.uzeka-chapter--settlement.is-paused .uzeka-settlement-flow { animation-play-state: paused; }
 @keyframes settlement-list-flow {
   0%, 13% { left: 50%; top: 38px; opacity: 1; transform: translateX(-50%) scale(1); }
   24%, 39% { left: 5%; top: 118px; opacity: 1; transform: translateX(0) scale(.78); }
@@ -1502,14 +1529,17 @@
   .uzeka-settlement-payout-head { padding: 10px; border-radius: 27px 27px 18px 18px; }
   .uzeka-settlement-payout-total strong { font-size: clamp(17px, 4vw, 27px); }
   .uzeka-settlement-payout-total small { font-size: 9px; }
-  .uzeka-settlement-payout-head button { font-size: 10px; }
+  .uzeka-settlement-payout-head .uzeka-settlement-request { font-size: 10px; }
   .uzeka-settlement-event { gap: 6px; padding: 8px; }
   .uzeka-settlement-ticket { width: 30px; height: 30px; }
   .uzeka-settlement-amount { font-size: 9px; }
   .uzeka-settlement-amount small { padding: 3px 5px; font-size: 8px; }
   .uzeka-settlement-tabs { gap: 3px; }
   .uzeka-settlement-tabs > * { gap: 3px; padding: 7px 6px; font-size: 9px; }
+  .uzeka-settlement-tabs button { min-width: 0; }
   .uzeka-settlement-tabs i { width: 13px; height: 13px; font-size: 8px; }
+  .uzeka-settlement-stage.is-manual-detail .uzeka-settlement-phone--list { left: 2%; top: 94px; transform: translateX(0) scale(.73); }
+  .uzeka-settlement-stage.is-manual-detail .uzeka-settlement-phone--payout { left: 50%; top: 28px; transform: translateX(-50%) scale(1); }
   .uzeka-settlement-ledger { padding: 16px 8px; }
   .uzeka-settlement-ledger > p { font-size: 10px; }
   .uzeka-settlement-ledger-row { min-height: 54px; padding: 7px; }
