@@ -19,6 +19,8 @@ type GasMapProps = {
   route?: [number, number][]
   /** A moving rider position using [latitude, longitude]. */
   rider?: [number, number]
+  /** Fit the route and its endpoints into the visible map area. */
+  fitRoute?: boolean
 }
 
 function makePinEl(color: string) {
@@ -38,7 +40,7 @@ function makeRiderEl() {
   return el
 }
 
-export default function GasMap({ center, zoom = 15, marker, markers, route, rider }: GasMapProps) {
+export default function GasMap({ center, zoom = 15, marker, markers, route, rider, fitRoute = false }: GasMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const riderMarkerRef = useRef<maplibregl.Marker | null>(null)
@@ -59,6 +61,18 @@ export default function GasMap({ center, zoom = 15, marker, markers, route, ride
       attributionControl: false,
     })
     mapRef.current = map
+    if (fitRoute && route?.length) {
+      const bounds = new maplibregl.LngLatBounds()
+      route.forEach(([lat, lng]) => bounds.extend([lng, lat]))
+      allMarkers.forEach(({ position }) => bounds.extend([position[1], position[0]]))
+      map.once('load', () => {
+        map.fitBounds(bounds, {
+          padding: { top: 86, right: 28, bottom: 270, left: 28 },
+          maxZoom: 14.8,
+          duration: 0,
+        })
+      })
+    }
     return () => {
       map.remove()
       mapRef.current = null

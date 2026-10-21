@@ -140,7 +140,7 @@
   container-type: inline-size;
   position: relative;
   width: 82%;
-  height: 91%;
+  height: 100%;
   flex: 0 0 auto;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.85);
@@ -149,6 +149,7 @@
   color: #08090a;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   box-shadow: 0 16px 35px rgba(14,19,26,.22), inset 0 0 0 1px rgba(0,0,0,.025);
+  top : 8%
 }
 .catalog-preview .mobile-status-bar { top: 3.8%; right: 4.3%; left: 4.3%; }
 .catalog-header { position: absolute; top: 10.6%; right: 4%; left: 4%; display: flex; align-items: center; justify-content: space-between; font-size: 4.9cqw; letter-spacing: -.035em; }
@@ -197,13 +198,13 @@
 .components-card--live:hover .catalog-product--left { transform: translate(-16px,14px) rotate(-16deg) !important; transition: transform .35s cubic-bezier(.2,.9,.25,1); }
 .components-card--live:hover .catalog-product--right { transform: translate(16px,14px) rotate(16deg) !important; transition: transform .35s cubic-bezier(.2,.9,.25,1); }
 .components-card--live:hover .catalog-product--center { transform: translate(-50%,-18px) scale(1.16) !important; transition: transform .35s cubic-bezier(.2,.9,.25,1); }
-.catalog-product-caption { position: absolute; top: 46.1%; right: 0; left: 0; display: flex; align-items: center; flex-direction: column; gap: 2.1cqw; font-size: 3.35cqw; }
+.catalog-product-caption { position: absolute; top: 49.1%; right: 0; left: 0; display: flex; align-items: center; flex-direction: column; gap: 2.1cqw; font-size: 3.35cqw; }
 .catalog-product-caption > span { display: flex; align-items: center; gap: 2cqw; color: #777; }
 .catalog-product-caption i { font-size: 4.1cqw; font-style: normal; line-height: .8; }
 .catalog-product-caption em { width: 8cqw; height: 2.7cqw; border-radius: 99px; background: linear-gradient(90deg, #e4e4e4 25%, #f2f2f2 37%, #e4e4e4 63%); background-size: 400% 100%; animation: catalog-shimmer 1.8s ease-in-out infinite; }
 @keyframes catalog-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
-.catalog-empty-copy { position: absolute; top: 57%; right: 5%; left: 5%; font-size: 5.6cqw; line-height: 1.25; font-weight: 650; letter-spacing: -.025em; text-align: center; }
-.catalog-add { position: absolute; top: 69%; left: 50%; display: flex; align-items: center; justify-content: center; gap: 2cqw; min-width: 64%; max-width: 88%; min-height: 11.7cqw; padding: 0 5cqw; border: 0; border-radius: 999px; color: #fff; background: #050505; font: 500 3.8cqw/1 Inter, sans-serif; white-space: nowrap; transform: translateX(-50%); cursor: pointer; transition: transform .18s ease, background .18s ease; }
+.catalog-empty-copy { position: absolute; top: 58%; right: 5%; left: 5%; font-size: 6.6cqw; line-height: 1.25; font-weight: 650; letter-spacing: -.025em; text-align: center; }
+.catalog-add { position: absolute; top: 76%; left: 50%; display: flex; align-items: center; justify-content: center; gap: 2cqw; min-width: 64%; max-width: 88%; min-height: 11.7cqw; padding: 0 5cqw; border: 0; border-radius: 999px; color: #fff; background: #050505; font: 500 3.8cqw/1 Inter, sans-serif; white-space: nowrap; transform: translateX(-50%); cursor: pointer; transition: transform .18s ease, background .18s ease; }
 .catalog-add > span { display: grid; place-items: center; }
 .catalog-add > span svg { width: 4.2cqw; height: 4.2cqw; }
 .catalog-add:hover { transform: translateX(-50%) translateY(-2px); background: #1c1c1c; }

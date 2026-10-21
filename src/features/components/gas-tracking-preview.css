@@ -18,7 +18,7 @@
 }
 .gas-tracking-screen { position: absolute; inset: 0; overflow: hidden; background: #fff; }
 
-.gas-tracking-map { position: absolute; z-index: 0; inset: 0; overflow: hidden; background-color: #eef0ef; }
+.gas-tracking-map { position: absolute; z-index: 0; inset: 0; overflow: hidden; background: #f3f3f3; }
 
 .gas-tracking-header { position: absolute; z-index: 5; top: 7%; right: 0; left: 0; height: 11%; padding: 0 4%; display: grid; grid-template-columns: 34px 1fr 34px; align-items: center; background: rgba(255,255,255,.98); }
 .gas-tracking-header button { width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 11px; background: #f2f3f4; color: #61666b; }
@@ -33,7 +33,7 @@
 .gas-sheet-tip { color: #34c759; font-size: 3.8cqw; font-weight: 500; white-space: nowrap; }
 .gas-sheet-toggle { width: 25px; height: 28px; display: grid; place-items: center; border: 0; background: transparent; color: rgba(0,0,0,.62); transition: transform .3s ease; }
 .gas-tracking-sheet.is-collapsed .gas-sheet-toggle { transform: rotate(180deg); }
-.gas-sheet-content { min-height: 0; flex: 1; margin: 0 1.5cqw; padding: 2cqw; display: flex; flex-direction: column; gap: 2cqw; overflow: hidden; border: 1px solid rgba(0,0,0,.05); border-radius: 12px; background: #fff; box-shadow: 0 1px 4px rgba(12,12,13,.08); }
+.gas-sheet-content { min-height: 0; flex: 1; margin: 0 0cqw; padding: 2cqw; display: flex; flex-direction: column; gap: 2cqw; overflow: hidden; border: 1px solid rgba(0,0,0,.05); border-radius: 12px; background: #fff; box-shadow: 0 1px 4px rgba(12,12,13,.08); }
 .gas-sheet-cylinder-row { min-height: 0; flex: 0 0 9cqw; display: flex; align-items: center; gap: 2.5cqw; font-size: 3.8cqw; }
 .gas-sheet-cylinder-icon { width: 7.2cqw; height: 7.2cqw; display: grid; place-items: center; border-radius: 2.4cqw; background: #fafafa; }
 .gas-sheet-cylinder-icon img { width: 10px; height: 16px; object-fit: contain; }
@@ -42,17 +42,20 @@
 .gas-sheet-contact-row .gas-sheet-customer-copy { gap: 2px; }
 .gas-sheet-call { width: 7.2cqw; height: 7.2cqw; flex: 0 0 7.2cqw; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f4f4f4; color: #52555a; }
 .gas-sheet-call svg { width: 13px; height: 13px; }
-.gas-sheet-timeline { min-height: 0; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.gas-sheet-step { min-height: 10cqw; display: flex; align-items: center; gap: 2.2cqw; }
-.gas-sheet-step--green { min-height: 14cqw; align-items: flex-start; }
+.gas-sheet-timeline { min-height: 0; flex: 1; display: flex; flex-direction: column; justify-content: space-between;  }
+.gas-sheet-step { min-height: 8cqw; display: flex; align-items: center; gap: 2.2cqw;  }
+.gas-sheet-step--green { min-height: 9cqw; align-items: flex-start; }
 .gas-sheet-step--blue { min-height: 14cqw; align-items: flex-start; }
 .gas-sheet-step-icon { width: 7.2cqw; height: 7.2cqw; flex: 0 0 7.2cqw; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: #2886ff; color: white; }
 .gas-sheet-step-icon svg { width: 16px; height: 16px; }
+.gas-sheet-step-icon--fuel { border: 1px solid #ececec; background: #fff; }
 .gas-sheet-step--green .gas-sheet-step-icon { background: #52b922; }
 .gas-sheet-step--green.is-active .gas-sheet-step-icon { background: #31c759; }
 .gas-sheet-step-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
 .gas-sheet-step-copy strong, .gas-sheet-step--compact > strong { overflow: hidden; font-size: 3.2cqw; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.gas-sheet-step--green .gas-sheet-step-copy strong { overflow: visible; white-space: normal; text-overflow: clip; }
 .gas-sheet-step-copy small { color: rgba(0,0,0,.6); font-size: 2.8cqw; }
+.gas-sheet-step--green.is-complete .gas-sheet-step-copy small { color: #2fae53; font-weight: 500; }
 .gas-sheet-progress { height: 5px; display: block; overflow: hidden; border-radius: 24px; background: #f4f4f4; }
 .gas-sheet-progress b { height: 100%; display: block; border-radius: inherit; background: #52b922; transition: width .5s ease; }
 .gas-sheet-step--blue .gas-sheet-progress b { background: #0085ff; }
@@ -66,7 +69,6 @@
 .gas-tracking-home-indicator { position: absolute; z-index: 9; bottom: 1.4%; left: 50%; width: 29%; height: 4px; transform: translateX(-50%); border-radius: 4px; background: #101113; }
 .gas-tracking-modal-backdrop, .gas-tracking-complete-backdrop { position: absolute; z-index: 7; inset: 7% 0 3%; display: flex; align-items: flex-end; justify-content: center; padding: 8% 4%; background: rgba(23,27,32,.24); }
 .gas-tracking-order-modal, .gas-tracking-complete-modal { position: relative; width: 100%; padding: 14px 11px 10px; border-radius: 17px; background: #fff; box-shadow: 0 12px 30px rgba(0,0,0,.22); text-align: center; }
-.gas-tracking-modal-close { position: absolute; top: 7px; right: 7px; width: 22px; height: 22px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f2f3f4; color: #60656b; }
 .gas-tracking-order-modal h2, .gas-tracking-complete-modal h2 { margin: 0; font-size: 4cqw; }
 .gas-tracking-order-modal > p, .gas-tracking-complete-modal > p { margin: 5px 0 8px; color: #73777b; font-size: 2.8cqw; }
 .gas-tracking-request-customer, .gas-tracking-request-info, .gas-tracking-request-cylinder { padding: 7px; border: 1px solid #f0f1f2; text-align: left; font-size: 3cqw; }
@@ -78,9 +80,12 @@
 .gas-tracking-request-row { display: flex; align-items: center; gap: 5px; }
 .gas-tracking-request-row b, .gas-tracking-request-cylinder b { margin-left: auto; color: #2b2d31; }
 .gas-tracking-request-divider { height: 1px; background: #f0f1f2; }
+.gas-tracking-request-divider--dashed { height: 0; border-top: 1px dashed #e2e4e6; background: none; }
 .gas-tracking-request-address { display: flex; flex-direction: column; gap: 3px; }
 .gas-tracking-request-label { color: #9a9ea2; font-size: 2.4cqw; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
 .gas-tracking-request-address-row { display: flex; align-items: center; gap: 5px; color: #2b2d31; font-weight: 500; }
+.gas-tracking-request-icon { display: inline-flex; flex: 0 0 auto; width: 13px; height: 13px; }
+.gas-tracking-request-icon svg { display: block; width: 100%; height: 100%; }
 .gas-tracking-request-link { margin-left: auto; color: #147cff; font-size: 2.7cqw; font-weight: 600; white-space: nowrap; }
 .gas-tracking-request-cylinder { display: flex; align-items: center; gap: 7px; border-top: 0; border-radius: 0 0 9px 9px; }
 .gas-tracking-request-actions { display: flex; gap: 7px; margin-top: 9px; }

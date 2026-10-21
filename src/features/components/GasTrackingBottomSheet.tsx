@@ -25,9 +25,12 @@ export default function GasTrackingBottomSheet({
 }) {
   const fillingDone = stage === 'station' || stage === 'returning' || stage === 'complete'
   const fillingActive = stage === 'filling' || stage === 'new-order'
+  const fillingPositive = fillingActive || fillingDone
   const refillStarted = stage === 'returning' || stage === 'complete'
+  const firstDone = stage !== 'pickup'
   const firstProgress = stage === 'pickup' ? Math.max(14, progress * 0.45) : 100
   const refillProgress = stage === 'returning' ? Math.max(10, progress) : stage === 'station' || stage === 'complete' ? 100 : fillingActive ? progress : 0
+  const showFirstStep = stage !== 'returning'
 
   return (
     <section className={`gas-tracking-sheet${collapsed ? ' is-collapsed' : ''}`} aria-label="Delivery status">
@@ -49,23 +52,17 @@ export default function GasTrackingBottomSheet({
         </div>}
 
         <div className="gas-sheet-timeline">
-          {stage === 'pickup' ? (
-            <div className="gas-sheet-step gas-sheet-step--green is-active">
+          {showFirstStep && <>
+            <div className={`gas-sheet-step gas-sheet-step--green${firstDone ? ' is-complete' : ' is-active'}`}>
               <span className="gas-sheet-step-icon"><RiderIcon /></span>
-              <div className="gas-sheet-step-copy"><strong>{labels[stage]}</strong><small>Arriving in 5 minutes</small><i className="gas-sheet-progress"><b style={{ width: `${firstProgress}%` }} /></i></div>
+              <div className="gas-sheet-step-copy"><strong>{labels[stage]}</strong><small>{firstDone ? 'Completed' : 'Arriving in 5 minutes'}</small><i className="gas-sheet-progress"><b style={{ width: `${firstProgress}%` }} /></i></div>
             </div>
-          ) : (
-            <div className="gas-sheet-step gas-sheet-step--green gas-sheet-step--compact is-complete">
-              <span className="gas-sheet-step-icon"><RiderIcon /></span>
-              <strong>Rider has arrived at the filling Station</strong>
-              <span className="gas-sheet-status-pill">Completed</span>
-            </div>
-          )}
-          <div className="gas-sheet-connector gas-sheet-connector--green" />
+            <div className="gas-sheet-connector gas-sheet-connector--green" />
+          </>}
           <div className={`gas-sheet-step gas-sheet-step--compact${fillingActive ? ' is-active' : fillingDone ? ' is-complete' : ''}`}>
-            <span className="gas-sheet-step-icon"><FuelIcon /></span>
+            <span className="gas-sheet-step-icon gas-sheet-step-icon--fuel"><FuelIcon /></span>
             <strong>Filling Process</strong>
-            <span className={`gas-sheet-status-pill${fillingActive ? ' is-active' : ''}`}>{fillingActive ? 'In progress' : fillingDone ? 'Completed' : 'Waiting'}</span>
+            <span className={`gas-sheet-status-pill${fillingPositive ? ' is-active' : ''}`}>{fillingActive ? 'In progress' : fillingDone ? 'Completed' : 'Waiting'}</span>
           </div>
           <div className="gas-sheet-connector gas-sheet-connector--blue" />
           <div className={`gas-sheet-step gas-sheet-step--blue${refillStarted ? ' is-active' : ''}`}>
