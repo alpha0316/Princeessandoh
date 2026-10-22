@@ -8,7 +8,7 @@ import {
   Minus,
   Plus,
 } from '@phosphor-icons/react'
-import { Cylinder, TapCursor, cylinderInfo, locations } from './gasShared'
+import { Cylinder, cylinderInfo, locations } from './gasShared'
 import GasMap from './GasMap'
 import MobileStatusBar from './MobileStatusBar'
 import './gas-order-preview.css'
@@ -81,13 +81,6 @@ export default function GasSizesPreview({ isPaused = false }: { isPaused?: boole
   const total = quantities.reduce((sum, quantity, index) => sum + quantity * [3, 5, 7][index], 0)
   const totalCount = quantities.reduce((sum, quantity) => sum + quantity, 0)
   const matchingLocations = locations.filter((place) => place.toLowerCase().includes(searchQuery.trim().toLowerCase()))
-  const cursorPosition = focus === 'sizes'
-    ? { left: '82%', top: quantities[1] === 0 ? '63%' : quantities[2] === 0 ? '69%' : '75%' }
-    : focus === 'schedule'
-      ? { left: '70%', top: '76%' }
-      : searchQuery.length >= 6
-        ? { left: '52%', top: '29%' }
-        : { left: '52%', top: '14%' }
 
   return (
     <div className={`gas-order-phone gas-order-phone--${focus}`} aria-label="Animated LPG refill order preview">
@@ -167,7 +160,6 @@ export default function GasSizesPreview({ isPaused = false }: { isPaused?: boole
         </div>
 
         <div className="gas-order-home-indicator" aria-hidden="true" />
-        <TapCursor style={cursorPosition} />
       </div>
     </div>
   )
