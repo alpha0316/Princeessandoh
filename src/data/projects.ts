@@ -62,7 +62,7 @@ export const projects: Project[] = [
       asset('GiftPal/Swipe.svg'),
       asset('GiftPal/Add Note.svg'),
     ],
-    links: [],
+    links: [{ type: 'web', url: 'https://giftpal.co/', label: 'Website' }],
     platform: 'mobile',
   },
   {
