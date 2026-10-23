@@ -25,11 +25,11 @@ export default function GasAppPage({ onNavigate }: { onNavigate?: (page: string)
         <ArrowLeft size={18} weight="bold" />
       </button>
 
-      <div className="gasapp-topnav" aria-hidden="true">
+      {/* <div className="gasapp-topnav" aria-hidden="true">
         <img className="gasapp-topnav-logo" src={APP_LOGO} alt="" />
         <span className="gasapp-topnav-divider" />
         <SpeakerSimpleHigh size={16} weight="fill" />
-      </div>
+      </div> */}
 
       <div className="gasapp-hero">
         <div className="gasapp-copy">
@@ -66,7 +66,7 @@ export default function GasAppPage({ onNavigate }: { onNavigate?: (page: string)
         </div>
       </div>
 
-      <nav className="gasapp-tabbar" aria-label="Case study sections">
+      {/* <nav className="gasapp-tabbar" aria-label="Case study sections">
         <button className="gasapp-tabbar-icon" type="button" aria-label="Mute narration">
           <SpeakerSimpleHigh size={16} />
         </button>
@@ -88,7 +88,7 @@ export default function GasAppPage({ onNavigate }: { onNavigate?: (page: string)
         <button className="gasapp-tabbar-icon" type="button" aria-label="More sections">
           <Plus size={16} />
         </button>
-      </nav>
+      </nav> */}
     </div>
   )
 }

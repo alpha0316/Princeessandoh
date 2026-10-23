@@ -7,7 +7,7 @@ export type Chapter = { id: string; label: string }
 
 const uzekaProject = projects.find((p) => p.id === 'uzeka')!
 
-export default function UzekaDetailsPanel({ chapters, appIcon }: { chapters: Chapter[]; appIcon: string }) {
+export default function UzekaDetailsPanel({ chapters, appIcon, progress }: { chapters: Chapter[]; appIcon: string; progress: number }) {
   const [open, setOpen] = useState(false)
 
   const jumpTo = (id: string) => {
@@ -23,10 +23,15 @@ export default function UzekaDetailsPanel({ chapters, appIcon }: { chapters: Cha
           type="button"
           className="uzeka-panel-toggle"
           aria-expanded={open}
-          aria-label={open ? 'Hide product details' : 'Show product details'}
+          aria-label={open ? 'Hide product details' : `Show product details, ${Math.round(progress * 100)}% case study complete`}
           onClick={() => setOpen((v) => !v)}
         >
-          {open ? <LineIcon name="close" size={16} /> : <span className="uzeka-status-dot" />}
+          {open ? <LineIcon name="close" size={16} /> : (
+            <svg className="uzeka-progress-ring" viewBox="0 0 24 24" aria-hidden="true">
+              <circle className="uzeka-progress-ring-track" cx="12" cy="12" r="9" />
+              <circle className="uzeka-progress-ring-value" cx="12" cy="12" r="9" style={{ strokeDashoffset: 56.55 * (1 - progress) }} />
+            </svg>
+          )}
         </button>
       </div>
 

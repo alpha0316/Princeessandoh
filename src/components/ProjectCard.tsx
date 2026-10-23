@@ -6,6 +6,7 @@ import type { Project } from '../types/project'
 const AUTO_ADVANCE_MS = 45000
 const DOT_LIMIT = 7
 const SWIPE_COMMIT_RATIO = 0.22
+const AXIS_LOCK_THRESHOLD = 6
 
 let uid = 0
 
@@ -17,7 +18,15 @@ export default function ProjectCard({
   /** Desktop-only: opens the full detail overlay at the currently shown screenshot. */
   onOpen?: (initialIndex: number) => void
 }) {
+  const len = project.images.length
+  const loop = len > 1
+
   const [index, setIndex] = useState(0)
+  // trackPos tracks the visual slide position. When looping, the track is
+  // rendered as [lastClone, ...images, firstClone], so trackPos runs 0..len+1
+  // (0 and len+1 are the clones) while trackPos === index + 1 at rest.
+  const [trackPos, setTrackPos] = useState(loop ? 1 : 0)
+  const [skipTransition, setSkipTransition] = useState(false)
   const [hovered, setHovered] = useState(false)
   const [visible, setVisible] = useState(false)
   const intervalRef = useRef<number | undefined>(undefined)
@@ -26,13 +35,18 @@ export default function ProjectCard({
 
   const screenRef = useRef<HTMLDivElement>(null)
   const [frameWidth, setFrameWidth] = useState(0)
-  const touchStartX = useRef(0)
+  const frameWidthRef = useRef(0)
+  const dragPxRef = useRef(0)
   const [dragPx, setDragPx] = useState(0)
   const [dragging, setDragging] = useState(false)
   const didSwipeRef = useRef(false)
 
   useEffect(() => {
-    const measure = () => setFrameWidth(screenRef.current?.clientWidth ?? 0)
+    const measure = () => {
+      const w = screenRef.current?.clientWidth ?? 0
+      frameWidthRef.current = w
+      setFrameWidth(w)
+    }
     measure()
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
@@ -52,47 +66,121 @@ export default function ProjectCard({
     return () => observer.disconnect()
   }, [])
 
+  const moveBy = useCallback(
+    (direction: 1 | -1) => {
+      setIndex((i) => ((i + direction) % len + len) % len)
+      setTrackPos((p) => p + direction)
+    },
+    [len],
+  )
+
+  const goTo = useCallback(
+    (i: number) => {
+      const nextIndex = ((i % len) + len) % len
+      setIndex(nextIndex)
+      setTrackPos(loop ? nextIndex + 1 : 0)
+    },
+    [len, loop],
+  )
+
   useEffect(() => {
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    if (!canHover) return
+    if (!canHover || !loop) return
 
     const timer = setTimeout(() => {
       intervalRef.current = window.setInterval(() => {
-        setIndex((i) => (i + 1) % project.images.length)
+        moveBy(1)
       }, AUTO_ADVANCE_MS)
     }, initDelayRef.current)
     return () => {
       clearTimeout(timer)
       clearInterval(intervalRef.current)
     }
-  }, [project.images.length])
+  }, [loop, moveBy])
 
-  const goTo = useCallback(
-    (i: number) => {
-      const len = project.images.length
-      setIndex(((i % len) + len) % len)
-    },
-    [project.images.length],
-  )
+  // Native (non-passive) touch listeners so we can lock the gesture to the
+  // horizontal axis and call preventDefault only once that's established —
+  // otherwise vertical page scroll and the horizontal drag fight each other.
+  useEffect(() => {
+    const el = screenRef.current
+    if (!el || !loop) return
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
-    setDragging(true)
-  }
+    let axis: 'x' | 'y' | null = null
+    let startX = 0
+    let startY = 0
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const raw = e.touches[0].clientX - touchStartX.current
-    setDragPx(raw)
-  }
-
-  const handleTouchEnd = () => {
-    const swiped = Math.abs(dragPx) > frameWidth * SWIPE_COMMIT_RATIO
-    if (swiped) {
-      goTo(index + (dragPx < 0 ? 1 : -1))
+    const handleStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+      axis = null
+      setDragging(true)
     }
-    didSwipeRef.current = swiped
-    setDragPx(0)
-    setDragging(false)
+
+    const handleMove = (e: TouchEvent) => {
+      const dx = e.touches[0].clientX - startX
+      const dy = e.touches[0].clientY - startY
+
+      if (axis === null) {
+        if (Math.abs(dx) < AXIS_LOCK_THRESHOLD && Math.abs(dy) < AXIS_LOCK_THRESHOLD) return
+        axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+        if (axis === 'y') {
+          setDragging(false)
+          return
+        }
+      }
+
+      if (axis === 'x') {
+        e.preventDefault()
+        dragPxRef.current = dx
+        setDragPx(dx)
+      }
+    }
+
+    const handleEnd = () => {
+      if (axis === 'x') {
+        const dx = dragPxRef.current
+        const swiped = Math.abs(dx) > frameWidthRef.current * SWIPE_COMMIT_RATIO
+        if (swiped) {
+          didSwipeRef.current = true
+          moveBy(dx < 0 ? 1 : -1)
+        }
+      }
+      axis = null
+      dragPxRef.current = 0
+      setDragPx(0)
+      setDragging(false)
+    }
+
+    el.addEventListener('touchstart', handleStart, { passive: true })
+    el.addEventListener('touchmove', handleMove, { passive: false })
+    el.addEventListener('touchend', handleEnd)
+    el.addEventListener('touchcancel', handleEnd)
+
+    return () => {
+      el.removeEventListener('touchstart', handleStart)
+      el.removeEventListener('touchmove', handleMove)
+      el.removeEventListener('touchend', handleEnd)
+      el.removeEventListener('touchcancel', handleEnd)
+    }
+  }, [loop, moveBy])
+
+  // After animating onto a clone slide at either end of the track, snap
+  // invisibly back to the equivalent real slide so the loop never runs out
+  // of clones to animate into.
+  useEffect(() => {
+    if (!skipTransition) return
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSkipTransition(false))
+    })
+    return () => cancelAnimationFrame(id)
+  }, [skipTransition])
+
+  const handleTrackTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.propertyName !== 'transform') return
+    if (loop && (trackPos === 0 || trackPos === len + 1)) {
+      setSkipTransition(true)
+      setTrackPos(trackPos === 0 ? len : 1)
+    }
   }
 
   const handleEnter = () => {
@@ -103,7 +191,7 @@ export default function ProjectCard({
 
   const handleLeave = () => {
     setHovered(false)
-    setIndex(0)
+    goTo(0)
   }
 
   const handleClick = () => {
@@ -119,7 +207,8 @@ export default function ProjectCard({
 
   const showDots = project.images.length > 1 && project.images.length <= DOT_LIMIT
   const showSwipeTrack = project.images.length > DOT_LIMIT
-  const trackOffset = -index * frameWidth + dragPx
+  const trackOffset = -trackPos * frameWidth + dragPx
+  const slides = loop ? [project.images[len - 1], ...project.images, project.images[0]] : project.images
 
   // Entrance offset slides the card up from 28px on first reveal, with a
   // gentle overshoot easing for the "bounce".
@@ -163,26 +252,21 @@ export default function ProjectCard({
         </div>
       )}
 
-      <div
-        className="app-card-screen"
-        ref={screenRef}
-        onTouchStart={project.images.length > 1 ? handleTouchStart : undefined}
-        onTouchMove={project.images.length > 1 ? handleTouchMove : undefined}
-        onTouchEnd={project.images.length > 1 ? handleTouchEnd : undefined}
-      >
+      <div className="app-card-screen" ref={screenRef}>
         {project.images.length > 0 ? (
           <div
             className="app-card-track"
             style={{
               transform: `translateX(${trackOffset}px)`,
-              transition: dragging ? 'none' : 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
+              transition: dragging || skipTransition ? 'none' : 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
             }}
+            onTransitionEnd={handleTrackTransitionEnd}
           >
-            {project.images.map((src, i) => (
+            {slides.map((src, i) => (
               <div key={i} className="app-card-slide">
                 <img
                   src={src}
-                  alt={`${project.name} screenshot ${i + 1}`}
+                  alt={`${project.name} screenshot ${((i - 1 + len) % len) + 1}`}
                   style={project.imagePosition ? { objectPosition: project.imagePosition } : undefined}
                 />
               </div>
@@ -204,7 +288,7 @@ export default function ProjectCard({
             className="app-card-arrow app-card-arrow--previous"
             onClick={(e) => {
               e.stopPropagation()
-              goTo(index - 1)
+              moveBy(-1)
             }}
             aria-label="Show previous screenshot"
           >
@@ -215,7 +299,7 @@ export default function ProjectCard({
             className="app-card-arrow app-card-arrow--next"
             onClick={(e) => {
               e.stopPropagation()
-              goTo(index + 1)
+              moveBy(1)
             }}
             aria-label="Show next screenshot"
           >

@@ -28,62 +28,62 @@
 .gas-order-intro, .gas-order-sizes { position: relative; flex: 0 0 auto; border: 1px solid rgba(20,28,35,.07); border-radius: 17px; background: #fff; box-shadow: 0 7px 18px rgba(22,32,43,.09); }
 .gas-order-intro { padding: 10px 10px 8px; }
 .gas-order-title-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
-.gas-order-title-line h2 { margin: 0; font: 800 clamp(10px, 1.1vw, 15px)/1.2 'Plus Jakarta Sans', Inter, sans-serif; letter-spacing: -.025em; }
+.gas-order-title-line h2 { margin: 0; font: 800 4.2cqw/1.2 'Plus Jakarta Sans', Inter, sans-serif; letter-spacing: -.025em; }
 .gas-order-title-line h2 span { color: #64666b; font-weight: 600; }
 .gas-order-schedule-icon { width: 25px; height: 25px; flex: 0 0 25px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f3f7fc; color: #2585ff; transition: transform .25s ease, background .25s ease; }
 .gas-order-schedule-icon.is-active { background: #e6f2ff; transform: rotate(-12deg) scale(1.05); }
 .gas-order-location { width: 100%; margin-top: 7px; padding: 7px 1px 0; display: flex; align-items: center; gap: 7px; border: 0; border-top: 1px solid #eff0f2; background: transparent; text-align: left; color: #777a7e; }
 .gas-location-marker { width: 25px; height: 25px; flex: 0 0 25px; display: grid; place-items: center; border-radius: 8px; background: #f0faf3; color: #18b955; }
 .gas-location-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.gas-location-copy small { color: #8a8c90; font-size: clamp(7px, .72vw, 9px); }
-.gas-location-copy strong { overflow: hidden; color: #202124; font-size: clamp(8px, .82vw, 11px); text-overflow: ellipsis; white-space: nowrap; }
+.gas-location-copy small { color: #8a8c90; font-size: 3cqw; }
+.gas-location-copy strong { overflow: hidden; color: #202124; font-size: 3.8cqw; text-overflow: ellipsis; white-space: nowrap; }
 .gas-order-location.is-active { color: #147cff; }
 .gas-order-location.is-active .gas-location-marker { background: #eaf5ff; }
 .gas-schedule-page { position: absolute; z-index: 3; right: 4%; bottom: 6%; left: 4%; padding: 11px 12px 10px; border: 1px solid rgba(20,28,35,.07); border-radius: 18px; background: #fff; box-shadow: 0 10px 26px rgba(22,32,43,.14); opacity: 0; transform: translateY(22px) scale(.985); pointer-events: none; transition: transform .55s cubic-bezier(.22,.75,.22,1), opacity .45s ease; }
 .gas-order-phone--schedule .gas-schedule-page { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 .gas-schedule-page header { margin-bottom: 9px; display: flex; justify-content: space-between; align-items: center; }
-.gas-schedule-page h2 { margin: 0; font: 700 clamp(11px, 1.05vw, 14px)/1.2 'Plus Jakarta Sans', Inter, sans-serif; }
-.gas-schedule-page header button { border: 0; background: transparent; color: #147cff; font-size: clamp(8px, .78vw, 10px); }
+.gas-schedule-page h2 { margin: 0; font: 700 4.4cqw/1.2 'Plus Jakarta Sans', Inter, sans-serif; }
+.gas-schedule-page header button { border: 0; background: transparent; color: #147cff; font-size: 3.6cqw; }
 .gas-schedule-options { min-height: 32px; padding: 3px; display: flex; align-items: stretch; justify-content: space-between; gap: 3px; border-radius: 20px; background: #f5f5f6; }
-.gas-schedule-options button { flex: 1; padding: 5px 4px; border: 0; border-radius: 18px; background: transparent; color: #8b8d91; font-size: clamp(7px, .75vw, 10px); white-space: nowrap; }
+.gas-schedule-options button { flex: 1; padding: 5px 4px; border: 0; border-radius: 18px; background: transparent; color: #8b8d91; font-size: 3.4cqw; white-space: nowrap; }
 .gas-schedule-options button.is-selected { background: #fff; color: #151618; box-shadow: 0 1px 4px rgba(0,0,0,.14); }
 .gas-schedule-page .gas-order-submit { margin-top: 10px; }
 .gas-order-sizes { padding: 10px 9px 8px; transition: transform .45s ease, box-shadow .45s ease; }
 .gas-order-phone--sizes .gas-order-sizes { transform: scale(1.012); box-shadow: 0 8px 22px rgba(22,32,43,.14); }
-.gas-order-sizes h3 { margin: 0 0 5px; font: 800 clamp(10px, 1vw, 14px)/1.2 'Plus Jakarta Sans', Inter, sans-serif; }
+.gas-order-sizes h3 { margin: 0 0 5px; font: 800 4.2cqw/1.2 'Plus Jakarta Sans', Inter, sans-serif; }
 .gas-cylinder-list { display: flex; flex-direction: column; }
 .gas-cylinder-row { min-height: 33px; display: flex; align-items: center; gap: 6px; }
 .gas-cylinder-image { width: 21px; height: 27px; flex: 0 0 21px; display: flex; align-items: flex-end; }
 .gas-cylinder-image img { width: 100%; height: 100%; object-fit: contain; }
 .gas-cylinder-label { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
-.gas-cylinder-label strong { font-size: clamp(7px, .76vw, 10px); font-weight: 600; }
-.gas-cylinder-label small { color: #84878c; font-size: clamp(6px, .67vw, 8px); }
+.gas-cylinder-label strong { font-size: 3.6cqw; font-weight: 600; }
+.gas-cylinder-label small { color: #84878c; font-size: 3cqw; }
 .gas-cylinder-stepper { display: flex; align-items: center; gap: 5px; }
 .gas-cylinder-stepper button { width: 19px; height: 19px; display: grid; place-items: center; border: 1px solid #eceff2; border-radius: 50%; background: white; color: #73777d; }
 .gas-cylinder-stepper button.is-plus { color: #1680ff; }
-.gas-cylinder-stepper b { min-width: 11px; text-align: center; font-size: 9px; }
-.gas-order-summary { margin: 5px 0 1px; padding: 5px 7px; display: flex; justify-content: space-between; border-radius: 7px; background: #eef6ff; color: #495969; font-size: clamp(6px, .66vw, 8px); }
+.gas-cylinder-stepper b { min-width: 11px; text-align: center; font-size: 3.6cqw; }
+.gas-order-summary { margin: 5px 0 1px; padding: 5px 7px; display: flex; justify-content: space-between; border-radius: 7px; background: #eef6ff; color: #495969; font-size: 3cqw; }
 .gas-order-summary strong { color: #147cff; }
-.gas-order-submit { width: 100%; min-height: 30px; margin-top: 7px; border: 0; border-radius: 20px; background: #287afa; color: #fff; box-shadow: 0 6px 14px rgba(40,122,250,.22); font-size: clamp(8px, .78vw, 10px); font-weight: 700; transition: background 300ms ease; }
+.gas-order-submit { width: 100%; min-height: 30px; margin-top: 7px; border: 0; border-radius: 20px; background: #287afa; color: #fff; box-shadow: 0 6px 14px rgba(40,122,250,.22); font-size: 3.8cqw; font-weight: 700; transition: background 300ms ease; }
 .gas-order-submit.is-placed { background: #20b85a; }
 .gas-location-screen { position: absolute; z-index: 4; top: 6.3%; right: 4%; left: 4%; height: 47.4%; overflow-y: auto; padding: 7px 9px; border: 1px solid rgba(20,28,35,.08); border-radius: 18px; background: #fff; box-shadow: 0 12px 28px rgba(16,25,36,.18); opacity: 0; transform: translateY(18px) scale(.985); pointer-events: none; transition: transform .55s cubic-bezier(.22,.75,.22,1), opacity .45s ease; }
 .gas-order-phone--location .gas-location-screen { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 .gas-order-phone--location > .mobile-status-bar { z-index: 5; }
 .gas-location-input-row { min-height: 40px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #eceef1; }
 .gas-location-input-row .gas-location-marker { width: 28px; height: 28px; flex-basis: 28px; }
-.gas-location-input-row input { width: 0; min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #161719; font: 500 clamp(8px, .82vw, 11px)/1.2 Inter, sans-serif; }
+.gas-location-input-row input { width: 0; min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #161719; font: 500 3.6cqw/1.2 Inter, sans-serif; }
 .gas-location-input-row input::placeholder { color: #303236; opacity: 1; }
 .gas-location-input-row > button { width: 24px; height: 24px; border: 0; background: transparent; color: #383b40; font-size: 16px; }
 .gas-location-recent { padding: 7px 1px 3px; display: flex; flex-direction: column; gap: 4px; }
-.gas-location-recent strong { font-size: clamp(8px, .75vw, 10px); }
-.gas-location-recent span { width: max-content; max-width: 100%; padding: 4px 8px; display: flex; align-items: center; gap: 4px; overflow: hidden; border-radius: 999px; background: #f4f5f6; color: #686c71; font-size: clamp(7px, .68vw, 9px); text-overflow: ellipsis; white-space: nowrap; }
+.gas-location-recent strong { font-size: 3.2cqw; }
+.gas-location-recent span { width: max-content; max-width: 100%; padding: 4px 8px; display: flex; align-items: center; gap: 4px; overflow: hidden; border-radius: 999px; background: #f4f5f6; color: #686c71; font-size: 2.8cqw; text-overflow: ellipsis; white-space: nowrap; }
 .gas-current-location, .gas-location-matches button { width: 100%; min-height: 38px; display: flex; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid #eff0f2; background: transparent; color: #2c3035; text-align: left; }
 .gas-current-location { color: #1680ff; justify-content: space-between; }
-.gas-current-location span, .gas-location-matches button span { min-width: 0; flex: 1; overflow: hidden; font-size: clamp(8px, .82vw, 11px); text-overflow: ellipsis; white-space: nowrap; }
+.gas-current-location span, .gas-location-matches button span { min-width: 0; flex: 1; overflow: hidden; font-size: 3.6cqw; text-overflow: ellipsis; white-space: nowrap; }
 .gas-location-matches button.is-selected { color: #147cff; background: #f4f9ff; }
-.gas-location-matches p { color: #8b8d91; font-size: 9px; }
+.gas-location-matches p { color: #8b8d91; font-size: 3.2cqw; }
 .gas-visual-keyboard {
-  position: absolute; z-index: 5; right: 0; bottom: -22%; left: 0; height: 38%;
+  position: absolute; z-index: 5; right: 0; bottom: 0; left: 0; height: 38%;
   padding: 2.5cqw 2cqw 3cqw; display: flex; flex-direction: column; gap: 1.2cqw;
   background: linear-gradient(180deg, #ebedf0, #dfe2e6); border-top: 1px solid rgba(0,0,0,.05);
   opacity: 0; transform: translateY(24px); transition: transform .45s ease, opacity .4s ease; pointer-events: none;
@@ -109,6 +109,13 @@
 
 @media (max-width: 440px) {
   .gas-order-phone { height: 118%; }
+  .gas-order-schedule-icon { width: 30px; height: 30px; flex-basis: 30px; }
+  .gas-location-marker { width: 30px; height: 30px; flex-basis: 30px; }
+  .gas-cylinder-image { width: 25px; height: 32px; flex-basis: 25px; }
+  .gas-cylinder-stepper button { width: 23px; height: 23px; }
+  .gas-order-submit { min-height: 36px; }
+  .gas-schedule-options { min-height: 38px; }
+  .gas-schedule-page { padding: 13px 14px 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gas-order-phone, .gas-order-stack, .gas-order-sizes, .gas-tap-cursor, .gas-schedule-page, .gas-location-screen, .gas-visual-keyboard { transition: none; animation: none; }

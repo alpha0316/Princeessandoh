@@ -145,6 +145,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
   const [carouselRestart, setCarouselRestart] = useState(0)
   const [tractionStarted, setTractionStarted] = useState(false)
   const [lightChapterOnScreen, setLightChapterOnScreen] = useState(false)
+  const [caseStudyProgress, setCaseStudyProgress] = useState(0)
   const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const pageRef = useRef<HTMLDivElement>(null)
   const revealRef = useRef<HTMLDivElement>(null)
@@ -158,6 +159,23 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
   const [activeSettlementTab, setActiveSettlementTab] = useState<'ready' | 'owing' | 'running'>('ready')
   const [payoutHeadCollapsed, setPayoutHeadCollapsed] = useState(false)
   const settlementElapsedRef = useRef(0)
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const page = pageRef.current
+      if (!page) return
+      const pageTop = window.scrollY + page.getBoundingClientRect().top
+      const scrollable = Math.max(1, page.scrollHeight - window.innerHeight)
+      setCaseStudyProgress(Math.min(1, Math.max(0, (window.scrollY - pageTop) / scrollable)))
+    }
+    updateProgress()
+    window.addEventListener('scroll', updateProgress, { passive: true })
+    window.addEventListener('resize', updateProgress)
+    return () => {
+      window.removeEventListener('scroll', updateProgress)
+      window.removeEventListener('resize', updateProgress)
+    }
+  }, [])
 
   useEffect(() => {
     const scroller = settlementPayoutScrollRef.current
@@ -199,7 +217,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
   }, [])
 
   useEffect(() => {
-    if (!settlementStarted || settlementPaused) return
+    if (!settlementStarted || settlementPaused || window.matchMedia('(max-width: 900px)').matches) return
     const cycleDuration = 17_000
     const timelineStart = performance.now() - settlementElapsedRef.current
     let frame = 0
@@ -224,6 +242,15 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
       window.cancelAnimationFrame(frame)
     }
   }, [settlementStarted, settlementPaused])
+
+  useEffect(() => {
+    if (!settlementStarted || !window.matchMedia('(max-width: 900px)').matches) return
+    const timer = window.setInterval(() => {
+      setSettlementEventOpen((current) => !current)
+      if (settlementPayoutScrollRef.current) settlementPayoutScrollRef.current.scrollTop = 0
+    }, 4000)
+    return () => window.clearInterval(timer)
+  }, [settlementStarted])
 
   useEffect(() => {
     const section = settlementRef.current
@@ -274,7 +301,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
       <button className="uzeka-back uzeka-glass-btn" aria-label="Back to projects" onClick={() => onNavigate?.('home')}>
         <LineIcon name="arrow-left" size={18} />
       </button>
-      <UzekaDetailsPanel chapters={CHAPTERS} appIcon={APP_ICON} />
+      <UzekaDetailsPanel chapters={CHAPTERS} appIcon={APP_ICON} progress={caseStudyProgress} />
 
       <div className="uzeka-hero-screen" id="uzeka-overview">
         <div className="uzeka-edge-screens uzeka-edge-screens--flashlight" ref={revealRef} aria-hidden="true">
@@ -574,7 +601,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
               <div className="uzeka-settlement-tabs" role="tablist" aria-label="Settlement status">
                 {([['ready', 'Ready To Settle', '1'], ['owing', 'Owing', '2'], ['running', 'Running', '1']] as const).map(([id, label, count]) => <button key={id} type="button" role="tab" aria-selected={activeSettlementTab === id} className={activeSettlementTab === id ? 'is-active' : ''} onClick={() => setActiveSettlementTab(id)}>{label} <i>{count}</i></button>)}
               </div>
-              <button className="uzeka-settlement-event" type="button" aria-label="Open Afrobeats Takover settlement details" onClick={() => { setSettlementPaused(true); setSettlementEventOpen(true) }}><span className="uzeka-settlement-ticket">🎤</span><span className="uzeka-settlement-event-copy"><b>Afrobeats Takover</b><small>Ended <strong>7th June</strong></small></span><strong className="uzeka-settlement-amount">Kz 736,000 kz<small>{activeSettlementTab === 'ready' ? 'Ready To Settle' : activeSettlementTab === 'owing' ? 'Owing' : 'Running'}</small></strong></button>
+              <button className="uzeka-settlement-event" type="button" aria-label="Open Afrobeats Takover settlement details" onClick={() => { setSettlementPaused(true); setSettlementEventOpen(true); if (settlementPayoutScrollRef.current) settlementPayoutScrollRef.current.scrollTop = 0 }}><span className="uzeka-settlement-ticket">🎤</span><span className="uzeka-settlement-event-copy"><b>Afrobeats Takover</b><small>Ended <strong>7th June</strong></small></span><strong className="uzeka-settlement-amount">Kz 736,000 kz<small>{activeSettlementTab === 'ready' ? 'Ready To Settle' : activeSettlementTab === 'owing' ? 'Owing' : 'Running'}</small></strong></button>
             </div>
             <span className="uzeka-settlement-flow" aria-hidden="true"><i /></span>
             <div className="uzeka-settlement-phone uzeka-settlement-phone--payout">
@@ -597,6 +624,11 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
               </div>
             </div>
           </div>
+          <nav className="uzeka-settlement-pagination" aria-label="Settlement screen preview">
+            <button type="button" aria-label="Show settlement list" aria-current={!settlementEventOpen ? 'page' : undefined} onClick={() => { setSettlementEventOpen(false); if (settlementPayoutScrollRef.current) settlementPayoutScrollRef.current.scrollTop = 0 }}>01</button>
+            <span>{settlementEventOpen ? 'Settlement details' : 'Settlement'}</span>
+            <button type="button" aria-label="Show settlement details" aria-current={settlementEventOpen ? 'page' : undefined} onClick={() => { setSettlementEventOpen(true); if (settlementPayoutScrollRef.current) settlementPayoutScrollRef.current.scrollTop = 0 }}>02</button>
+          </nav>
 
           <div className="uzeka-settlement-columns">
             <article>
@@ -610,6 +642,11 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
               <p>Own-reference payments opened a genuine gap: if money goes straight to the organiser, Uzeka cannot see it arrive, so how does a ticket get issued? The answer was an API key alongside the entity number, letting Uzeka query the organiser’s provider directly. That reframed the whole screen as a credential — verified before it is trusted, masked after it is saved, and <strong>alerting loudly when it stops working mid-event</strong>, because that is the state where customers pay and tickets silently stop arriving.</p>
             </article>
           </div>
+          <footer className="uzeka-case-footer" aria-label="Uzeka case study closing image">
+            <div className="uzeka-case-footer-wordmark" aria-hidden="true">
+              {WORDMARK_LETTERS.map((letter) => <img key={letter.id} src={letter.src} alt="" style={{ '--ratio': letter.ratio } as React.CSSProperties} />)}
+            </div>
+          </footer>
         </div>
       </section>
     </div>

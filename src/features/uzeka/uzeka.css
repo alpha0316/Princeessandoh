@@ -103,13 +103,10 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
 }
 
-.uzeka-status-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #34c759;
-  box-shadow: 0 0 0 2px rgba(244, 244, 244, 0.2);
-}
+.uzeka-progress-ring { display: block; width: 25px; height: 25px; overflow: visible; transform: rotate(-90deg); }
+.uzeka-progress-ring circle { fill: none; stroke-width: 2.4; }
+.uzeka-progress-ring-track { stroke: rgba(255,255,255,.23); }
+.uzeka-progress-ring-value { stroke: #34c759; stroke-linecap: round; stroke-dasharray: 56.55; transition: stroke-dashoffset .12s linear; }
 
 /* ---------- product-details panel: a single element that morphs from the
    small glass status dot into the full white detail card ---------- */
@@ -1497,14 +1494,14 @@
 .uzeka-chapter--settlement.is-paused .uzeka-settlement-phone--payout,
 .uzeka-chapter--settlement.is-paused .uzeka-settlement-flow { animation-play-state: paused; }
 @keyframes settlement-list-flow {
-  0%, 13% { left: 50%; top: 38px; opacity: 1; transform: translateX(-50%) scale(1); }
-  24%, 39% { left: 5%; top: 118px; opacity: 1; transform: translateX(0) scale(.78); }
-  47%, 100% { left: 5%; top: 118px; opacity: 0; transform: translateX(-34%) scale(.7); }
+  0%, 12% { left: 50%; top: 38px; opacity: 1; transform: translateX(-50%) scale(1); }
+  20% { left: 5%; top: 118px; opacity: 1; transform: translateX(0) scale(.78); }
+  30%, 100% { left: 5%; top: 118px; opacity: 0; transform: translateX(-34%) scale(.7); }
 }
 @keyframes settlement-payout-flow {
-  0%, 17% { left: 79%; top: 38px; opacity: 0; transform: translateX(20%) scale(.84); }
-  29%, 42% { left: 46%; top: 38px; opacity: 1; transform: translateX(0) scale(1); }
-  53%, 100% { left: 50%; top: 38px; opacity: 1; transform: translateX(-50%) scale(1); }
+  0%, 24% { left: 79%; top: 38px; opacity: 0; transform: translateX(20%) scale(.84); }
+  32%, 45% { left: 46%; top: 38px; opacity: 1; transform: translateX(0) scale(1); }
+  55%, 100% { left: 50%; top: 38px; opacity: 1; transform: translateX(-50%) scale(1); }
 }
 @keyframes settlement-arrow-flow {
   0%, 17%, 48%, 100% { opacity: 0; }
@@ -1516,15 +1513,36 @@
 .uzeka-settlement-columns p { margin: 0 0 18px; font-size: 16px; line-height: 1.5; }
 .uzeka-settlement-columns strong { color: #f4f4f4; font-weight: 600; }
 
+/* The settlement prototype is a paged, single-device simulation. */
+.uzeka-settlement-pagination { display: none; align-items: center; justify-content: center; gap: 14px; margin: 18px auto 0; color: rgba(255,255,255,.6); font-size: 12px; }
+.uzeka-settlement-pagination button { width: 34px; height: 30px; border: 1px solid #333; border-radius: 16px; color: #999; background: #111; font: inherit; cursor: pointer; }
+.uzeka-settlement-pagination button[aria-current="page"] { color: #111; border-color: #fff; background: #fff; }
+.uzeka-settlement-columns { margin-inline: 14.4%; }
+.uzeka-settlement-columns article { width: 100%; }
+.uzeka-case-footer { position: relative; display: grid; width: 100vw; min-height: clamp(460px, 58vw, 820px); place-items: center; margin: 90px calc(50% - 50vw) -76px; overflow: hidden; isolation: isolate; background: #050609 url('/bgs/uzeka-footer-landscape.png') center 62% / cover no-repeat; }
+.uzeka-case-footer::before { position: absolute; z-index: -1; inset: 0; content: ''; background: linear-gradient(180deg, #000 0%, rgba(0,0,0,.76) 22%, rgba(0,0,0,.08) 72%, rgba(0,0,0,.06) 100%); }
+.uzeka-case-footer-wordmark { display: flex; width: 80vw; align-items: center; justify-content: center; gap: clamp(5px, .9vw, 14px); opacity: .13; }
+.uzeka-case-footer-wordmark img { display: block; width: 0; min-width: 0; height: auto; flex: var(--ratio) 1 0; aspect-ratio: var(--ratio); object-fit: contain; }
+
 @media (max-width: 900px) {
+  .uzeka-settlement-stage { height: 620px; }
+  .uzeka-settlement-phone { top: 28px; left: 50%; width: min(390px, calc(100% - 28px)); height: 590px; border-radius: 27px 27px 0 0; transform: translateX(-50%); }
+  .uzeka-settlement-phone--list { padding: 10px; }
+  .uzeka-settlement-phone--payout { left: 50%; padding-bottom: 18px; }
+  .uzeka-settlement-flow { display: none; }
+  .uzeka-settlement-stage .uzeka-settlement-phone--list,
+  .uzeka-settlement-stage .uzeka-settlement-phone--payout { animation: none !important; opacity: 0; pointer-events: none; }
+  .uzeka-settlement-stage:not(.is-manual-detail) .uzeka-settlement-phone--list,
+  .uzeka-settlement-stage.is-manual-detail .uzeka-settlement-phone--payout { opacity: 1; pointer-events: auto; }
+  .uzeka-settlement-pagination { display: flex; }
   .uzeka-chapter.uzeka-chapter--settlement { padding: 76px 20px 48px; }
   .uzeka-settlement-intro { width: 100%; margin: 0 0 28px; }
   .uzeka-settlement-intro h2 { font-size: clamp(30px, 8vw, 38px); }
   .uzeka-settlement-intro .uzeka-chapter-lede { font-size: 14px; }
   .uzeka-settlement-stage { height: 510px; border-radius: 24px; }
-  .uzeka-settlement-phone { top: 28px; width: 47%; height: 590px; border-radius: 27px 27px 0 0; }
+  .uzeka-settlement-phone { top: 28px; width: 68%; height: 590px; border-radius: 27px 27px 0 0; }
   .uzeka-settlement-phone--list { left: 50%; padding: 10px; }
-  .uzeka-settlement-phone--payout { left: 54%; }
+  .uzeka-settlement-phone--payout { left: 50%; }
   .uzeka-settlement-flow { left: 48%; width: 6%; }
   .uzeka-settlement-payout-head { padding: 10px; border-radius: 27px 27px 18px 18px; }
   .uzeka-settlement-payout-total strong { font-size: clamp(17px, 4vw, 27px); }
@@ -1546,18 +1564,29 @@
   .uzeka-settlement-ledger-row span,.uzeka-settlement-ledger-row > strong { font-size: 9px; }
   .uzeka-settlement-ledger-row small { font-size: 8px; }
   @keyframes settlement-list-flow {
-    0%, 13% { left: 50%; top: 28px; opacity: 1; transform: translateX(-50%) scale(1); }
-    24%, 39% { left: 2%; top: 94px; opacity: 1; transform: translateX(0) scale(.73); }
-    47%, 100% { left: 2%; top: 94px; opacity: 0; transform: translateX(-34%) scale(.65); }
+    0%, 12% { left: 50%; top: 28px; opacity: 1; transform: translateX(-50%) scale(1); }
+    20% { left: 2%; top: 94px; opacity: 1; transform: translateX(0) scale(.73); }
+    30%, 100% { left: 2%; top: 94px; opacity: 0; transform: translateX(-34%) scale(.65); }
   }
   @keyframes settlement-payout-flow {
-    0%, 17% { left: 79%; top: 28px; opacity: 0; transform: translateX(20%) scale(.84); }
-    29%, 42% { left: 52%; top: 28px; opacity: 1; transform: translateX(0) scale(1); }
-    53%, 100% { left: 50%; top: 28px; opacity: 1; transform: translateX(-50%) scale(1); }
+    0%, 24% { left: 79%; top: 28px; opacity: 0; transform: translateX(20%) scale(.84); }
+    32%, 45% { left: 52%; top: 28px; opacity: 1; transform: translateX(0) scale(1); }
+    55%, 100% { left: 50%; top: 28px; opacity: 1; transform: translateX(-50%) scale(1); }
   }
   .uzeka-settlement-columns { grid-template-columns: 1fr; gap: 26px; margin-top: 42px; }
   .uzeka-settlement-columns h3 { font-size: 18px; }
   .uzeka-settlement-columns p { font-size: 14px; }
+}
+
+@media (max-width: 900px) {
+  .uzeka-settlement-stage { height: 620px; }
+  .uzeka-settlement-phone { top: 28px; width: min(390px, calc(100% - 28px)); height: 590px; border-radius: 27px 27px 0 0; }
+  .uzeka-settlement-phone--list { padding: 10px; }
+  .uzeka-settlement-payout-head { padding: 10px; border-radius: 27px 27px 18px 18px; }
+  .uzeka-settlement-columns { margin-inline: 0; }
+  .uzeka-case-footer { width: 100vw; min-height: 470px; margin: 20px calc(50% - 50vw) -48px; background-size: auto 100%; background-position: center bottom; }
+  .uzeka-case-footer-wordmark { width: 80vw; gap: 3px; }
+  .uzeka-case-footer-wordmark { align-self: start; margin-top: clamp(100px, 30vw, 160px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

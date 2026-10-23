@@ -28,9 +28,9 @@ export const projects: Project[] = [
     name: 'Gears',
     description: 'Find trusted mechanics, detailers, auto shops, and fuel stations near you.',
     images: [
-      asset('Gears/Home.svg'),
-      asset('Gears/Bookmarks.svg'),
-      asset('Gears/Business Details Page.svg'),
+      asset('Gears/Home.png'),
+      asset('Gears/Bookmarks.png'),
+      asset('Gears/Business Details.png'),
     ],
     links: [
       { type: 'web', url: 'https://www.gears.live/', label: 'Website' },
