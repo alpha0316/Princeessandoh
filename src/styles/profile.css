@@ -203,32 +203,6 @@
   position: relative;
 }
 
-/* Wavy edge overlay — an animated outline drawn on top of the whole card
-   (see useWavyClipPath), independent of the screenshot content underneath
-   so it stays visible no matter what colors the content behind it uses. */
-.app-card-wavy-edge {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 7;
-  pointer-events: none;
-  overflow: visible;
-}
-
-.app-card-wavy-edge path {
-  stroke: var(--text, rgba(20, 20, 25, 0.5));
-  stroke-opacity: 0.22;
-  stroke-width: 1.6;
-  stroke-linejoin: round;
-  will-change: d;
-}
-
-.theme-dark .app-card-wavy-edge path {
-  stroke: #fff;
-  stroke-opacity: 0.28;
-}
-
 .app-card-track {
   display: flex;
   height: 100%;

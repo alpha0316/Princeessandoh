@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import ProjectLinkIcon, { getProjectLinkTooltip } from './ProjectLinkIcon'
-import { useWavyClipPath } from '../hooks/useWavyClipPath'
-import { triggerRipple } from '../stores/cardRipple'
 import type { Project } from '../types/project'
 
 const AUTO_ADVANCE_MS = 45000
@@ -34,8 +32,6 @@ export default function ProjectCard({
   const intervalRef = useRef<number | undefined>(undefined)
   const initDelayRef = useRef((uid++ * 1.3 + Math.random() * 2) % 30 * 1000)
   const cardRef = useRef<HTMLDivElement>(null)
-  const wavyPathRef = useRef<SVGPathElement>(null)
-  useWavyClipPath(hovered, cardRef, wavyPathRef)
 
   const screenRef = useRef<HTMLDivElement>(null)
   const [frameWidth, setFrameWidth] = useState(0)
@@ -190,16 +186,7 @@ export default function ProjectCard({
   const handleEnter = () => {
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       setHovered(true)
-      const rect = screenRef.current?.getBoundingClientRect()
-      if (rect) triggerRipple(rect.left + rect.width / 2, rect.top + rect.height / 2)
     }
-  }
-
-  // Re-broadcasts the ripple origin as the cursor travels across the card,
-  // so the wave keeps emitting from wherever it currently is rather than
-  // only pulsing once on entry — triggerRipple throttles this internally.
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (hovered) triggerRipple(e.clientX, e.clientY)
   }
 
   const handleLeave = () => {
@@ -236,7 +223,6 @@ export default function ProjectCard({
         transition: 'transform 0.5s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.6s ease',
       }}
       onMouseEnter={handleEnter}
-      onMouseMove={handleMove}
       onMouseLeave={handleLeave}
       onClick={handleClick}
     >
@@ -290,7 +276,7 @@ export default function ProjectCard({
           <div className="app-card-placeholder">{project.name.charAt(0)}</div>
         )}
 
-        {(project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') && (
+        {(project.id === 'uzeka' || project.id === 'gas-app') && (
           <span className={`app-card-case-study-hint ${hovered ? 'is-visible' : ''}`}>View Case Study</span>
         )}
       </div>
@@ -350,10 +336,6 @@ export default function ProjectCard({
           )}
         </footer>
       </div>
-
-      <svg className="app-card-wavy-edge" aria-hidden="true">
-        <path ref={wavyPathRef} fill="none" />
-      </svg>
     </div>
   )
 }
