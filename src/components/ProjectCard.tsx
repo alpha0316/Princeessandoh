@@ -200,7 +200,7 @@ export default function ProjectCard({
       return
     }
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    if (canHover || project.id === 'uzeka' || project.id === 'gas-app') {
+    if (canHover || project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') {
       onOpen?.(index)
     }
   }
@@ -276,7 +276,7 @@ export default function ProjectCard({
           <div className="app-card-placeholder">{project.name.charAt(0)}</div>
         )}
 
-        {(project.id === 'uzeka' || project.id === 'gas-app') && (
+        {(project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') && (
           <span className={`app-card-case-study-hint ${hovered ? 'is-visible' : ''}`}>View Case Study</span>
         )}
       </div>
