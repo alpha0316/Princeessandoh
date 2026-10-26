@@ -34,9 +34,10 @@ export default function ProjectCard({
   const intervalRef = useRef<number | undefined>(undefined)
   const initDelayRef = useRef((uid++ * 1.3 + Math.random() * 2) % 30 * 1000)
   const cardRef = useRef<HTMLDivElement>(null)
+  const wavyPathRef = useRef<SVGPathElement>(null)
+  useWavyClipPath(hovered, cardRef, wavyPathRef)
 
   const screenRef = useRef<HTMLDivElement>(null)
-  useWavyClipPath(hovered, screenRef)
   const [frameWidth, setFrameWidth] = useState(0)
   const frameWidthRef = useRef(0)
   const dragPxRef = useRef(0)
@@ -349,6 +350,10 @@ export default function ProjectCard({
           )}
         </footer>
       </div>
+
+      <svg className="app-card-wavy-edge" aria-hidden="true">
+        <path ref={wavyPathRef} fill="none" />
+      </svg>
     </div>
   )
 }

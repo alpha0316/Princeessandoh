@@ -2,25 +2,26 @@ import { useEffect, useRef, type RefObject } from 'react'
 import { mouse } from '../stores/mouse'
 import { rippleStore } from '../stores/cardRipple'
 
-// Carves an actual wavy silhouette into the element's edge via CSS
-// clip-path — a shape change reads clearly at any zoom level, unlike a
-// few-pixel pixel-displacement effect. Notches only ever cut inward (never
-// bulge past the element's own rect), so this is safe to apply without
-// touching overflow/clipping on any ancestor.
+// Draws the wavy silhouette as a visible SVG stroke that hugs the card's
+// edge, rather than clip-path'ing the card itself. A clip-path cut only
+// shows up where it exposes something visually different behind it — on a
+// white card sitting on a white page that's nothing, so the effect was
+// invisible. A drawn stroke is visible regardless of what's behind the
+// card, and keeps the screenshot content itself undistorted and legible.
 const SEGMENTS_PER_EDGE = 15 // 60 points around the rectangle — enough to resolve WAVE_FREQ smoothly
 const WAVE_FREQ = 7 // notches per full lap of the perimeter — broad, liquid swells rather than a scalloped/torn edge
 // Amplitudes are a fraction of the card's own (smaller) dimension, so the
 // wobble reads the same on a small mobile-mockup card and a large web card,
 // and stays at the same relative "viscosity" as the main FluidBackground.
-const IDLE_PCT = 0.03 // 2-5% ambient wobble, always on, matching the background's idle drift
-const HOVER_PCT = 0.065 // noticeably livelier under the cursor, but still legible
-const RIPPLE_PCT = 0.045
-const SPEED_PCT = 0.018 // extra wobble added per unit of cursor speed (capped below)
+const IDLE_PCT = 0.025 // ~2-5% ambient wobble, always on, matching the background's idle drift
+const HOVER_PCT = 0.09 // clearly livelier under the cursor — safe to push further since content is untouched
+const RIPPLE_PCT = 0.06
+const SPEED_PCT = 0.02 // extra wobble added per unit of cursor speed (capped below)
 const RIPPLE_SPEED = 1.1 // px/ms the wave travels across the row
 const RIPPLE_DURATION = 650 // ms the bump takes to pass through a given card
 const EASE = 0.08
 
-function buildClipPath(w: number, h: number, amp: number, t: number, dirAngle: number) {
+function buildWavyPath(w: number, h: number, amp: number, t: number, dirAngle: number) {
   const total = SEGMENTS_PER_EDGE * 4
   const pts: [number, number][] = new Array(total)
 
@@ -50,10 +51,10 @@ function buildClipPath(w: number, h: number, amp: number, t: number, dirAngle: n
     }
 
     const angle = (k / total) * Math.PI * 2
-    // wave swings fully from 0 (flush with the original edge) to 1 (deepest
-    // notch) — a floor here would just read as "slightly rounder corners"
-    // instead of a real scalloped/torn edge.
-    const wave = 0.5 + 0.5 * Math.sin(angle * WAVE_FREQ + t)
+    // Bulges in both directions around the resting edge (not just inward),
+    // so the line reads as the edge itself rippling rather than a one-sided
+    // notch.
+    const wave = Math.sin(angle * WAVE_FREQ + t)
     const dirPull = Math.max(0, Math.cos(angle - dirAngle))
     const depth = amp * wave * (0.55 + 0.45 * dirPull)
     pts[k] = [x - nx * depth, y - ny * depth]
@@ -75,7 +76,17 @@ function buildClipPath(w: number, h: number, amp: number, t: number, dirAngle: n
   return d + 'Z'
 }
 
-export function useWavyClipPath(active: boolean, elementRef: RefObject<HTMLElement | null>) {
+/**
+ * Animates an SVG `<path>`'s `d` attribute into a wavy outline that tracks
+ * `elementRef`'s box size — used as an edge-hugging stroke overlay on top
+ * of a card. `active` (hover) raises the amplitude; cursor speed/direction
+ * and the shared ripple store both feed in too.
+ */
+export function useWavyClipPath(
+  active: boolean,
+  elementRef: RefObject<HTMLElement | null>,
+  pathRef: RefObject<SVGPathElement | null>,
+) {
   const state = useRef({ t: Math.random() * 1000, amp: 0, dirAngle: 0 })
 
   useEffect(() => {
@@ -84,7 +95,8 @@ export function useWavyClipPath(active: boolean, elementRef: RefObject<HTMLEleme
     const tick = () => {
       raf = requestAnimationFrame(tick)
       const el = elementRef.current
-      if (!el) return
+      const path = pathRef.current
+      if (!el || !path) return
       const rect = el.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) return
 
@@ -108,7 +120,7 @@ export function useWavyClipPath(active: boolean, elementRef: RefObject<HTMLEleme
       }
 
       const basePct = active ? HOVER_PCT : IDLE_PCT
-      const target = basePct * minDim + speed * SPEED_PCT * minDim + ripple
+      const target = basePct * minDim + speed * SPEED_PCT * minDim + Math.abs(ripple)
       s.amp += (target - s.amp) * EASE
 
       if (speed > 0.05) {
@@ -117,10 +129,10 @@ export function useWavyClipPath(active: boolean, elementRef: RefObject<HTMLEleme
         s.dirAngle = Math.atan2(mouse.y - centerY, mouse.x - centerX)
       }
 
-      el.style.clipPath = `path("${buildClipPath(rect.width, rect.height, s.amp, s.t, s.dirAngle)}")`
+      path.setAttribute('d', buildWavyPath(rect.width, rect.height, s.amp, s.t, s.dirAngle))
     }
 
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [active, elementRef])
+  }, [active, elementRef, pathRef])
 }
