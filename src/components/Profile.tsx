@@ -70,7 +70,7 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
             <ProjectCard
               project={project}
               onOpen={(index) =>
-                (project.id === 'uzeka' || project.id === 'gas-app') && onNavigate
+                (project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') && onNavigate
                   ? onNavigate(project.id)
                   : setOpenProject({ project, index })
               }

@@ -14,12 +14,13 @@ const SnapsPage = lazy(() => import('./features/snaps/SnapsPage'))
 const AboutPage = lazy(() => import('./features/about/AboutPage'))
 const UzekaPage = lazy(() => import('./features/uzeka/UzekaPage'))
 const GasAppPage = lazy(() => import('./features/gasapp/GasAppPage'))
+const GearsPage = lazy(() => import('./features/gears/GearsPage'))
 const ComponentsPage = lazy(() => import('./features/components/ComponentsPage'))
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
 
-type Page = 'home' | 'snaps' | 'about' | 'uzeka' | 'gas-app' | 'components'
+type Page = 'home' | 'snaps' | 'about' | 'uzeka' | 'gas-app' | 'gears' | 'components'
 
 function AppContent() {
   const isDev = import.meta.env.DEV
@@ -80,6 +81,16 @@ function AppContent() {
           <GasAppPage onNavigate={(p: string) => setPage(p as Page)} />
         </Suspense>
         <IconCredit />
+      </>
+    )
+  }
+
+  if (page === 'gears') {
+    return (
+      <>
+        <Suspense fallback={null}>
+          <GearsPage onNavigate={(p: string) => setPage(p as Page)} />
+        </Suspense>
       </>
     )
   }
