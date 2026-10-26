@@ -29,6 +29,9 @@ const WHEEL_ILLUSTRATION = asset('steering-wheel-illustration.png')
 const ALTERNATOR_ILLUSTRATION = asset('alternator-illustration.png')
 const HOME_SCREEN = gearsAsset('Home.png')
 const BUSINESS_DETAILS_SCREEN = gearsAsset('Business Details.png')
+const PARTS_SCREEN = gearsAsset('Auto Parts Dealers.png')
+const DETAILER_SCREEN = gearsAsset('Discover Car Detailers.png')
+const FUEL_SCREEN = gearsAsset('Find Fuel Stations.png')
 
 const TAG_LABELS = ['Quality Service', 'On Time', 'Affordable', 'Safe', 'Excellent Job']
 
@@ -203,13 +206,11 @@ const PLAYERS_ICONS = [
   { key: 'fuel', icon: <BusinessFuelIcon /> },
 ]
 
-// Only the mechanic screen exists so far — the other three are shown as
-// labeled placeholders until their screenshots are ready to drop in.
 const PLAYERS = [
   { key: 'mechanic', label: 'Mechanic', icon: <BusinessGearIcon />, screen: HOME_SCREEN },
-  { key: 'parts', label: 'Auto parts dealer', icon: <BusinessCartIcon />, screen: null },
-  { key: 'detailer', label: 'Detailer', icon: <BusinessCarWashIcon />, screen: null },
-  { key: 'fuel', label: 'Filling station', icon: <BusinessFuelIcon />, screen: null },
+  { key: 'parts', label: 'Auto parts dealer', icon: <BusinessCartIcon />, screen: PARTS_SCREEN },
+  { key: 'detailer', label: 'Detailer', icon: <BusinessCarWashIcon />, screen: DETAILER_SCREEN },
+  { key: 'fuel', label: 'Filling station', icon: <BusinessFuelIcon />, screen: FUEL_SCREEN },
 ]
 
 function PlayersSection() {
