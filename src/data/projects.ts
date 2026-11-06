@@ -62,7 +62,10 @@ export const projects: Project[] = [
       asset('GiftPal/Swipe.svg'),
       asset('GiftPal/Add Note.svg'),
     ],
-    links: [{ type: 'web', url: 'https://giftpal.co/', label: 'Website' }],
+    links: [
+      { type: 'web', url: 'https://giftpal.co/', label: 'Website' },
+      { type: 'appstore', url: 'https://apps.apple.com/gh/app/mygiftpal/id6821663731', label: 'App Store' },
+    ],
     platform: 'mobile',
   },
   {
