@@ -26,6 +26,9 @@ dist-ssr
 *.sw?
 
 # Large media files — keep locally, do not commit
+# (originals live in media-src/; web-optimised copies in public/videos are
+# committed — see the exception below)
+media-src/
 *.mp4
 *.MP4
 *.mov
@@ -38,3 +41,6 @@ src/assets/Work/*.MOV
 
 # ...except assets imported directly by source code, which must ship in the repo
 !src/assets/vendor-pro/HomeVend.mp4
+
+# Web-optimised demo videos (H.264, compressed) are deployed.
+!public/videos/*.mp4

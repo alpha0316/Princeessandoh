@@ -26,7 +26,7 @@
 .uzeka-ground-fact-icon.is-green { color: #30bf5c; }
 .uzeka-ground-fact h3 { margin: 0 0 5px; color: #17171a; font-size: 15px; line-height: 1.3; font-weight: 600; }
 .uzeka-ground-fact p { margin: 0; color: #858589; font-size: 12px; line-height: 1.65; }
-.uzeka-ground-visual { position: relative; min-height: 355px; overflow: hidden; border-radius: 22px; isolation: isolate; background: #222 url('/bgs/bg%202.png') center 58% / cover no-repeat; }
+.uzeka-ground-visual { position: relative; min-height: 355px; overflow: hidden; border-radius: 22px; isolation: isolate; background: #222 url('/bgs/bg%202.webp') center 58% / cover no-repeat; }
 .uzeka-ground-visual::before { position: absolute; z-index: -1; inset: 0; content: ''; background: linear-gradient(180deg, rgba(12, 11, 19, 0.06) 0%, rgba(10, 8, 15, 0.08) 38%, rgba(7, 7, 10, 0.75) 100%); }
 .uzeka-ground-visual-top { position: absolute; inset: 17px 17px auto; display: flex; justify-content: space-between; color: rgba(255, 255, 255, 0.82); font-size: 9px; letter-spacing: 0.12em; text-shadow: 0 1px 8px rgba(0,0,0,.5); }
 .uzeka-ground-insight { position: absolute; top: 22%; right: -18px; width: 175px; min-height: 139px; padding: 15px; border: 1px solid rgba(255,255,255,.6); border-radius: 17px; background: rgba(255,255,255,.94); box-shadow: 0 14px 35px rgba(0,0,0,.18); transform: rotate(4deg); }
@@ -1519,7 +1519,7 @@
 .uzeka-settlement-pagination button[aria-current="page"] { color: #111; border-color: #fff; background: #fff; }
 .uzeka-settlement-columns { margin-inline: 14.4%; }
 .uzeka-settlement-columns article { width: 100%; }
-.uzeka-case-footer { position: relative; display: grid; width: 100vw; min-height: clamp(460px, 58vw, 820px); place-items: center; margin: 90px calc(50% - 50vw) -76px; overflow: hidden; isolation: isolate; background: #050609 url('/bgs/uzeka-footer-landscape.png') center 62% / cover no-repeat; }
+.uzeka-case-footer { position: relative; display: grid; width: 100vw; min-height: clamp(460px, 58vw, 820px); place-items: center; margin: 90px calc(50% - 50vw) -76px; overflow: hidden; isolation: isolate; background: #050609 url('/bgs/uzeka-footer-landscape.webp') center 62% / cover no-repeat; }
 .uzeka-case-footer::before { position: absolute; z-index: -1; inset: 0; content: ''; background: linear-gradient(180deg, #000 0%, rgba(0,0,0,.76) 22%, rgba(0,0,0,.08) 72%, rgba(0,0,0,.06) 100%); }
 .uzeka-case-footer-wordmark { display: flex; width: 90vw; align-items: center; justify-content: center; gap: clamp(5px, .9vw, 14px); opacity: .13; margin-bottom: 20%; }
 .uzeka-case-footer-wordmark img { display: block; width: 0; min-width: 0; height: auto; flex: var(--ratio) 1 0; aspect-ratio: var(--ratio); object-fit: contain; }
@@ -1608,7 +1608,7 @@
 .uzeka-ground-fact { grid-template-columns: 22px minmax(0, 1fr); gap: 14px; }
 .uzeka-ground-fact h3 { font-size: 14px; }
 .uzeka-ground-fact p { font-size: 11px; line-height: 1.65; }
-.uzeka-ground-visual { min-height: 330px; background-image: linear-gradient(180deg, rgba(8, 8, 12, .06), rgba(8, 8, 12, .12) 44%, rgba(8, 8, 12, .52)), url('/bgs/bg%202.png'); }
+  .uzeka-ground-visual { min-height: 330px; background-image: linear-gradient(180deg, rgba(8, 8, 12, .06), rgba(8, 8, 12, .12) 44%, rgba(8, 8, 12, .52)), url('/bgs/bg%202.webp'); }
 .uzeka-ground-visual::before { display: none; }
 
 @media (max-width: 900px) {

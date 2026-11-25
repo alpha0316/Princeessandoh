@@ -20,6 +20,14 @@ export type Project = {
   images: string[]
   links: ProjectLink[]
   platform: 'mobile' | 'web'
+  /** Muted, looping screen recording of the app in use (Mobbin-style).
+   * When set it replaces the screenshot slider on the card; `images[0]`
+   * doubles as its poster frame while it loads. */
+  demoVideo?: string
+  /** First frame of `demoVideo` (small WebP) shown until it starts playing. */
+  demoPoster?: string
+  /** Play the recording as the first item before continuing through images[1…]. */
+  demoVideoFirst?: boolean
   /** CSS object-position for web screenshots (which crop with object-fit:
    * cover) — e.g. 'top left' to preserve a sidebar instead of the default
    * top-center crop. Ignored for mobile phone frames (object-fit: contain). */

@@ -16,13 +16,14 @@ const EXIT_DURATION_MS = 700
 let hasPlayed = false
 
 export default function LoadingScreen() {
-  const [charsShown, setCharsShown] = useState(0)
+  // 0..1 — how much of the signature has been "inked" so far.
+  const [inked, setInked] = useState(0)
   const [showRocket, setShowRocket] = useState(false)
   const [exiting, setExiting] = useState(false)
   const [done, setDone] = useState(hasPlayed)
   const [avatarStyle, setAvatarStyle] = useState<CSSProperties>({})
   const [rocketShift, setRocketShift] = useState(0)
-  const avatarRef = useRef<HTMLImageElement>(null)
+  const avatarRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -38,16 +39,20 @@ export default function LoadingScreen() {
     return releaseGlass
   }, [done, exiting])
 
-  // Preload every image the page will need (avatar, rocket, all project
-  // screenshots) and tie the typewriter's completion to real load progress
+  // Preload what the first screen needs (avatar, rocket, and each card's
+  // first frame — its video poster, or first screenshot; the rest load
+  // lazily as cards come into view) and tie the typewriter's completion to real load progress
   // — it won't finish typing before the assets are actually ready, but a
   // time-based floor keeps the pace feeling natural even when everything
   // loads instantly (e.g. from cache).
   useEffect(() => {
     if (done) return
 
-    const urls = new Set<string>(['/avatar.png', '/rocket.gif'])
-    projects.forEach((p) => p.images.forEach((src) => urls.add(src)))
+    const urls = new Set<string>(['/avatar.png', '/rocket.webp'])
+    projects.forEach((p) => {
+      const first = p.demoPoster ?? p.images[0]
+      if (first) urls.add(first)
+    })
     const list = Array.from(urls)
     const total = list.length
     let loaded = 0
@@ -78,7 +83,7 @@ export default function LoadingScreen() {
       const loadDone = timedOut || (assetsReady && elapsed >= MIN_TYPE_MS)
       const progress = loadDone ? 1 : Math.min(timeProgress, 0.92)
 
-      setCharsShown(Math.floor(progress * SIGNATURE.length))
+      setInked(progress)
 
       if (progress >= 1) {
         setTimeout(() => setShowRocket(true), ROCKET_DELAY_MS)
@@ -136,19 +141,34 @@ export default function LoadingScreen() {
 
   if (done) return null
 
+  const lightProgress = `${18 + inked * 64}%`
+
   return (
     <div className={`loading-screen ${exiting ? 'is-exiting' : ''}`} aria-hidden="true">
       <div className="loading-content">
-        <img ref={avatarRef} className="loading-avatar" src="/avatar.png" alt="" style={avatarStyle} />
+        <div
+          ref={avatarRef}
+          className="loading-avatar-stage"
+          style={{ '--light-progress': lightProgress, ...avatarStyle } as CSSProperties}
+        >
+          <img className="loading-avatar" src="/avatar.png" alt="" />
+          <span className="loading-avatar-flashlight" />
+        </div>
         <div
           className={`loading-signature ${exiting ? 'is-fading' : ''} ${showRocket ? 'is-centering-rocket' : ''}`}
           style={{ '--rocket-shift': `${rocketShift}px` } as CSSProperties}
         >
-          <span ref={textRef} className="loading-signature-text">
-            {SIGNATURE.slice(0, charsShown)}
-            {!showRocket && <span className="loading-cursor" />}
+          {/* The full handle is always laid out (so its width is stable);
+              a soft-edged mask sweeps left to right over it so the joined
+              script appears as one continuous pen stroke being written. */}
+          <span
+            ref={textRef}
+            className="loading-signature-text"
+            style={{ '--ink': `${(inked * 112 - 6).toFixed(2)}%` } as CSSProperties}
+          >
+            {SIGNATURE}
           </span>
-          {showRocket && <img className="loading-rocket" src="/rocket.gif" alt="" />}
+          {showRocket && <img className="loading-rocket" src="/rocket.webp" alt="" />}
         </div>
       </div>
     </div>

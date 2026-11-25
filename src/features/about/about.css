@@ -18,6 +18,75 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M20 3l9 9-14 14-8-8z' fill='%23fff' stroke='%2317171a' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M7 18l8 8M5 26c-2 2-2 4-2 4s4 0 6-2' fill='none' stroke='%2317171a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 4 28, crosshair;
+}
+
+.about-panel.is-writing {
+  cursor: crosshair;
+}
+
+.about-ink-layer {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.about-ink-layer path {
+  fill: none;
+  stroke: rgba(33, 33, 35, 0.78);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.about-note-hint {
+  position: absolute;
+  z-index: 8;
+  bottom: 26px;
+  left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(460px, calc(100% - 56px));
+  padding: 10px 14px;
+  border: 1px solid rgba(30, 30, 34, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 28px rgba(26, 27, 34, 0.07);
+  color: #77777d;
+  font-size: 12px;
+  line-height: 1.35;
+  cursor: default;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.about-note-hint button {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 1px solid rgba(30, 30, 34, 0.1);
+  border-radius: 999px;
+  background: #fff;
+  color: #35353a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.about-note-hint .about-note-send {
+  border-color: #17171a;
+  background: #17171a;
+  color: #fff;
+}
+
+.about-note-status {
+  max-width: 260px;
+  color: #45454a;
 }
 
 .about-head {
@@ -183,13 +252,42 @@
   to { opacity: 0; }
 }
 
-.about-modal-paper {
+.about-modal-paper-wrap {
+  position: relative;
   width: min(543px, 88vw, calc(84vh * 543 / 564));
-  height: auto;
+  aspect-ratio: 543 / 564;
+  flex: 0 0 auto;
   cursor: default;
   animation: about-paper-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: transform;
 }
+
+.about-modal-paper {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.about-modal-paper-tilt { width: 100%; height: 100%; }
+
+.about-social-link {
+  position: absolute;
+  z-index: 1;
+  top: 87.5%;
+  height: 7.6%;
+  display: block;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.about-social-link:focus-visible {
+  outline: 2px solid #2585ff;
+  outline-offset: -2px;
+}
+
+.about-social-link--x { left: 2.5%; width: 8%; }
+.about-social-link--github { left: 13.4%; width: 8%; }
+.about-social-link--whatsapp { left: 24.3%; width: 8%; }
 
 /* Rising out of the box… */
 @keyframes about-paper-rise {
@@ -199,7 +297,7 @@
 
 /* …and falling back in. The transform target is set inline (aimed at the
    box's real screen position); this class just supplies the fall feel. */
-.about-modal-paper.is-falling {
+.about-modal-paper-wrap.is-falling {
   animation: none;
   transition: transform 0.62s cubic-bezier(0.45, 0.05, 0.4, 1);
 }
@@ -234,7 +332,19 @@
   }
   .about-modal,
   .about-modal.is-closing,
-  .about-modal-paper {
+  .about-modal-paper-wrap {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-note-hint {
+    right: 16px;
+    bottom: 94px;
+    left: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: none;
+    border-radius: 18px;
   }
 }

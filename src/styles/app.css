@@ -47,7 +47,7 @@ body.glass-active .profile-page {
   --tilt-x: 0deg;
   --tilt-y: 0deg;
   --shadow-x: 0px;
-  --shadow-y: 13px;
+  --shadow-y: 8px;
   --glow-x: 50%;
   --glow-y: 50%;
   --glow-angle: 0deg;
@@ -64,7 +64,7 @@ body.glass-active .profile-page {
   transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(0);
   transform-style: preserve-3d;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  filter: drop-shadow(var(--shadow-x) var(--shadow-y) 20px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(var(--shadow-x) var(--shadow-y) 28px rgba(0, 0, 0, 0.22));
 }
 
 .tilt-card-inner > img {
@@ -84,10 +84,9 @@ body.glass-active .profile-page {
   padding: 1.5px;
   background: conic-gradient(
     from var(--glow-angle),
-    rgba(255, 255, 255, 0.85),
-    rgba(255, 255, 255, 0.05) 35%,
-    rgba(255, 255, 255, 0.05) 65%,
-    rgba(255, 255, 255, 0.85) 100%
+    var(--stroke-color) 0deg,
+    color-mix(in srgb, var(--stroke-color) 68%, transparent) 26deg,
+    transparent 58deg 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);

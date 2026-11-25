@@ -3,6 +3,9 @@
   position: relative;
   z-index: 1;
   width: 100%;
+  /* clip (not hidden) so section slides can't cause a horizontal
+     scrollbar without breaking the sticky tab bar. */
+  overflow-x: clip;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -95,8 +98,12 @@
   padding: 0 20px;
 }
 
+/* Web apps show as a single vertical column — each card reads as its own
+   "device frame" at a glance, rather than competing in a dense grid. */
 .project-grid--web {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
+  max-width: 1400px;
+  gap: 28px;
 }
 
 .project-grid--mobile {
@@ -111,12 +118,27 @@
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Web cards are a wide light "canvas" with the site screenshot/recording
+   inset on it (side + top margin, bleeding off the bottom edge) like a
+   browser window resting on a backdrop. */
+.project-card {
+  --card-canvas: #f3f3f3;
+}
+
+.theme-dark .project-card {
+  --card-canvas: rgba(44, 46, 66, 0.6);
+}
+
 .project-grid--web .project-card {
   width: 100%;
-  aspect-ratio: 700 / 560;
+  margin: 0 auto;
+  height: 95vh;
+  height: 95svh;
+  background: var(--card-canvas);
 }
 
 .project-grid--mobile .project-card {
+  background: var(--card-canvas);
   width: 100%;
   aspect-ratio: 470 / 640;
 }
@@ -209,6 +231,232 @@
   touch-action: pan-y;
 }
 
+/* Live/demo site preview (looping <video> walkthrough, or a plain <iframe>
+   as a fallback for a liveUrl with no recorded demo): fills the card frame
+   at any size (desktop grid or the mobile aspect-ratio breakpoint) since
+   it's just width/height 100%. pointer-events: none keeps the whole card a
+   single click target (opening the real site/case-study in a new tab or
+   in-portfolio page) instead of letting clicks land inside the iframe's
+   own page. Mobile-app recordings are captured at the phone frame's own
+   aspect ratio, so they're shown in full via `contain` like the mobile
+   screenshot carousel — `.project-grid--web` overrides to a cropping
+   `cover`, matching how web screenshots bleed edge-to-edge there. */
+.app-card-live-embed {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: none;
+  pointer-events: none;
+  background: var(--card-bg, #fff);
+}
+
+.project-grid--web .app-card-live-embed {
+  position: absolute;
+  top: 6%;
+  left: 6.5%;
+  width: 87%;
+  height: 94%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 18px 50px -12px rgba(12, 12, 13, 0.18), 0 2px 8px rgba(12, 12, 13, 0.06);
+}
+
+/* Mobile-app demo recordings sit inside an actual phone "device frame"
+   (status bar + home indicator), matched to the screenshot assets' own
+   baked-in status bars (gears.css documents the same convention) — a raw
+   browser recording has none of that chrome, so without this it would
+   look out of place next to the other mobile cards. The frame is inset
+   within the card (not edge-to-edge) so the card's own background forms a
+   visible margin around it, same as a screenshot inside `.app-card-slide`. */
+/* container-type: size turns the wrap into a size query container so the
+   frame below can compute a true bidirectional "contain" fit via cqw/cqh —
+   plain CSS width:auto/height:auto + aspect-ratio only derives the free axis
+   from whichever ONE axis is already definite, so on a flex/grid item with no
+   other definite axis it either ignores the ratio (both axes definite) or
+   collapses to ~0 (both axes auto). cqw/cqh give the frame two independent
+   percentages to pick the smaller of, in a single declaration. */
+.app-card-phone-wrap {
+  container-type: size;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 7% 14%;
+  pointer-events: none;
+}
+
+.app-card-phone-frame {
+  container-type: inline-size;
+  position: relative;
+  /* Width is whichever is smaller: the full available width (100cqw), or the
+     width that a full-height (100cqh) box would have at the 470:640 ratio.
+     aspect-ratio then derives height from that width, so the frame always
+     shrinks to fit the wrap in both directions without distorting its shape. */
+  width: min(100cqw, calc(100cqh * 470 / 640));
+  height: auto;
+  aspect-ratio: 470 / 640;
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 1px rgba(20, 22, 28, 0.06), 0 2px 8px rgba(12, 12, 13, 0.06);
+}
+
+/* Simulated web-app screen (Gears): sized to a real device's point
+   dimensions (iPhone 14/15, 390 x 844) instead of the generic 470:640 ratio
+   above, so the frame reads as an actual phone — it gets the Safari-style
+   toolbar below instead of a home indicator. */
+.app-card-phone-frame--device {
+  width: min(100cqw, calc(100cqh * 390 / 844));
+  aspect-ratio: 390 / 844;
+}
+
+/* MobileStatusBar's own base rules live in features/components/components.css,
+   which isn't loaded on the home page — reproduced here so the icons size
+   correctly via the cqw units instead of falling back to raw SVG intrinsic
+   size (huge). Kept as the identical upstream selectors so nothing conflicts
+   if that stylesheet ever loads on the same page too. */
+.mobile-status-bar {
+  position: absolute;
+  z-index: 5;
+  top: 4.3cqw;
+  right: 4cqw;
+  left: 4cqw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #050505;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1;
+  pointer-events: none;
+}
+.mobile-status-bar > strong { font-size: 4.2cqw; font-weight: 700; letter-spacing: -.025em; }
+.mobile-status-bar--light { color: #fff; }
+.mobile-status-icons { display: flex; align-items: center; gap: 1.2cqw; }
+.mobile-status-icons svg { display: block; color: currentColor; }
+.mobile-status-signal { width: 5cqw; height: 3.35cqw; }
+.mobile-status-wifi { width: 4.75cqw; height: 3.35cqw; }
+.mobile-status-battery { width: 7.65cqw; height: 3.55cqw; }
+
+.app-card-phone-status {
+  flex: 0 0 auto;
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  height: 9.2cqw;
+  padding: 0 5.5cqw;
+  background: #fff;
+  z-index: 2;
+}
+
+.app-card-phone-screen {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Mobbin-style recording: the raw screen capture (it already includes the
+   real status bar) in a rounded device outline, no simulated chrome. */
+.app-card-phone-frame > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.app-card-phone-frame--device {
+  border-radius: 9cqw;
+}
+
+.app-card--gears .app-card-phone-frame--device {
+  border: 2.5px solid #fff;
+}
+
+.app-card--gears .app-card-phone-frame--device > video {
+  object-fit: contain;
+  object-position: center;
+  border-radius: calc(9cqw - 2.5px);
+}
+
+.app-card-phone-screen video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.app-card-phone-home-indicator {
+  position: absolute;
+  z-index: 3;
+  bottom: 1.6%;
+  left: 50%;
+  width: 30%;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  background: #101113;
+  opacity: 0.9;
+}
+
+/* Safari-style bottom toolbar (device variant only) — a real flex sibling
+   of the screen, not an overlay, so it takes its own space below it the
+   way the home indicator pill (above) sits on top of it instead. */
+.mobile-browser-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2cqw;
+  height: 16cqw;
+  padding: 0 5cqw;
+  background: #fff;
+  color: #0a0a0a;
+  z-index: 2;
+}
+
+.mobile-browser-bar-icon {
+  flex: 0 0 auto;
+  width: 5.4cqw;
+  height: 5.4cqw;
+  color: #0a0a0a;
+}
+
+.mobile-browser-bar-url {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.8cqw;
+  min-width: 0;
+  padding: 2cqw 4cqw;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.055);
+  font-size: 3.7cqw;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-browser-bar-refresh {
+  flex: 0 0 auto;
+  width: 3.6cqw;
+  height: 3.6cqw;
+}
+
+@media (max-width: 768px) {
+  .app-card-phone-wrap {
+    padding: 6% 20%;
+  }
+}
+
 .app-card-arrow {
   position: absolute;
   top: 50%;
@@ -289,12 +537,15 @@
    phone frames do — phone mockups stay fully visible via .app-card-slide
    img's default object-fit:contain above. */
 .project-grid--web .app-card-slide {
-  padding: 0;
+  padding: 5.5% 8% 0;
+  align-items: flex-start;
 }
 
 .project-grid--web .app-card-slide img {
   object-fit: cover;
   object-position: top;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 18px 50px -12px rgba(12, 12, 13, 0.18), 0 2px 8px rgba(12, 12, 13, 0.06);
 }
 
 .app-card-placeholder {
@@ -576,6 +827,9 @@
 .tab-toggle {
   display: inline-flex;
   gap: 4px;
+  max-width: calc(100vw - 32px);
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 2px;
   background: var(--tab-bg, #fff);
   border-radius: 999px;
@@ -586,16 +840,28 @@
   z-index: 100;
 }
 
+.tab-toggle::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-toggle button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.tab-toggle .tab-toggle-icon {
+  width: 16px;
+  height: 16px;
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
-  .project-grid--web,
   .project-grid--mobile {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 620px) {
-  .project-grid--web,
   .project-grid--mobile {
     grid-template-columns: 1fr;
   }
@@ -628,18 +894,32 @@
   }
 
   .project-grid--web .project-card {
-    width: 360px;
+    width: 92%;
     max-width: 100%;
     min-width: 0;
-    aspect-ratio: 1 / 1;
+    height: auto;
+    aspect-ratio: 4 / 5;
   }
 
   .project-grid--web .app-card-slide {
     align-items: flex-start;
     justify-content: flex-start;
+    padding: 6% 6% 0;
   }
 
-  .project-grid--web .app-card-slide img {
+  .project-grid--web .app-card-sheet {
+    inset: 5% 5%;
+  }
+
+  .project-grid--web .app-card-live-embed {
+    top: 4.8%;
+    left: 6%;
+    width: 88%;
+    height: 95.2%;
+  }
+
+  .project-grid--web .app-card-slide img,
+  .project-grid--web .app-card-live-embed {
     object-fit: cover;
     object-position: top left;
   }
@@ -650,9 +930,34 @@
   }
 }
 
+/* Recorded desktop sites need the full browser viewport visible. */
+.project-grid--web .app-card--gas-app-admin .app-card-live-embed,
+.project-grid--web .app-card--alpha-beverage .app-card-live-embed {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0;
+}
+
+.project-grid--web .app-card--gas-app-admin .app-card-overlay,
+.project-grid--web .app-card--alpha-beverage .app-card-overlay {
+  height: 20%;
+  padding-bottom: 16px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.58) 100%);
+}
+
 @media (max-width: 768px) {
-  .dock-nav-item--pinterest,
-  .dock-nav-item--behance {
+  .project-grid--web .app-card--gas-app-admin,
+  .project-grid--web .app-card--alpha-beverage {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media (max-width: 768px) {
+  .dock-nav-item--pinterest {
     display: none;
   }
 }
@@ -967,4 +1272,140 @@
   .project-overlay-arrow { width: 42px; height: 42px; }
   .project-overlay-arrow--previous { left: -54px; }
   .project-overlay-arrow--next { right: -54px; }
+}
+
+/* ---------- web screenshot "sheets" (FlipStack) ----------
+   The current screenshot rests inset on the card canvas; changing slide
+   curls it away like a sheet of paper (WebGL2, see pageCurl.ts). */
+.app-card-sheet {
+  position: absolute;
+  inset: 6% 6.5%;
+  /* Size container so the stack below can size against both axes. */
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.flip-stack {
+  position: relative;
+  /* Always the full sheet width (never crop the sides). Wide shots shrink
+     in height to fit whole; tall shots (e.g. long landing pages) fill the
+     sheet and crop from the bottom via object-position: top. */
+  width: 100cqw;
+  height: min(100cqh, calc(100cqw / var(--shot-ar, 1.6)));
+}
+
+.flip-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 18px 50px -12px rgba(12, 12, 13, 0.18), 0 2px 8px rgba(12, 12, 13, 0.06);
+}
+
+.flip-page > img,
+.flip-page > video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  user-select: none;
+}
+
+/* The Somu recording includes a narrow black capture edge on its left. */
+.app-card--somu-web .flip-page > video {
+  clip-path: inset(0 0 0 2px);
+}
+
+/* Hidden until its first frame is drawn, so there's no blank flash while
+   the textures upload. */
+.flip-canvas {
+  position: absolute;
+  inset: 0;
+  /* GPU canvases can escape an ancestor's rounded overflow clip; round it
+     directly too. */
+  border-radius: 12px;
+  clip-path: inset(0 round 12px);
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+}
+
+.flip-fade {
+  animation: flip-fade-in 0.45s ease both;
+}
+
+@keyframes flip-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- section slide (Mobile Apps <-> Web Apps) ---------- */
+.tab-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* stretch, not center: on phones .project-grid is width:auto with
+     percentage-width cards, which collapses to 0 when shrink-wrapped. */
+  align-items: stretch;
+}
+
+.tab-section {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto 44px;
+  padding: 0 20px;
+}
+
+.tab-panel-loading { min-height: 60vh; }
+
+@media (max-width: 768px) {
+  .tab-section { padding: 0 12px; }
+}
+
+.tab-panel.is-slide-out-next { animation: grid-out-next 0.32s cubic-bezier(0.55, 0, 0.75, 0.2) forwards; }
+.tab-panel.is-slide-out-prev { animation: grid-out-prev 0.32s cubic-bezier(0.55, 0, 0.75, 0.2) forwards; }
+.tab-panel.is-slide-in-next { animation: grid-in-next 0.52s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.tab-panel.is-slide-in-prev { animation: grid-in-prev 0.52s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes grid-out-next { to { opacity: 0; transform: translateX(-10%); } }
+@keyframes grid-out-prev { to { opacity: 0; transform: translateX(10%); } }
+@keyframes grid-in-next { from { opacity: 0; transform: translateX(10%); } }
+@keyframes grid-in-prev { from { opacity: 0; transform: translateX(-10%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel[class*='is-slide-'] { animation-duration: 0.01s; }
+}
+
+.section-next-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px auto 0;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--card-bg, #fff);
+  color: var(--text-muted, rgba(11, 11, 12, 0.6));
+  font: inherit;
+  font-size: 14px;
+  box-shadow: 0 6px 24px var(--card-shadow, rgba(20, 20, 30, 0.04));
+  cursor: pointer;
+}
+
+.section-next-hint:hover { color: var(--text, #0b0b0c); }
+
+.section-next-hint span {
+  display: inline-block;
+  animation: next-hint-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes next-hint-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
 }

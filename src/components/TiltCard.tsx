@@ -1,7 +1,8 @@
 import { useRef, type CSSProperties, type ReactNode } from 'react'
 
-const MAX_TILT = 14
-const SHADOW_REACH = 26
+const MAX_TILT = 5
+const SHADOW_REACH = 17
+const STROKE_COLORS = ['#f2b544', '#49bde8', '#b481ff', '#f0788c', '#4ecb91', '#ff8a4c']
 
 export default function TiltCard({
   className = '',
@@ -14,13 +15,20 @@ export default function TiltCard({
 }) {
   const ref = useRef<HTMLDivElement>(null)
 
+  const handleEnter = () => {
+    const el = ref.current
+    if (!el) return
+    const color = STROKE_COLORS[Math.floor(Math.random() * STROKE_COLORS.length)]
+    el.style.setProperty('--stroke-color', color)
+  }
+
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current
     if (!el) return
     const rect = el.getBoundingClientRect()
     const px = (e.clientX - rect.left) / rect.width - 0.5
     const py = (e.clientY - rect.top) / rect.height - 0.5
-    const angle = (Math.atan2(py, px) * 180) / Math.PI
+    const cursorAngle = (Math.atan2(px, -py) * 180) / Math.PI
 
     el.style.setProperty('--tilt-x', `${(-py * MAX_TILT * 2).toFixed(2)}deg`)
     el.style.setProperty('--tilt-y', `${(px * MAX_TILT * 2).toFixed(2)}deg`)
@@ -28,7 +36,7 @@ export default function TiltCard({
     el.style.setProperty('--shadow-y', `${(-py * SHADOW_REACH + SHADOW_REACH * 0.5).toFixed(1)}px`)
     el.style.setProperty('--glow-x', `${((px + 0.5) * 100).toFixed(1)}%`)
     el.style.setProperty('--glow-y', `${((py + 0.5) * 100).toFixed(1)}%`)
-    el.style.setProperty('--glow-angle', `${angle.toFixed(1)}deg`)
+    el.style.setProperty('--glow-angle', `${(cursorAngle - 28).toFixed(1)}deg`)
     el.style.setProperty('--glow-opacity', '1')
   }
 
@@ -47,6 +55,7 @@ export default function TiltCard({
       ref={ref}
       className={`tilt-card ${className}`}
       style={style}
+      onMouseEnter={handleEnter}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
     >

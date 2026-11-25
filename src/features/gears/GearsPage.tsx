@@ -35,7 +35,7 @@ type WebkitWindow = typeof window & { webkitAudioContext?: typeof AudioContext }
 
 const asset = (path: string) => `/v2-svg/Gears/${path}`
 
-const HERO_BACKGROUND = asset('Hero Background.jpg')
+const HERO_BACKGROUND = asset('Hero Background.webp')
 const GEARS_PROGRESS_RING_CIRCUMFERENCE = 2 * Math.PI * 9
 const MECHANIC_AVATAR = asset('Mechanic Avatar.png')
 
@@ -538,7 +538,7 @@ export default function GearsPage({ onNavigate }: { onNavigate?: (page: string) 
           onPointerDown={handleScratchMove}
           onPointerLeave={handleScratchLeave}
         >
-          <img ref={heroBgRef} className="gears-hero-fill gears-hero-bg" src={HERO_BACKGROUND} alt="" draggable={false} />
+          <img ref={heroBgRef} className="gears-hero-fill gears-hero-bg" src={HERO_BACKGROUND} alt="" fetchPriority="high" decoding="async" draggable={false} />
           <canvas className="gears-hero-fill gears-hero-fog" ref={fogCanvasRef} aria-hidden="true" />
         </div>
         <div className="gears-hero-glow" aria-hidden="true" />

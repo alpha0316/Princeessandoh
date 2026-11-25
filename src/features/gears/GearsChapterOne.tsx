@@ -17,9 +17,9 @@ import { BusinessCartIcon, BusinessCarWashIcon, BusinessFuelIcon, BusinessGearIc
 const asset = (path: string) => `/v2-svg/Gears/Chapter 1/${path}`
 const gearsAsset = (path: string) => `/v2-svg/Gears/${path}`
 
-const TWEET_BALDWIN = asset('tweet-baldwin.png')
-const TWEET_PHILIP = asset('tweet-philip.png')
-const TWEET_CHIEF = asset('tweet-chief.png')
+const TWEET_BALDWIN = asset('tweet-baldwin.webp')
+const TWEET_PHILIP = asset('tweet-philip.webp')
+const TWEET_CHIEF = asset('tweet-chief.webp')
 const TIKTOK_ICON = asset('tiktok-icon.svg')
 const MAPS_ICON = asset('maps-icon.svg')
 const SEAL_CHECK = asset('seal-check.svg')
@@ -27,11 +27,11 @@ const CAR_ILLUSTRATION = asset('car-illustration.png')
 const BATTERY_ILLUSTRATION = asset('battery-illustration.png')
 const WHEEL_ILLUSTRATION = asset('steering-wheel-illustration.png')
 const ALTERNATOR_ILLUSTRATION = asset('alternator-illustration.png')
-const HOME_SCREEN = gearsAsset('Home.png')
-const BUSINESS_DETAILS_SCREEN = gearsAsset('Business Details.png')
-const PARTS_SCREEN = gearsAsset('Auto Parts Dealers.png')
-const DETAILER_SCREEN = gearsAsset('Discover Car Detailers.png')
-const FUEL_SCREEN = gearsAsset('Find Fuel Stations.png')
+const HOME_SCREEN = gearsAsset('Home.webp')
+const BUSINESS_DETAILS_SCREEN = gearsAsset('Business Details.webp')
+const PARTS_SCREEN = gearsAsset('Auto Parts Dealers.webp')
+const DETAILER_SCREEN = gearsAsset('Discover Car Detailers.webp')
+const FUEL_SCREEN = gearsAsset('Find Fuel Stations.webp')
 
 const TAG_LABELS = ['Quality Service', 'On Time', 'Affordable', 'Safe', 'Excellent Job']
 
@@ -255,7 +255,7 @@ function PlayersSection() {
           {PLAYERS.map(({ key, label, icon, screen }) => (
             <div key={key} className="gears-players-phone">
               {screen ? (
-                <img className="gears-players-phone-shot" src={screen} alt={`${label} screen in Gears`} />
+                <img className="gears-players-phone-shot" src={screen} alt={`${label} screen in Gears`} loading="lazy" decoding="async" />
               ) : (
                 <div className="gears-players-phone-placeholder">
                   <span className="gears-players-placeholder-icon">{icon}</span>
@@ -717,6 +717,8 @@ export default function GearsChapterOne() {
               className="gears-phone-shot"
               src={HOME_SCREEN}
               alt="Gears home screen: a map pinning Muta-Motors with a search sheet listing nearby mechanics"
+              loading="lazy"
+              decoding="async"
             />
           </div>
 

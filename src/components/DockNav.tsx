@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
-import { CodeSimple, House } from '@phosphor-icons/react'
+import { House } from '@phosphor-icons/react'
 import frame1000003409 from './nav-icons/frame-1000003409.svg'
-import frame1000003410 from './nav-icons/frame-1000003410.svg'
 import { ImagesDuotone } from './nav-icons/ImagesDuotone'
 import image1 from './nav-icons/image-1.png'
 import { MingcutePinterestFill } from './nav-icons/MingcutePinterestFill'
@@ -13,10 +12,8 @@ type NavItem =
 
 const navItems: (NavItem & { href?: string })[] = [
   { type: 'active-icon', label: 'Home', icon: <House className="dock-nav-icon" weight="bold" />, page: 'home' },
-  { type: 'icon', label: 'Components', icon: <CodeSimple className="dock-nav-icon" weight="bold" />, page: 'components' },
   { type: 'image', label: 'X', src: frame1000003409, href: 'https://x.com/pr_alphaa/status/2106354775113539896?s=20' },
   { type: 'icon', label: 'Pinterest', icon: <MingcutePinterestFill className="dock-nav-icon" />, href: 'https://pin.it/40FtwCncU' },
-  { type: 'image', label: 'Behance', src: frame1000003410, href: 'https://www.behance.net/princeessandoh1' },
   { type: 'icon', label: 'Images', icon: <ImagesDuotone className="dock-nav-icon" />, page: 'snaps' },
   {
     type: 'icon',

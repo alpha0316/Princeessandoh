@@ -1,9 +1,67 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CaretLeft, CaretRight } from '@phosphor-icons/react'
+import FlipStack from './FlipStack'
 import ProjectLinkIcon, { getProjectLinkTooltip } from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
+/** Muted looping screen recording that only downloads/plays while on screen,
+ * so a page full of cards doesn't stream every video at once. */
+function DemoVideo({
+  src,
+  poster,
+  className,
+  onAspect,
+  loop = true,
+  onEnded,
+}: {
+  src: string
+  poster?: string
+  className?: string
+  /** Reports the recording's width / height once its metadata loads. */
+  onAspect?: (ratio: number) => void
+  loop?: boolean
+  onEnded?: () => void
+}) {
+  const ref = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) el.play().catch(() => {})
+        else el.pause()
+      },
+      { threshold: 0.25 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return (
+    <video
+      ref={ref}
+      className={className}
+      src={src}
+      poster={poster}
+      preload="metadata"
+      onLoadedMetadata={(e) => {
+        const v = e.currentTarget
+        if (v.videoWidth && v.videoHeight) onAspect?.(v.videoWidth / v.videoHeight)
+      }}
+      onEnded={onEnded}
+      loop={loop}
+      muted
+      playsInline
+      disablePictureInPicture
+      tabIndex={-1}
+    />
+  )
+}
+
 const AUTO_ADVANCE_MS = 45000
+// Web cards (page-curl sheets): first turn 3s after the card comes into
+// view, then keep turning while it stays on screen.
+const WEB_FIRST_FLIP_MS = 3000
+const WEB_FLIP_EVERY_MS = 5000
 const DOT_LIMIT = 7
 const SWIPE_COMMIT_RATIO = 0.22
 const AXIS_LOCK_THRESHOLD = 6
@@ -18,8 +76,12 @@ export default function ProjectCard({
   /** Desktop-only: opens the full detail overlay at the currently shown screenshot. */
   onOpen?: (initialIndex: number) => void
 }) {
-  const len = project.images.length
-  const loop = len > 1
+  // A recorded walkthrough replaces the screenshot slider entirely.
+  const hasVideo = Boolean(project.demoVideo)
+  const hasLeadVideo = hasVideo && Boolean(project.demoVideoFirst)
+  const displayImages = hasLeadVideo ? project.images.slice(1) : project.images
+  const len = displayImages.length + (hasLeadVideo ? 1 : 0)
+  const loop = len > 1 && (!hasVideo || hasLeadVideo)
 
   const [index, setIndex] = useState(0)
   // trackPos tracks the visual slide position. When looping, the track is
@@ -29,6 +91,8 @@ export default function ProjectCard({
   const [skipTransition, setSkipTransition] = useState(false)
   const [hovered, setHovered] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [inView, setInView] = useState(false)
+  const [videoAspect, setVideoAspect] = useState<number | null>(null)
   const intervalRef = useRef<number | undefined>(undefined)
   const initDelayRef = useRef((uid++ * 1.3 + Math.random() * 2) % 30 * 1000)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -83,9 +147,33 @@ export default function ProjectCard({
     [len, loop],
   )
 
+  // Continuous on-screen tracking (unlike `visible`, which latches).
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el || project.platform !== 'web') return
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      threshold: 0.4,
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [project.platform])
+
+  useEffect(() => {
+    if (project.platform !== 'web' || !loop || !inView || (hasLeadVideo && index === 0)) return
+    let interval: number | undefined
+    const first = window.setTimeout(() => {
+      moveBy(1)
+      interval = window.setInterval(() => moveBy(1), WEB_FLIP_EVERY_MS)
+    }, WEB_FIRST_FLIP_MS)
+    return () => {
+      clearTimeout(first)
+      clearInterval(interval)
+    }
+  }, [project.platform, loop, inView, moveBy, hasLeadVideo, index])
+
   useEffect(() => {
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    if (!canHover || !loop) return
+    if (!canHover || !loop || project.platform === 'web') return
 
     const timer = setTimeout(() => {
       intervalRef.current = window.setInterval(() => {
@@ -96,7 +184,7 @@ export default function ProjectCard({
       clearTimeout(timer)
       clearInterval(intervalRef.current)
     }
-  }, [loop, moveBy])
+  }, [loop, moveBy, project.platform])
 
   // Native (non-passive) touch listeners so we can lock the gesture to the
   // horizontal axis and call preventDefault only once that's established —
@@ -205,8 +293,8 @@ export default function ProjectCard({
     }
   }
 
-  const showDots = project.images.length > 1 && project.images.length <= DOT_LIMIT
-  const showSwipeTrack = project.images.length > DOT_LIMIT
+  const showDots = !hasVideo && displayImages.length > 1 && displayImages.length <= DOT_LIMIT
+  const showSwipeTrack = !hasVideo && displayImages.length > DOT_LIMIT
   const trackOffset = -trackPos * frameWidth + dragPx
   const slides = loop ? [project.images[len - 1], ...project.images, project.images[0]] : project.images
 
@@ -217,7 +305,7 @@ export default function ProjectCard({
   return (
     <div
       ref={cardRef}
-      className={`app-card ${visible ? 'app-card--visible' : ''}`}
+      className={`app-card app-card--${project.id} ${visible ? 'app-card--visible' : ''}`}
       style={{
         transform: `translateY(${revealOffset}px)`,
         transition: 'transform 0.5s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.6s ease',
@@ -253,7 +341,52 @@ export default function ProjectCard({
       )}
 
       <div className="app-card-screen" ref={screenRef}>
-        {project.images.length > 0 ? (
+        {hasLeadVideo && project.platform === 'web' && index === 0 ? (
+          <div className="app-card-sheet">
+            <div
+              className="flip-stack"
+              style={videoAspect ? ({ '--shot-ar': videoAspect } as React.CSSProperties) : undefined}
+            >
+              <div className="flip-page">
+                <DemoVideo
+                  src={project.demoVideo!}
+                  poster={project.demoPoster ?? project.images[0]}
+                  loop={false}
+                  onAspect={setVideoAspect}
+                  onEnded={() => moveBy(1)}
+                />
+              </div>
+            </div>
+          </div>
+        ) : project.demoVideo && project.platform === 'mobile' ? (
+          <div className="app-card-phone-wrap">
+            <div className="app-card-phone-frame app-card-phone-frame--device">
+              <DemoVideo src={project.demoVideo} poster={project.demoPoster ?? project.images[0]} />
+            </div>
+          </div>
+        ) : project.demoVideo && !hasLeadVideo ? (
+          // Same fit as the screenshot sheets: the frame takes the
+          // recording's own aspect ratio so the whole screen is visible.
+          <div className="app-card-sheet">
+            <div
+              className="flip-stack"
+              style={videoAspect ? ({ '--shot-ar': videoAspect } as React.CSSProperties) : undefined}
+            >
+              <div className="flip-page">
+                <DemoVideo src={project.demoVideo} poster={project.demoPoster ?? project.images[0]} onAspect={setVideoAspect} />
+              </div>
+            </div>
+          </div>
+        ) : project.platform === 'web' && project.images.length > 0 ? (
+          <div className="app-card-sheet">
+            <FlipStack
+              images={displayImages}
+              index={hasLeadVideo ? Math.max(0, index - 1) : index}
+              alt={`${project.name} screenshot ${index + 1}`}
+              imagePosition={project.imagePosition}
+            />
+          </div>
+        ) : project.images.length > 0 ? (
           <div
             className="app-card-track"
             style={{
@@ -267,6 +400,9 @@ export default function ProjectCard({
                 <img
                   src={src}
                   alt={`${project.name} screenshot ${((i - 1 + len) % len) + 1}`}
+                  loading={visible && i === trackPos ? 'eager' : 'lazy'}
+                  fetchPriority={visible && i === trackPos ? 'high' : 'auto'}
+                  decoding="async"
                   style={project.imagePosition ? { objectPosition: project.imagePosition } : undefined}
                 />
               </div>
@@ -281,7 +417,7 @@ export default function ProjectCard({
         )}
       </div>
 
-      {project.images.length > 1 && (
+      {!hasVideo && project.images.length > 1 && (
         <>
           <button
             type="button"

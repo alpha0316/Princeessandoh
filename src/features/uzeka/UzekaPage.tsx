@@ -27,7 +27,7 @@ const PRODUCT_SHOWCASE = [
     description: 'Discovery, checkout, tickets and transfers. Where someone decides where to spend their Saturday night.',
     logo: APP_ICON,
     logoCrop: false,
-    src: asset('Web App.svg'),
+    src: asset('Web App.webp'),
     alt: 'Uzeka Events app case study, showing event discovery and ticket booking',
   },
   {
@@ -35,9 +35,9 @@ const PRODUCT_SHOWCASE = [
     name: 'Scanner app',
     audience: 'Gate staff · Access control',
     description: 'Four outcomes, under a second each, often on a borrowed phone with patchy signal.',
-    logo: asset('Other Product Logos/Screenshot 2026-03-02 at 5.43.39 PM 1.svg'),
+    logo: asset('Other Product Logos/Screenshot 2026-03-02 at 5.43.39 PM 1.webp'),
     logoCrop: true,
-    src: asset('Scanner.png'),
+    src: asset('Scanner.webp'),
     alt: 'Uzeka Scanner app case study, showing event access and product stock controls',
   },
   {
@@ -45,7 +45,7 @@ const PRODUCT_SHOWCASE = [
     name: 'Vendor app',
     audience: 'Agents · At the gate',
     description: 'Selling tickets and products face to face, standing up, often at night, with a queue building.',
-    logo: asset('Other Product Logos/Uzeka_Logo-03 1.svg'),
+    logo: asset('Other Product Logos/Uzeka_Logo-03 1.webp'),
     logoCrop: false,
     src: asset('Vendor.png'),
     alt: 'Uzeka Vendor app case study, showing mobile product sales controls',
@@ -63,11 +63,11 @@ const PRODUCT_SHOWCASE = [
 ]
 const PRODUCT_ICONS = [
   { src: asset('Other Product Logos/Vendor 2.svg') },
-  { src: asset('Other Product Logos/Uzeka_Logo-03 1.svg') },
+  { src: asset('Other Product Logos/Uzeka_Logo-03 1.webp') },
   // This export has a tiny 19x19 icon sitting inside a 75x75 canvas (a
   // drop-shadow glyph pulled straight from a Figma screenshot) — crop
   // tight to it so it isn't a speck next to the other two full-bleed icons.
-  { src: asset('Other Product Logos/Screenshot 2026-03-02 at 5.43.39 PM 1.svg'), crop: true },
+  { src: asset('Other Product Logos/Screenshot 2026-03-02 at 5.43.39 PM 1.webp'), crop: true },
 ]
 
 function AnimatedNumber({ target, decimals = 0, started }: { target: number; decimals?: number; started: boolean }) {
@@ -131,10 +131,10 @@ const WORDMARK_LETTERS = [
 type Screen = { id: string; src: string; className: string }
 
 const EDGE_SCREENS: Screen[] = [
-  { id: 'edge-onboarding', src: asset('Onboarding.svg'), className: 'uzeka-edge--onboarding' },
+  { id: 'edge-onboarding', src: asset('Onboarding.webp'), className: 'uzeka-edge--onboarding' },
   { id: 'edge-vendor', src: asset('Vendor.png'), className: 'uzeka-edge--vendor' },
-  { id: 'edge-event', src: asset('Event Details.svg'), className: 'uzeka-edge--event' },
-  { id: 'edge-web', src: asset('Web App.svg'), className: 'uzeka-edge--web' },
+  { id: 'edge-event', src: asset('Event Details.webp'), className: 'uzeka-edge--event' },
+  { id: 'edge-web', src: asset('Web App.webp'), className: 'uzeka-edge--web' },
 ]
 
 export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) => void }) {
@@ -307,7 +307,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
         <div className="uzeka-edge-screens uzeka-edge-screens--flashlight" ref={revealRef} aria-hidden="true">
           {EDGE_SCREENS.map((screen) => (
             <TiltCard key={screen.id} className={`uzeka-edge-screen ${screen.className}`}>
-              <img src={screen.src} alt="" draggable={false} />
+              <img src={screen.src} alt="" loading="lazy" decoding="async" draggable={false} />
             </TiltCard>
           ))}
 
@@ -428,10 +428,10 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
                   <div className="uzeka-product-copy">
                     {product.logoCrop ? (
                       <span className="uzeka-product-brand uzeka-product-brand--crop" aria-hidden="true">
-                        <img src={product.logo} alt="" />
+                      <img src={product.logo} alt="" loading="lazy" decoding="async" />
                       </span>
                     ) : (
-                      <img className="uzeka-product-brand" src={product.logo} alt="" />
+                      <img className="uzeka-product-brand" src={product.logo} alt="" loading="lazy" decoding="async" />
                     )}
                     <div className="uzeka-product-copy-text">
                       <h3>{product.name}</h3>
@@ -440,7 +440,7 @@ export default function UzekaPage({ onNavigate }: { onNavigate?: (page: string) 
                     </div>
                   </div>
                   <div className={`uzeka-product-visual uzeka-product-visual--${product.id}${inspectedProduct === product.id ? ' is-inspected' : ''}`}>
-                    <img src={product.src} alt={product.alt} draggable={false} />
+                    <img src={product.src} alt={product.alt} loading="lazy" decoding="async" draggable={false} />
                     {(product.id === 'events' || product.id === 'vendor') && (
                       <button
                         className="uzeka-product-inspect"
