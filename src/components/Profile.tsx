@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
-import { CodeSimple, DeviceMobile, Monitor } from '@phosphor-icons/react'
+import { AppStoreLogo, CodeSimple, DeviceMobile, Monitor } from '@phosphor-icons/react'
 import ProjectCard from './ProjectCard'
 import ProjectOverlay from './ProjectOverlay'
 import DockNav from './DockNav'
@@ -195,19 +195,20 @@ export default function Profile({ onNavigate }: { onNavigate?: (page: string) =>
       <nav ref={tabBarRef} className="tab-toggle" aria-label="Portfolio sections">
         <button type="button" aria-pressed={tab === 'mobile'} className={tab === 'mobile' ? 'is-active' : ''} onClick={() => switchTab('mobile')}>
           <DeviceMobile size={16} weight={tab === 'mobile' ? 'fill' : 'regular'} />
-          Mobile Apps
+          <span className="tab-label-desktop">Mobile Apps</span><span className="tab-label-mobile">Mobile</span>
         </button>
         <button type="button" aria-pressed={tab === 'web'} className={tab === 'web' ? 'is-active' : ''} onClick={() => switchTab('web')}>
           <Monitor size={16} weight={tab === 'web' ? 'fill' : 'regular'} />
-          Web Apps
+          <span className="tab-label-desktop">Web Apps</span><span className="tab-label-mobile">Web</span>
         </button>
         <button type="button" aria-pressed={tab === 'components'} className={tab === 'components' ? 'is-active' : ''} onClick={() => switchTab('components')}>
           <CodeSimple size={16} weight="bold" />
           Components
         </button>
         <button type="button" aria-pressed={tab === 'snaps'} className={tab === 'snaps' ? 'is-active' : ''} onClick={() => switchTab('snaps')}>
-          <ImagesDuotone className="tab-toggle-icon" />
-          Screenshots
+          <ImagesDuotone className="tab-toggle-icon tab-icon-desktop" />
+          <AppStoreLogo className="tab-toggle-icon tab-icon-mobile" />
+          <span className="tab-label-desktop">Screenshots</span><span className="tab-label-mobile">App Store</span>
         </button>
       </nav>
 
