@@ -5,7 +5,7 @@ import '../styles/loading.css'
 
 const SIGNATURE = '@pr_alphaa'
 const MIN_TYPE_MS = 1500
-const MAX_WAIT_MS = 6000
+const MAX_WAIT_MS = 3500
 const ROCKET_DELAY_MS = 300
 const EXIT_HOLD_MS = 650
 const EXIT_DURATION_MS = 700
@@ -48,12 +48,26 @@ export default function LoadingScreen() {
   useEffect(() => {
     if (done) return
 
-    const urls = new Set<string>(['/avatar.png', '/rocket.webp'])
-    projects.forEach((p) => {
-      const first = p.demoPoster ?? p.images[0]
-      if (first) urls.add(first)
+    // Only the first screen gates the splash: the avatar and the first row
+    // of (mobile) cards. Everything else, including the rocket, is warmed in
+    // the background without holding the page back.
+    const firstFrame = (p: (typeof projects)[number]) => p.demoPoster ?? p.images[0]
+    const mobile = projects.filter((p) => p.platform === 'mobile')
+    const gate = new Set<string>(['/avatar.png'])
+    mobile.slice(0, 3).forEach((p) => {
+      const f = firstFrame(p)
+      if (f) gate.add(f)
     })
-    const list = Array.from(urls)
+    const background = new Set<string>(['/rocket.webp'])
+    projects.forEach((p) => {
+      const f = firstFrame(p)
+      if (f && !gate.has(f)) background.add(f)
+    })
+    background.forEach((src) => {
+      const img = new Image()
+      img.src = src
+    })
+    const list = Array.from(gate)
     const total = list.length
     let loaded = 0
 
