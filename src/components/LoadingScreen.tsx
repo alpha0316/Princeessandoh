@@ -89,7 +89,12 @@ export default function LoadingScreen() {
       if (cancelled) return
       const elapsed = performance.now() - start
       const timeProgress = Math.min(1, elapsed / MIN_TYPE_MS)
-      const assetsReady = loaded >= total
+      // ...and the first-row videos can actually start playing (they buffer
+      // behind the splash; see DemoVideo's `eager`).
+      const videosReady = Array.from(document.querySelectorAll<HTMLVideoElement>('video[data-eager]')).every(
+        (v) => v.readyState >= 3,
+      )
+      const assetsReady = loaded >= total && videosReady
       const timedOut = elapsed >= MAX_WAIT_MS
       // Require the minimum typing duration to actually elapse before
       // completing, even if assets resolve instantly from cache — a fast

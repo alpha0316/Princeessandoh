@@ -584,6 +584,35 @@ a:focus-visible > .roll .roll-bottom {
   object-fit: fill;
 }
 
+/* Loading shimmer over the screen until its first frame is in (the video
+   or screenshot gets .is-ready on load). Sits under the Dynamic Island. */
+.project-grid--mobile .app-card .app-card-device::before {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  inset: var(--bezel);
+  border-radius: calc(var(--phone-w) * 0.149);
+  background:
+    linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.75) 50%, transparent 70%) -150% 0 / 60% 100% no-repeat,
+    #ececef;
+  animation: phone-shimmer 1.3s ease-in-out infinite;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.project-grid--mobile .app-card .app-card-device:has(> video.is-ready, > img.is-current.is-ready)::before {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes phone-shimmer {
+  to { background-position: 250% 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-grid--mobile .app-card .app-card-device::before { animation: none; }
+}
+
 /* Dynamic Island */
 .project-grid--mobile .app-card .app-card-device::after {
   content: '';

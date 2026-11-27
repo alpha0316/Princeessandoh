@@ -4,8 +4,10 @@ import FlipStack from './FlipStack'
 import ProjectLinkIcon, { getProjectLinkTooltip } from './ProjectLinkIcon'
 import type { Project } from '../types/project'
 
-/** Muted looping screen recording that only downloads/plays while on screen,
- * so a page full of cards doesn't stream every video at once. */
+/** Muted looping screen recording. `eager` ones (the first screen) start
+ * buffering immediately, i.e. while the splash is still up; the rest attach
+ * their source only once they're about a screen away, so a page full of
+ * cards doesn't fight the first videos for bandwidth. Plays while visible. */
 function DemoVideo({
   src,
   poster,
@@ -13,7 +15,9 @@ function DemoVideo({
   onAspect,
   loop = true,
   onEnded,
+  eager = false,
 }: {
+  eager?: boolean
   src: string
   poster?: string
   className?: string
@@ -23,9 +27,17 @@ function DemoVideo({
   onEnded?: () => void
 }) {
   const ref = useRef<HTMLVideoElement>(null)
+  const [near, setNear] = useState(eager)
   useEffect(() => {
     const el = ref.current
-    if (!el) return
+    if (!el || near) return
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), { rootMargin: '100% 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [near])
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !near) return
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) el.play().catch(() => {})
@@ -35,14 +47,17 @@ function DemoVideo({
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [near])
   return (
     <video
       ref={ref}
       className={className}
-      src={src}
+      src={near ? src : undefined}
       poster={poster}
-      preload="metadata"
+      preload={eager ? 'auto' : 'metadata'}
+      data-eager={eager || undefined}
+      // Marks the frame loaded so the phone's shimmer fades out (CSS :has).
+      onLoadedData={(e) => e.currentTarget.classList.add('is-ready')}
       onLoadedMetadata={(e) => {
         const v = e.currentTarget
         if (v.videoWidth && v.videoHeight) onAspect?.(v.videoWidth / v.videoHeight)
@@ -71,8 +86,11 @@ let uid = 0
 export default function ProjectCard({
   project,
   onOpen,
+  eager = false,
 }: {
   project: Project
+  /** First-screen card: buffer its video right away (during the splash). */
+  eager?: boolean
   /** Desktop-only: opens the full detail overlay at the currently shown screenshot. */
   onOpen?: (initialIndex: number) => void
 }) {
@@ -361,7 +379,7 @@ export default function ProjectCard({
         ) : project.demoVideo && project.platform === 'mobile' ? (
           <div className="app-card-phone-wrap">
             <div className="app-card-phone-frame app-card-phone-frame--device app-card-device">
-              <DemoVideo src={project.demoVideo} poster={project.demoPoster ?? project.images[0]} />
+              <DemoVideo src={project.demoVideo} poster={project.demoPoster ?? project.images[0]} eager={eager} />
               <span className="app-card-device-buttons" aria-hidden="true" />
             </div>
           </div>
@@ -401,6 +419,7 @@ export default function ProjectCard({
                   className={i === index ? 'is-current' : ''}
                   loading={i === 0 ? 'eager' : 'lazy'}
                   decoding="async"
+                  onLoad={(e) => e.currentTarget.classList.add('is-ready')}
                 />
               ))}
               <span className="app-card-device-buttons" aria-hidden="true" />

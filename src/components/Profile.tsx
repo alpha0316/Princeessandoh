@@ -124,10 +124,12 @@ export default function Profile({
     const empty = Math.max(0, MIN_CARDS[platform] - list.length)
     return (
       <div className={`project-grid project-grid--${platform}`}>
-        {list.map((project) => (
+        {list.map((project, i) => (
           <div key={project.id} className="project-card">
             <ProjectCard
               project={project}
+              // The first row of phones is what the splash reveals.
+              eager={platform === 'mobile' && i < 2}
               onOpen={(index) =>
                 (project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') && onNavigate
                   ? onNavigate(project.id)
