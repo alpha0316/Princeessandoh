@@ -112,7 +112,7 @@ export default function WeatherOverlay({ weather }: { weather: Weather }) {
   // Sunny: warm gradient overlay
   if (weather === 'sunny') {
     return (
-      <div style={{
+      <div className="weather-overlay" style={{
         position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none',
         background: 'radial-gradient(circle at 30% 20%, rgba(255,220,150,0.15) 0%, rgba(255,200,100,0.05) 40%, transparent 70%)',
       }}>
@@ -129,7 +129,7 @@ export default function WeatherOverlay({ weather }: { weather: Weather }) {
   // Cloudy: soft grey gradient overlay
   if (weather === 'cloudy') {
     return (
-      <div style={{
+      <div className="weather-overlay" style={{
         position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none',
         background: 'linear-gradient(180deg, rgba(200,210,220,0.2) 0%, rgba(180,190,200,0.1) 50%, rgba(160,170,180,0.05) 100%)',
       }}>
@@ -152,7 +152,7 @@ export default function WeatherOverlay({ weather }: { weather: Weather }) {
 
   // Rain/Snow: canvas
   return (
-    <canvas
+    <canvas className="weather-overlay"
       ref={canvasRef}
       style={{
         position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none',

@@ -223,6 +223,8 @@ export default function FluidBackground({ region = 'full' }: { region?: 'full' |
     let id: number
     const loop = (now: number) => {
       id = requestAnimationFrame(loop)
+      // Hidden by CSS (phones show a plain white page): skip the GPU work.
+      if (!canvas.offsetWidth) return
       decayMouse()
       // mouse.strength keeps the effect alive on mobile (tilt/shake input),
       // where there is no hovering pointer.

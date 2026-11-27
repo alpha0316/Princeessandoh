@@ -57,6 +57,7 @@ export default function Profile({
   const [startTab] = useState<Tab>(initialTab)
   const [active, setActive] = useState<Tab>(initialTab)
   const [openProject, setOpenProject] = useState<{ project: Project; index: number } | null>(null)
+  const [moreOpen, setMoreOpen] = useState(false)
   const sectionRefs = useRef<Partial<Record<Tab, HTMLElement | null>>>({})
 
   const scrollToSection = useCallback((tab: Tab, behavior: ScrollBehavior = 'smooth') => {
@@ -156,8 +157,23 @@ export default function Profile({
               color:'black'
             }}>I design and ship mobile &amp; web products</mark>, from first sketch to production code.
           </p>
-          <SidebarContact />
-          <Toolkit />
+          {/* On phones this part folds away behind "Show more"; on desktop the
+              toggle is hidden and it always shows. */}
+          <div id="profile-more" className={`profile-more ${moreOpen ? 'is-open' : ''}`}>
+            <div className="profile-more-inner">
+              <SidebarContact />
+              <Toolkit />
+            </div>
+          </div>
+          <button
+            type="button"
+            className="profile-more-toggle"
+            aria-expanded={moreOpen}
+            aria-controls="profile-more"
+            onClick={() => setMoreOpen((o) => !o)}
+          >
+            {moreOpen ? 'Show less' : 'Show more'}
+          </button>
         </header>
         <GithubHeatmap />
       </aside>

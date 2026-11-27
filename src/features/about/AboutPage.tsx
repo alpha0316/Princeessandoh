@@ -46,7 +46,7 @@ const PAPERS: { id: PaperId; label: string; src: string; alt: string }[] = [
   { id: 'work', label: 'Work', src: '/About/Work%20Experience.svg', alt: 'Work experience' },
   { id: 'journey', label: 'Journey', src: '/About/Personality.svg', alt: 'My journey into design' },
   { id: 'academics', label: 'Academics', src: '/About/Academic.svg', alt: 'Academics' },
-  { id: 'tools', label: 'Tools', src: '/About/Myself-1.svg', alt: 'Tools I’m familiar with' },
+  { id: 'tools', label: 'Tools', src: '/About/Tools.svg', alt: 'Design engineering toolkit: Figma, Claude, VS Code, Codex, React, React Native, TypeScript, JavaScript, Three.js, animations, GitHub, Vercel' },
 ]
 
 const INITIAL_STACK: PaperId[] = ['overview', 'work', 'journey', 'academics', 'tools']

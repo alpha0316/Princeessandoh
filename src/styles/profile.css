@@ -1465,6 +1465,58 @@ a:focus-visible > .roll .roll-bottom {
   .gh-heatmap {
     max-width: 420px;
   }
+
+  /* Plain white page on phones: no marble behind the work either. */
+  .home-shell .fluid-bg,
+  .home-shell .weather-overlay {
+    display: none;
+  }
+
+  html:has(.home-shell.theme-light),
+  html:has(.home-shell.theme-light) body {
+    background: #fff;
+  }
+
+  /* White cards on a white page need an edge to read as cards. */
+  .theme-light .project-card,
+  .theme-light .tab-section--components .components-card {
+    box-shadow: 0 0 0 1px rgba(20, 20, 30, 0.07), 0 6px 18px rgba(20, 20, 30, 0.06);
+  }
+
+  /* Show more / less */
+  .profile-more {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .profile-more-inner {
+    /* the grid row animates; the content is just clipped while it does */
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .profile-more.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .profile-header .profile-more-toggle {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f5bd3;
+    cursor: pointer;
+  }
+}
+
+/* Desktop: everything visible, no toggle. */
+.profile-more-toggle {
+  display: none;
 }
 
 @media (max-width: 620px) {
@@ -1481,6 +1533,27 @@ a:focus-visible > .roll .roll-bottom {
   /* Icon-only for inactive tabs; the active one keeps its label. */
   .dock-nav-tab:not(.is-active) .dock-nav-tab-label {
     display: none;
+  }
+
+  /* Icons 3px larger on phones (16 -> 19, 19 -> 22, 22 -> 25). */
+  .dock-nav-tab-icon {
+    font-size: 19px;
+  }
+
+  .dock-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dock-nav-avatar {
+    width: 25px;
+    height: 25px;
+  }
+
+  /* Inline tool marks in the sidebar sentence: ~14px -> 17px. */
+  .toolkit-icon {
+    width: 17px;
+    height: 17px;
   }
 }
 
