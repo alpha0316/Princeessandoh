@@ -9,22 +9,34 @@ import LoadingScreen from './components/LoadingScreen'
 import IconCredit from './components/IconCredit'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { useWeather } from './hooks/useWeather'
+import { isWorkTab, type WorkTab } from './components/navTabs'
 
 const SnapsPage = lazy(() => import('./features/snaps/SnapsPage'))
 const AboutPage = lazy(() => import('./features/about/AboutPage'))
 const UzekaPage = lazy(() => import('./features/uzeka/UzekaPage'))
 const GasAppPage = lazy(() => import('./features/gasapp/GasAppPage'))
 const GearsPage = lazy(() => import('./features/gears/GearsPage'))
-const ComponentsPage = lazy(() => import('./features/components/ComponentsPage'))
 
 const FONT = "'Syne', sans-serif"
 const WEATHERS: Weather[] = ['sunny', 'cloudy', 'rain', 'snow']
 
-type Page = 'home' | 'snaps' | 'about' | 'uzeka' | 'gas-app' | 'gears' | 'components'
+type Page = 'home' | 'snaps' | 'about' | 'uzeka' | 'gas-app' | 'gears'
 
 function AppContent() {
   const isDev = import.meta.env.DEV
   const [page, setPage] = useState<Page>('home')
+  // Remembered so returning from Pictures/About (or a case study) lands on
+  // the same work section, and so the dock on those pages can jump to one.
+  const [homeTab, setHomeTab] = useState<WorkTab>('mobile')
+  const navigate = (p: string) => {
+    if (isWorkTab(p)) {
+      setHomeTab(p)
+      setPage('home')
+    } else {
+      setPage(p as Page)
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
   const [manualWeather, setManualWeather] = useState<Weather>('sunny')
   const { weather: detectedWeather } = useWeather()
   const weather = isDev ? manualWeather : detectedWeather
@@ -45,7 +57,7 @@ function AppContent() {
       <div className={`theme-${theme}`}>
         <FluidBackground />
         <Suspense fallback={null}>
-          <SnapsPage onNavigate={(p: string) => setPage(p as Page)} />
+          <SnapsPage onNavigate={navigate} />
         </Suspense>
         <IconCredit dark={isNight} />
       </div>
@@ -57,7 +69,7 @@ function AppContent() {
       <div className={`theme-${theme}`}>
         <FluidBackground />
         <Suspense fallback={null}>
-          <AboutPage onNavigate={(p: string) => setPage(p as Page)} />
+          <AboutPage onNavigate={navigate} />
         </Suspense>
         <IconCredit dark={isNight} />
       </div>
@@ -68,7 +80,7 @@ function AppContent() {
     return (
       <>
         <Suspense fallback={null}>
-          <UzekaPage onNavigate={(p: string) => setPage(p as Page)} />
+          <UzekaPage onNavigate={navigate} />
         </Suspense>
       </>
     )
@@ -78,7 +90,7 @@ function AppContent() {
     return (
       <>
         <Suspense fallback={null}>
-          <GasAppPage onNavigate={(p: string) => setPage(p as Page)} />
+          <GasAppPage onNavigate={navigate} />
         </Suspense>
         <IconCredit />
       </>
@@ -89,27 +101,15 @@ function AppContent() {
     return (
       <>
         <Suspense fallback={null}>
-          <GearsPage onNavigate={(p: string) => setPage(p as Page)} />
+          <GearsPage onNavigate={navigate} />
         </Suspense>
       </>
     )
   }
 
-  if (page === 'components') {
-    return (
-      <div className={`theme-${theme}`}>
-        <FluidBackground />
-        <Suspense fallback={null}>
-          <ComponentsPage onNavigate={(p: string) => setPage(p as Page)} />
-        </Suspense>
-        <IconCredit dark={isNight} />
-      </div>
-    )
-  }
-
   return (
-    <div className={`theme-${theme}`}>
-      <FluidBackground />
+    <div className={`theme-${theme} home-shell`}>
+      <FluidBackground region="works" />
       {isNight && <div style={{
         position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
         background: 'rgba(5,5,18,0.65)',
@@ -146,7 +146,7 @@ function AppContent() {
           </button>}
         </div>
       </nav>
-      <Profile onNavigate={(page: string) => setPage(page as Page)} />
+      <Profile initialTab={homeTab} onTabChange={setHomeTab} onNavigate={navigate} />
       <LoadingScreen />
       <IconCredit dark={isNight} />
     </div>

@@ -1,256 +1,202 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
-import { AppStoreLogo, CodeSimple, DeviceMobile, Monitor } from '@phosphor-icons/react'
 import ProjectCard from './ProjectCard'
 import ProjectOverlay from './ProjectOverlay'
 import DockNav from './DockNav'
+import { WORK_TABS, isWorkTab, type WorkTab } from './navTabs'
+import GithubHeatmap from './GithubHeatmap'
+import SidebarContact from './SidebarContact'
+import Toolkit from './Toolkit'
+import RotatingTagline from './RotatingTagline'
 import { projects } from '../data/projects'
 import type { Project } from '../types/project'
-import { ImagesDuotone } from './nav-icons/ImagesDuotone'
 import '../styles/profile.css'
 
-// Heavy, so split out and fetched one tab ahead (see the prefetch effect)
-// rather than with the home page.
+// Heavy, so split out of the home bundle; both start loading right after
+// the first paint (see the effect below) so they're ready before the reader
+// scrolls down to them.
 const loadComponents = () => import('../features/components/ComponentsPage')
 const loadStore = () => import('../features/store/StorePreviews')
 const ComponentsGrid = lazy(() => loadComponents().then((m) => ({ default: m.ComponentsGrid })))
-// Screenshots tab = App Store / Play Store preview images per app.
+// App Store / Play Store preview images per app.
 const StorePreviews = lazy(loadStore)
 
-type Tab = 'mobile' | 'web' | 'components' | 'snaps'
-// Top-bar order; scrolling past the end of one tab slides to the next.
-const TAB_ORDER: Tab[] = ['mobile', 'web', 'components', 'snaps']
+// Resolves once both lazy sections can render. Section offsets are only
+// final after that (the Components grid is much taller than its loading
+// placeholder), so every jump waits for it.
+let lazyReady: Promise<unknown> | null = null
+const whenLazyReady = () => (lazyReady ??= Promise.all([loadComponents(), loadStore()]))
+// Two frames: one for Suspense to commit, one for layout.
+const afterLayout = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn))
+
+type Tab = WorkTab
 const TAB_LABEL: Record<Tab, string> = {
   mobile: 'Mobile Apps',
   web: 'Web Apps',
   components: 'Components',
-  snaps: 'Screenshots',
+  store: 'App Store Previews',
 }
-const SLIDE_OUT_MS = 320
-const SLIDE_IN_MS = 520
-// Extra downward wheel travel needed at the very bottom before it counts
-// as "keep going to the next section" rather than scroll momentum.
-const OVERSCROLL_WHEEL_PX = 100
-const OVERSCROLL_TOUCH_PX = 80
+// Placeholder slots so short grids still read as a full row.
+const MIN_CARDS: Record<'mobile' | 'web', number> = { mobile: 6, web: 4 }
+// A section counts as "current" once its top passes this share of the
+// viewport height.
+const SPY_LINE = 0.4
+// Gap left above a section heading when jumping to it.
+const SCROLL_OFFSET = 32
 
-const nextTabOf = (t: Tab): Tab | undefined => TAB_ORDER[TAB_ORDER.indexOf(t) + 1]
-
-export default function Profile({ onNavigate }: { onNavigate?: (page: string) => void }) {
-  const [tab, setTab] = useState<Tab>('mobile')
-  const isProjectTab = tab === 'mobile' || tab === 'web'
-  const cardCount = tab === 'mobile' ? 6 : 4
-  const tabProjects = isProjectTab ? projects.filter((p) => p.platform === tab) : []
-  const emptyCount = Math.max(0, cardCount - tabProjects.length)
-  const [dockHidden, setDockHidden] = useState(false)
+export default function Profile({
+  onNavigate,
+  initialTab = 'mobile',
+  onTabChange,
+}: {
+  onNavigate?: (page: string) => void
+  initialTab?: Tab
+  onTabChange?: (tab: Tab) => void
+}) {
+  // Only the tab we arrived with matters; afterwards the scroll-spy reports
+  // back through onTabChange, which would otherwise re-trigger the jump.
+  const [startTab] = useState<Tab>(initialTab)
+  const [active, setActive] = useState<Tab>(initialTab)
   const [openProject, setOpenProject] = useState<{ project: Project; index: number } | null>(null)
-  const lastScrollY = useRef(0)
-  const [slide, setSlide] = useState<{ phase: 'out' | 'in'; dir: 1 | -1 } | null>(null)
-  const tabRef = useRef(tab)
-  const busyRef = useRef(false)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const tabBarRef = useRef<HTMLElement>(null)
+  const sectionRefs = useRef<Partial<Record<Tab, HTMLElement | null>>>({})
 
-  useEffect(() => {
-    tabRef.current = tab
-    // Warm the next tab's code so sliding into it never lands on a
-    // half-height loading placeholder.
-    const next = nextTabOf(tab)
-    if (next === 'components') loadComponents()
-    if (next === 'snaps') loadStore()
-  }, [tab])
-
-  // Slide the current grid out, swap tabs, slide the new one in. When
-  // `toTop` is set (arriving from an overscroll), the page jumps back to the
-  // top of the grid while it's invisible so the new section starts fresh.
-  const switchTab = useCallback((next: Tab, toTop = false) => {
-    const current = tabRef.current
-    if (next === current || busyRef.current) return
-    busyRef.current = true
-    const dir: 1 | -1 = TAB_ORDER.indexOf(next) > TAB_ORDER.indexOf(current) ? 1 : -1
-    setSlide({ phase: 'out', dir })
-    window.setTimeout(() => {
-      setTab(next)
-      setSlide({ phase: 'in', dir })
-      if (toTop) {
-        requestAnimationFrame(() => {
-          const grid = gridRef.current
-          if (!grid) return
-          const barH = tabBarRef.current?.offsetHeight ?? 0
-          const top = grid.getBoundingClientRect().top + window.scrollY - barH - 40
-          window.scrollTo({ top: Math.max(0, top), behavior: 'instant' })
-        })
-      }
-      window.setTimeout(() => {
-        setSlide(null)
-        busyRef.current = false
-      }, SLIDE_IN_MS)
-    }, SLIDE_OUT_MS)
+  const scrollToSection = useCallback((tab: Tab, behavior: ScrollBehavior = 'smooth') => {
+    whenLazyReady().then(() =>
+      afterLayout(() => {
+        const el = sectionRefs.current[tab]
+        if (!el) return
+        const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET
+        window.scrollTo({ top: Math.max(0, top), behavior })
+      }),
+    )
   }, [])
 
-  // Scrolling past the end of a section continues into the next one.
   useEffect(() => {
-    const atBottom = () =>
-      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4
-    let bottomSince = 0
-    let lastWheel = 0
-    let freshGesture = false
-    let acc = 0
-    // While the section slides (and briefly after), swallow wheel input so
-    // trackpad momentum doesn't immediately scroll the new section away.
-    let lockUntil = 0
+    onTabChange?.(active)
+  }, [active, onTabChange])
 
-    const nextTab = () => nextTabOf(tabRef.current)
-
-    const onWheel = (e: WheelEvent) => {
-      const now = performance.now()
-      const gap = now - lastWheel
-      lastWheel = now
-      if (now < lockUntil) {
-        e.preventDefault()
-        return
-      }
-      if (!nextTab() || busyRef.current || e.deltaY <= 0 || !atBottom()) {
-        bottomSince = atBottom() ? bottomSince || now : 0
-        freshGesture = false
-        acc = 0
-        return
-      }
-      // The first event seen at the bottom is the one that got us here.
-      if (!bottomSince) {
-        bottomSince = now
-        return
-      }
-      // Ignore the trackpad momentum that carried the page to the bottom:
-      // only a new gesture, or one held well after landing, counts.
-      if (gap > 180) freshGesture = true
-      if (!freshGesture && now - bottomSince < 700) return
-      acc += e.deltaY
-      if (acc > OVERSCROLL_WHEEL_PX) {
-        acc = 0
-        freshGesture = false
-        lockUntil = now + SLIDE_OUT_MS + SLIDE_IN_MS + 450
-        e.preventDefault()
-        switchTab(nextTab()!, true)
-      }
-    }
-
-    let touchStartY = 0
-    let touchFromBottom = false
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY
-      touchFromBottom = atBottom()
-    }
-    const onTouchMove = (e: TouchEvent) => {
-      if (!touchFromBottom || !nextTab() || busyRef.current) return
-      if (touchStartY - e.touches[0].clientY > OVERSCROLL_TOUCH_PX) {
-        touchFromBottom = false
-        switchTab(nextTab()!, true)
-      }
-    }
-
-    window.addEventListener('wheel', onWheel, { passive: false })
-    window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove', onTouchMove, { passive: true })
-    return () => {
-      window.removeEventListener('wheel', onWheel)
-      window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchmove', onTouchMove)
-    }
-  }, [switchTab])
-  const dockTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-
+  // Fetch the lazy sections now; arriving from another page with a lower
+  // section selected, jump straight to it once they're in.
   useEffect(() => {
+    if (startTab !== 'mobile') {
+      scrollToSection(startTab, 'instant')
+      return
+    }
+    // Otherwise fetch them once the first screen has settled, so they don't
+    // compete with the hero videos and images for bandwidth.
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500))
+    idle(() => whenLazyReady())
+  }, [startTab, scrollToSection])
+
+  // Scroll-spy: the dock highlights whichever section is under the spy line.
+  useEffect(() => {
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const line = window.innerHeight * SPY_LINE
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4
+      let current: Tab = WORK_TABS[0]
+      for (const tab of WORK_TABS) {
+        const el = sectionRefs.current[tab]
+        if (el && el.getBoundingClientRect().top <= line) current = tab
+      }
+      // A short last section may never reach the line; the page bottom
+      // means it's the one being read.
+      if (atBottom) current = WORK_TABS[WORK_TABS.length - 1]
+      setActive(current)
+    }
     const onScroll = () => {
-      const currentY = window.scrollY
-      if (currentY > lastScrollY.current && currentY > 80) {
-        setDockHidden(true)
-      } else if (currentY < lastScrollY.current) {
-        setDockHidden(false)
-      }
-      lastScrollY.current = currentY
-
-      clearTimeout(dockTimer.current)
-      dockTimer.current = setTimeout(() => setDockHidden(false), 1200)
+      if (!frame) frame = requestAnimationFrame(update)
     }
+    update()
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
     return () => {
+      cancelAnimationFrame(frame)
       window.removeEventListener('scroll', onScroll)
-      clearTimeout(dockTimer.current)
+      window.removeEventListener('resize', onScroll)
     }
   }, [])
+
+  const renderProjects = (platform: 'mobile' | 'web') => {
+    const list = projects.filter((p) => p.platform === platform)
+    const empty = Math.max(0, MIN_CARDS[platform] - list.length)
+    return (
+      <div className={`project-grid project-grid--${platform}`}>
+        {list.map((project) => (
+          <div key={project.id} className="project-card">
+            <ProjectCard
+              project={project}
+              onOpen={(index) =>
+                (project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') && onNavigate
+                  ? onNavigate(project.id)
+                  : setOpenProject({ project, index })
+              }
+            />
+          </div>
+        ))}
+        {Array.from({ length: empty }).map((_, i) => (
+          <div key={`empty-${i}`} className="project-card project-card--empty" />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="profile-page">
-      <header className="profile-header">
-        <img className="profile-avatar" src="/avatar.png" alt="Essandoh Prince Takyi" />
-        <h1 className="profile-name">
-          Essandoh <span className="squiggle">Prince</span> Takyi
-        </h1>
-        <p className="profile-tagline">
-          Product <b>Design</b> <i>&</i> <b> <span style={{
-            fontFamily :'"JetBrains Mono", monospace',
-          }}>Engineering</span></b>
-        </p>
-      </header>
+      <aside className="profile-sidebar">
+        <header className="profile-header">
+          <img className="profile-avatar" src="/avatar.png" alt="Essandoh Prince Takyi" />
+          <h1 className="profile-name">
+            Essandoh <span className="squiggle">Prince</span> Takyi
+          </h1>
+          <RotatingTagline />
+          <p className="profile-bio">
+            <mark style={{
+              color:'black'
+            }}>I design and ship mobile &amp; web products</mark>, from first sketch to production code.
+          </p>
+          <SidebarContact />
+          <Toolkit />
+        </header>
+        <GithubHeatmap />
+      </aside>
 
-      <nav ref={tabBarRef} className="tab-toggle" aria-label="Portfolio sections">
-        <button type="button" aria-pressed={tab === 'mobile'} className={tab === 'mobile' ? 'is-active' : ''} onClick={() => switchTab('mobile')}>
-          <DeviceMobile size={16} weight={tab === 'mobile' ? 'fill' : 'regular'} />
-          <span className="tab-label-desktop">Mobile Apps</span><span className="tab-label-mobile">Mobile</span>
-        </button>
-        <button type="button" aria-pressed={tab === 'web'} className={tab === 'web' ? 'is-active' : ''} onClick={() => switchTab('web')}>
-          <Monitor size={16} weight={tab === 'web' ? 'fill' : 'regular'} />
-          <span className="tab-label-desktop">Web Apps</span><span className="tab-label-mobile">Web</span>
-        </button>
-        <button type="button" aria-pressed={tab === 'components'} className={tab === 'components' ? 'is-active' : ''} onClick={() => switchTab('components')}>
-          <CodeSimple size={16} weight="bold" />
-          Components
-        </button>
-        <button type="button" aria-pressed={tab === 'snaps'} className={tab === 'snaps' ? 'is-active' : ''} onClick={() => switchTab('snaps')}>
-          <ImagesDuotone className="tab-toggle-icon tab-icon-desktop" />
-          <AppStoreLogo className="tab-toggle-icon tab-icon-mobile" />
-          <span className="tab-label-desktop">Screenshots</span><span className="tab-label-mobile">App Store</span>
-        </button>
-      </nav>
+      <main className="works">
+        {WORK_TABS.map((tab) => (
+          <section
+            key={tab}
+            id={`work-${tab}`}
+            ref={(el) => {
+              sectionRefs.current[tab] = el
+            }}
+            className={`works-section works-section--${tab}`}
+            aria-labelledby={`work-${tab}-title`}
+          >
+            <h2 id={`work-${tab}-title`} className="works-title">{TAB_LABEL[tab]}</h2>
+            {tab === 'mobile' || tab === 'web' ? (
+              renderProjects(tab)
+            ) : (
+              <Suspense fallback={<div className="tab-panel-loading" />}>
+                <div className={`tab-section tab-section--${tab}`}>
+                  {tab === 'components' ? <ComponentsGrid /> : <StorePreviews />}
+                </div>
+              </Suspense>
+            )}
+          </section>
+        ))}
+      </main>
 
-      <div
-        ref={gridRef}
-        className={`tab-panel ${slide ? `is-slide-${slide.phase}-${slide.dir === 1 ? 'next' : 'prev'}` : ''}`}
-      >
-        {isProjectTab ? (
-          <main className={`project-grid project-grid--${tab}`}>
-            {tabProjects.map((project) => (
-              <div key={project.id} className="project-card">
-                <ProjectCard
-                  project={project}
-                  onOpen={(index) =>
-                    (project.id === 'uzeka' || project.id === 'gas-app' || project.id === 'gears') && onNavigate
-                      ? onNavigate(project.id)
-                      : setOpenProject({ project, index })
-                  }
-                />
-              </div>
-            ))}
-            {Array.from({ length: emptyCount }).map((_, i) => (
-              <div key={`empty-${i}`} className="project-card project-card--empty" />
-            ))}
-          </main>
-        ) : (
-          <Suspense fallback={<div className="tab-panel-loading" />}>
-            <div className={`tab-section tab-section--${tab}`}>
-              {tab === 'components' ? <ComponentsGrid /> : <StorePreviews />}
-            </div>
-          </Suspense>
-        )}
-      </div>
-
-      {nextTabOf(tab) && (
-        <button type="button" className="section-next-hint" onClick={() => switchTab(nextTabOf(tab)!, true)}>
-          Keep scrolling for {TAB_LABEL[nextTabOf(tab)!]}
-          <span aria-hidden="true">↓</span>
-        </button>
-      )}
-
-      <DockNav className={dockHidden ? 'dock-nav--hidden' : ''} activeLabel="Home" onNavigate={onNavigate} />
+      <DockNav
+        active={active}
+        onNavigate={(key) => {
+          if (isWorkTab(key)) {
+            scrollToSection(key)
+          } else {
+            onNavigate?.(key)
+          }
+        }}
+      />
 
       {openProject && (
         <ProjectOverlay

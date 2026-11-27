@@ -1,6 +1,23 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;min-height:100%;overflow-x:clip;background:#f4f3f8}
 
+/* Marble background canvas. On the home page it is confined to the works
+   column, leaving the fixed sidebar on the plain page colour. */
+.fluid-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+.fluid-bg--works {
+  left: var(--sidebar-w, 0px);
+  width: calc(100% - var(--sidebar-w, 0px));
+}
+
 /* Frosted-glass support for the full-screen surfaces (loading screen,
    project detail overlay). They can't use backdrop-filter: Chromium's
    backdrop snapshot on macOS excludes accelerated WebGL canvas layers, so

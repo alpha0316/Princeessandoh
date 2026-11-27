@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
   CaretRight,
@@ -9,9 +9,12 @@ import {
   Plus,
 } from '@phosphor-icons/react'
 import { Cylinder, cylinderInfo, locations } from './gasShared'
-import GasMap from './GasMap'
 import MobileStatusBar from './MobileStatusBar'
 import './gas-order-preview.css'
+
+// MapLibre is ~1 MB; keep it out of the Components chunk and only fetch it
+// once this phone is actually near the viewport.
+const GasMap = lazy(() => import('./GasMap'))
 
 // Keep the rider's destination marker in the upper portion of the phone, as in
 // the supplied Figma frames, while the map itself continues behind each state.
@@ -85,7 +88,7 @@ export default function GasSizesPreview({ isPaused = false }: { isPaused?: boole
   return (
     <div className={`gas-order-phone gas-order-phone--${focus}`} aria-label="Animated LPG refill order preview">
       <div className="gas-order-screen">
-        <GasMap center={MAP_CENTER} marker={MAP_MARKER} />
+        <LazyMap />
         <MobileStatusBar />
 
         <div className="gas-order-stack" aria-hidden={focus !== 'sizes'}>
@@ -161,6 +164,27 @@ export default function GasSizesPreview({ isPaused = false }: { isPaused?: boole
 
         <div className="gas-order-home-indicator" aria-hidden="true" />
       </div>
+    </div>
+  )
+}
+
+function LazyMap() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || near) return
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), { rootMargin: '600px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [near])
+  return (
+    <div ref={ref} style={{ position: 'absolute', inset: 0 }}>
+      {near && (
+        <Suspense fallback={null}>
+          <GasMap center={MAP_CENTER} marker={MAP_MARKER} />
+        </Suspense>
+      )}
     </div>
   )
 }

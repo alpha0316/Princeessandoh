@@ -402,7 +402,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
         </div>
       )}
 
-      <DockNav activeLabel="Profile" onNavigate={onNavigate} />
+      <DockNav active="about" onNavigate={onNavigate} />
     </div>
   )
 }

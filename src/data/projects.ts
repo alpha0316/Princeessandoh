@@ -12,6 +12,7 @@ export const projects: Project[] = [
     id: 'uzeka',
     name: 'Uzeka',
     description: 'Discover events around you and find your next ticket in seconds.',
+    logo: asset('Uzeka/Other Product Logos/uzeka main logo.svg'),
     images: [
       asset('Uzeka/Onboarding.webp'),
       asset('Uzeka/Vendor.webp'),
@@ -29,6 +30,8 @@ export const projects: Project[] = [
     id: 'gears',
     name: 'Gears',
     description: 'Find trusted mechanics, detailers, auto shops, and fuel stations near you.',
+    // App icon from gears.live.
+    logo: asset('Gears/Gears Logo.png'),
     images: [
       asset('Gears/Home.webp'),
       asset('Gears/Bookmarks.webp'),
@@ -88,19 +91,9 @@ export const projects: Project[] = [
     ],
     links: [],
     platform: 'mobile',
-  },
-  {
-    id: 'shuttle-app',
-    name: 'Shuttle App',
-    description: 'Real-time campus shuttle tracking for Ghanaian universities.',
-    logo: asset('Shuttle App/Shuttle App Logo.png'),
-    images: [
-      asset('Shuttle App/Track.webp'),
-      asset('Shuttle App/Grid.webp'),
-      asset('Shuttle App/Posts.webp'),
-    ],
-    links: [],
-    platform: 'mobile',
+    // WholeHealth Pharmacy App walkthrough (part 1; originals in media-src/).
+    demoVideo: '/videos/whole-health.mp4',
+    demoPoster: '/videos/whole-health-poster.webp',
   },
   {
     id: 'somu',
@@ -117,6 +110,46 @@ export const projects: Project[] = [
       // { type: 'x', url: '#', label: 'X' },
       // { type: 'appstore', url: '#', label: 'App Store' },
     ],
+    platform: 'mobile',
+    // Two screen recordings joined (originals in media-src/somu-part*.mov).
+    demoVideo: '/videos/somu.mp4',
+    demoPoster: '/videos/somu-poster.webp',
+  },
+  {
+    id: 'uzeka-vendor',
+    name: 'Uzeka Vendor',
+    description: 'Sell tickets and products face to face, and track stock and revenue live.',
+    logo: asset('Uzeka/Other Product Logos/Vendor 2.svg'),
+    images: ['/videos/uzeka-vendor-poster.webp'],
+    links: [],
+    platform: 'mobile',
+    // Original in media-src/uzeka-vendor.mov.
+    demoVideo: '/videos/uzeka-vendor.mp4',
+    demoPoster: '/videos/uzeka-vendor-poster.webp',
+  },
+  {
+    id: 'gas-app-rider',
+    name: 'GasApp Rider',
+    description: 'Pick up cylinders, refill at the station, and deliver — with live routes and earnings.',
+    logo: asset('Gas App/Gas App Logo.png'),
+    images: ['/videos/gas-app-rider-poster.webp'],
+    links: [],
+    platform: 'mobile',
+    // Original in media-src/gas-app-rider.mov.
+    demoVideo: '/videos/gas-app-rider.mp4',
+    demoPoster: '/videos/gas-app-rider-poster.webp',
+  },
+  {
+    id: 'shuttle-app',
+    name: 'Shuttle App',
+    description: 'Real-time campus shuttle tracking for Ghanaian universities.',
+    logo: asset('Shuttle App/Shuttle App Logo.png'),
+    images: [
+      asset('Shuttle App/Track.webp'),
+      asset('Shuttle App/Grid.webp'),
+      asset('Shuttle App/Posts.webp'),
+    ],
+    links: [],
     platform: 'mobile',
   },
   {
@@ -154,6 +187,8 @@ export const projects: Project[] = [
     id: 'alpha-beverage',
     name: 'ALPHA Beverage Co.',
     description: 'A digital storefront for ALPHA Hibiscus Sobolo, brewed in Kumasi.',
+    // Site icon from alpha-bev.vercel.app.
+    logo: asset('Alpha Beverage/Alpha Logo.svg'),
     images: ['/videos/alpha-beverage-poster.webp'],
     links: [{ type: 'web', url: 'https://alpha-bev.vercel.app/', label: 'Website' }],
     platform: 'web',
@@ -165,37 +200,33 @@ export const projects: Project[] = [
     name: 'Doryne',
     description: 'On-demand errand delivery built for students.',
     logo: asset('Doryne/Doryne Logo.png'),
-    images: [
-      asset('Doryne/Landing Page.webp'),
-      asset('Doryne/Map.webp'),
-      asset('Doryne/Orders.webp'),
-    ],
+    // Video only for now; screenshots (public/v2-svg/Doryne/*.webp) left out.
+    images: ['/videos/doryne-poster.webp'],
     links: [],
     platform: 'web',
+    demoVideo: '/videos/doryne.mp4',
+    demoPoster: '/videos/doryne-poster.webp',
   },
   {
     id: 'nnib',
     name: 'NNIB',
     description: 'Operational dashboard for policies, claims, and underwriting.',
-    images: [
-      asset('NNIB/IMG_1579.webp'),
-      asset('NNIB/IMG_1597.webp'),
-      asset('NNIB/IMG_1598.webp'),
-    ],
+    // Video only for now; screenshots (public/v2-svg/NNIB/*.webp) left out.
+    images: ['/videos/nnib-poster.webp'],
     links: [],
     platform: 'web',
+    demoVideo: '/videos/nnib.mp4',
+    demoPoster: '/videos/nnib-poster.webp',
   },
   {
     id: 'uwata',
     name: 'Uwata',
     description: 'AI-assisted invoicing — start from scratch, a screenshot, or a voice note.',
-    images: [
-      asset('Uwata/Auth.webp'),
-      asset('Uwata/Start From Scratch.webp'),
-      asset('Uwata/Type Invoice.webp'),
-    ],
+    // Video only for now; screenshots (public/v2-svg/Uwata/*.webp) left out.
+    images: ['/videos/uwata-poster.webp'],
     links: [],
     platform: 'web',
-    imagePosition: 'top left',
+    demoVideo: '/videos/uwata.mp4',
+    demoPoster: '/videos/uwata-poster.webp',
   },
 ]

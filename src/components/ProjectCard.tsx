@@ -360,8 +360,9 @@ export default function ProjectCard({
           </div>
         ) : project.demoVideo && project.platform === 'mobile' ? (
           <div className="app-card-phone-wrap">
-            <div className="app-card-phone-frame app-card-phone-frame--device">
+            <div className="app-card-phone-frame app-card-phone-frame--device app-card-device">
               <DemoVideo src={project.demoVideo} poster={project.demoPoster ?? project.images[0]} />
+              <span className="app-card-device-buttons" aria-hidden="true" />
             </div>
           </div>
         ) : project.demoVideo && !hasLeadVideo ? (
@@ -386,6 +387,25 @@ export default function ProjectCard({
               imagePosition={project.imagePosition}
             />
           </div>
+        ) : project.platform === 'mobile' && project.images.length > 0 ? (
+          // One fixed phone; the screens crossfade inside it rather than
+          // the whole mockup sliding sideways.
+          <div className="app-card-slide app-card-slide--static">
+            <div className="app-card-device app-card-device--stack">
+              {project.images.map((src, i) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt={i === index ? `${project.name} screenshot ${i + 1}` : ''}
+                  aria-hidden={i !== index}
+                  className={i === index ? 'is-current' : ''}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              ))}
+              <span className="app-card-device-buttons" aria-hidden="true" />
+            </div>
+          </div>
         ) : project.images.length > 0 ? (
           <div
             className="app-card-track"
@@ -397,6 +417,8 @@ export default function ProjectCard({
           >
             {slides.map((src, i) => (
               <div key={i} className="app-card-slide">
+                {/* The device wrapper is what draws the phone bezel. */}
+                <div className={project.platform === 'mobile' ? 'app-card-device' : 'app-card-slide-frame'}>
                 <img
                   src={src}
                   alt={`${project.name} screenshot ${((i - 1 + len) % len) + 1}`}
@@ -405,6 +427,8 @@ export default function ProjectCard({
                   decoding="async"
                   style={project.imagePosition ? { objectPosition: project.imagePosition } : undefined}
                 />
+                {project.platform === 'mobile' && <span className="app-card-device-buttons" aria-hidden="true" />}
+                </div>
               </div>
             ))}
           </div>

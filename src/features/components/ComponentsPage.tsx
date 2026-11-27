@@ -51,7 +51,7 @@ export default function ComponentsPage({ onNavigate }: { onNavigate?: (page: str
 
       <ComponentsGrid />
 
-      <DockNav activeLabel="Components" onNavigate={onNavigate} />
+      <DockNav active="components" onNavigate={onNavigate} />
     </div>
   )
 }

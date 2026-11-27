@@ -166,7 +166,9 @@ function mkShader(gl: WebGLRenderingContext, type: number, src: string) {
   return s
 }
 
-export default function FluidBackground() {
+// 'works' confines the marble to the scrolling works column (left edge set
+// by --sidebar-w in CSS); 'full' covers the whole viewport.
+export default function FluidBackground({ region = 'full' }: { region?: 'full' | 'works' }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -194,13 +196,17 @@ export default function FluidBackground() {
     const uVel = gl.getUniformLocation(prog, 'uVel')
     const uAniso = gl.getUniformLocation(prog, 'uAniso')
 
+    // Size from the canvas's own box so a partial-width region isn't stretched.
+    let rect = canvas.getBoundingClientRect()
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      rect = canvas.getBoundingClientRect()
+      canvas.width = Math.max(1, Math.round(rect.width))
+      canvas.height = Math.max(1, Math.round(rect.height))
       gl.viewport(0, 0, canvas.width, canvas.height)
     }
     resize()
-    window.addEventListener('resize', resize)
+    const ro = new ResizeObserver(resize)
+    ro.observe(canvas)
     const stopMouseTracking = initMouseTracking()
 
     // Eased cursor state — the shader always receives the smoothed values,
@@ -222,8 +228,11 @@ export default function FluidBackground() {
       // where there is no hovering pointer.
       const hoverTarget = Math.max(pointerInside ? 1 : 0, Math.min(mouse.strength, 1))
       eased.hover += (hoverTarget - eased.hover) * EASE
-      eased.x += (mouse.nx - eased.x) * EASE
-      eased.y += (mouse.ny - eased.y) * EASE
+      // Pointer position is viewport-normalised; re-map it onto this canvas.
+      const tx = (mouse.nx * window.innerWidth - rect.left) / rect.width
+      const ty = (mouse.ny * window.innerHeight - rect.top) / rect.height
+      eased.x += (tx - eased.x) * EASE
+      eased.y += (ty - eased.y) * EASE
       eased.vx += (mouse.vx - eased.vx) * EASE
       eased.vy += (mouse.vy - eased.vy) * EASE
       // Anisotropy tracks travel speed: still pointer = circular influence,
@@ -242,7 +251,7 @@ export default function FluidBackground() {
 
     return () => {
       cancelAnimationFrame(id)
-      window.removeEventListener('resize', resize)
+      ro.disconnect()
       window.removeEventListener('pointermove', onEnter)
       document.documentElement.removeEventListener('pointerleave', onLeave)
       window.removeEventListener('blur', onLeave)
@@ -253,16 +262,7 @@ export default function FluidBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fluid-bg"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        display: 'block',
-        zIndex: 0,
-      }}
+      className={`fluid-bg fluid-bg--${region}`}
     />
   )
 }

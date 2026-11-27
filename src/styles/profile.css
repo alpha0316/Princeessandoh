@@ -1,33 +1,60 @@
 /* ---------- layout shell ---------- */
+.home-shell {
+  --sidebar-w: 340px;
+}
+
 .profile-page {
   position: relative;
   z-index: 1;
   width: 100%;
-  /* clip (not hidden) so section slides can't cause a horizontal
-     scrollbar without breaking the sticky tab bar. */
+  /* clip (not hidden) so section slides can't cause a horizontal scrollbar. */
   overflow-x: clip;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 56px 24px 130px;
+  padding: 40px 24px 140px calc(var(--sidebar-w, 0px) + 24px);
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   color: var(--text, #0b0b0c);
 }
 
-/* ---------- header ---------- */
+/* ---------- sidebar (fixed; the works column scrolls beside it) ---------- */
+.profile-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  width: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 48px 36px 40px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: #fff;
+}
+
+.theme-dark .profile-sidebar {
+  background: var(--bg, #0a0a14);
+}
+
+.profile-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
 .profile-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 0px;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .profile-avatar {
-  width: 84px;
-  height: 84px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 22px;
@@ -35,10 +62,11 @@
 }
 
 .profile-name {
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  margin-bottom: 10px;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  margin-bottom: 8px;
   color: var(--text, #000000);
 }
 
@@ -47,15 +75,19 @@
 }
 
 .profile-tagline {
-  font-size: 17px;
+  font-size: 15px;
   color: var(--text-muted, #000000);
   font-weight: 500;
-  margin-bottom: 26px;
+  margin-bottom: 20px;
 }
 
 .profile-tagline b {
   color: var(--text, #0b0b0c);
   font-weight: 700;
+}
+
+.profile-tagline-mono {
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .profile-tagline i {
@@ -64,28 +96,374 @@
   font-weight: 500;
 }
 
-.tab-toggle button {
+/* ---------- rotating tagline ---------- */
+/* Outgoing and incoming titles share one grid cell so the swap never
+   shifts the layout; perspective gives the letters a slight 3D tip. */
+.tagline-stage {
+  display: inline-grid;
+  perspective: 600px;
+}
+
+.tagline-phrase {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.tagline-word {
+  display: inline-block;
+}
+
+.tagline-char {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity, filter;
+}
+
+.tagline-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+.tagline-word--bold,
+.tagline-word--mono {
+  color: var(--text, #0b0b0c);
+  font-weight: 700;
+}
+
+.tagline-word--mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tagline-word--amp {
+  font-style: italic;
+}
+
+.tagline-phrase--in .tagline-char {
+  animation: tagline-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Starts once the outgoing letter in the same spot has mostly cleared. */
+  animation-delay: calc(230ms + var(--i) * 20ms);
+}
+
+.tagline-phrase--out .tagline-char {
+  animation: tagline-out 0.32s cubic-bezier(0.55, 0, 0.75, 0.2) both;
+  animation-delay: calc(var(--i) * 12ms);
+}
+
+@keyframes tagline-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em) rotateX(-75deg);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes tagline-out {
+  to {
+    opacity: 0;
+    transform: translateY(-0.55em) rotateX(60deg);
+    filter: blur(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tagline-phrase .tagline-char { animation: none; }
+}
+
+.profile-bio {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+}
+
+.profile-bio a {
+  color: var(--text, #0b0b0c);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.profile-bio a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ---------- contact paragraph + email card ---------- */
+.profile-contact {
+  position: relative;
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+}
+
+.profile-contact a:not(.email-card) {
+  color: var(--text, #0b0b0c);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+  overflow-wrap: anywhere;
+}
+
+.profile-contact a:not(.email-card):hover {
+  text-decoration-color: currentColor;
+}
+
+/* Rolling link text (see RollText): letters swap upward on hover with
+   the same lift + blur as the rotating tagline. Underline is drawn as a
+   background line because text-decoration doesn't reach inline-blocks. */
+.profile-contact a:has(.roll) {
+  text-decoration: none;
+  background: linear-gradient(color-mix(in srgb, currentColor 30%, transparent), color-mix(in srgb, currentColor 30%, transparent)) 0 100% / 100% 1px no-repeat;
+  padding-bottom: 1px;
+  transition: background-size 0.2s ease;
+}
+
+.profile-contact a:has(.roll):hover {
+  background-image: linear-gradient(currentColor, currentColor);
+}
+
+.roll {
+  white-space: nowrap;
+}
+
+.roll-char {
+  position: relative;
+  display: inline-block;
+}
+
+.roll-top,
+.roll-bottom {
+  display: inline-block;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease,
+    filter 0.3s ease;
+  transition-delay: calc(var(--i) * 16ms);
+}
+
+.roll-bottom {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  filter: blur(3px);
+  transform: translateY(0.7em) rotateX(-70deg);
+}
+
+a:hover > .roll .roll-top,
+a:focus-visible > .roll .roll-top {
+  opacity: 0;
+  filter: blur(3px);
+  transform: translateY(-0.7em) rotateX(60deg);
+}
+
+a:hover > .roll .roll-bottom,
+a:focus-visible > .roll .roll-bottom {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll-top, .roll-bottom { transition: none; }
+}
+
+/* The email link's own positioning box, so the card sits right on top of
+   the address being hovered. */
+.profile-email-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* Centred over the email. The hide is delayed so the pointer can cross
+   the gap from the link onto the card. */
+.email-card {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  width: min(290px, calc(var(--sidebar-w, 340px) - 16px));
+  bottom: calc(100% + 10px);
+  line-height: normal;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: #1c1c1f;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.25s;
+}
+
+.email-card::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: #26262a;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.profile-email-wrap:hover .email-card,
+.profile-email-wrap:focus-within .email-card {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+}
+
+.email-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+
+.email-card-avatar {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #f4f3f8;
+}
+
+.email-card-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.email-card-who strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.email-card-who span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.email-card-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-muted, #000000);
-  font-size: 14px;
+  padding: 11px 12px;
+  border-radius: 0 0 18px 18px;
+  background: #26262a;
+  font-size: 13px;
+}
+
+.email-card-address {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email-card-arrow {
+  flex: none;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.email-card:hover .email-card-arrow {
+  color: #fff;
+  transform: translate(1px, -1px);
+}
+
+@media (hover: none) {
+  .email-card { display: none; }
+}
+
+/* ---------- marker highlight (bio, contact, toolkit) ---------- */
+.profile-sidebar mark {
+  padding: 0.05em 0.15em;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--text, #000) 9%, transparent);
+  color: inherit;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---------- tools sentence ---------- */
+.toolkit {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+}
+
+.toolkit-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.tab-toggle button:hover {
   color: var(--text, #0b0b0c);
+  white-space: nowrap;
 }
 
-.tab-toggle button.is-active {
-  background: var(--text, #0b0b0c);
-  color: var(--card-bg, #fff);
+.toolkit-icon {
+  width: 0.95em;
+  height: 0.95em;
+  flex: none;
+}
+
+/* ---------- GitHub heatmap ---------- */
+.gh-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+  text-decoration: none;
+}
+
+.gh-heatmap-grid {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.gh-l0 { fill: color-mix(in srgb, var(--text, #000) 7%, transparent); }
+.gh-l1 { fill: color-mix(in srgb, var(--text, #000) 25%, transparent); }
+.gh-l2 { fill: color-mix(in srgb, var(--text, #000) 45%, transparent); }
+.gh-l3 { fill: color-mix(in srgb, var(--text, #000) 70%, transparent); }
+.gh-l4 { fill: var(--text, #000); }
+
+.gh-skeleton {
+  animation: gh-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes gh-pulse {
+  50% { opacity: 0.4; }
+}
+
+.gh-heatmap-caption {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 12px;
+  transition: color 0.2s ease;
+}
+
+.gh-heatmap:hover .gh-heatmap-caption {
+  color: var(--text, #0b0b0c);
 }
 
 /* ---------- project grid ---------- */
@@ -107,7 +485,8 @@
 }
 
 .project-grid--mobile {
-  grid-template-columns: repeat(3, 1fr);
+  /* Two big phones per row, sized so one row fills the viewport. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .project-card {
@@ -137,10 +516,185 @@
   background: var(--card-canvas);
 }
 
+/* Mobile cards: a white card with a realistic phone centred in it. The
+   card is an inline-size container so every inset scales with its width. */
 .project-grid--mobile .project-card {
-  background: var(--card-canvas);
+  container-type: inline-size;
   width: 100%;
-  aspect-ratio: 470 / 640;
+  height: var(--mcard-h);
+  background: var(--card-bg, #fff);
+  border-radius: clamp(22px, 2.6vw, 38px);
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 10px 30px rgba(20, 20, 30, 0.05);
+}
+
+/* The phone's stage: a size container so the device can fit both axes. */
+.project-grid--mobile .app-card-slide,
+.project-grid--mobile .app-card-phone-wrap {
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 8cqw;
+}
+
+/* Device: the screen opening is exactly 390:844 (the recordings' own
+   shape) with a thin black bezel and a titanium edge around it, so media
+   fills it edge to edge. Overall shape = 1 : (0.968 / 0.462 + 0.032). */
+.project-grid--mobile .app-card .app-card-device {
+  --phone-w: min(calc(100cqw * 0.95), calc(100cqh * 0.4701));
+  --bezel: calc(var(--phone-w) * 0.016);
+  --edge: calc(var(--phone-w) * 0.017);
+  position: relative;
+  flex: none;
+  display: block;
+  width: var(--phone-w);
+  height: auto;
+  aspect-ratio: auto;
+  padding: var(--bezel);
+  border: none;
+  border-radius: calc(var(--phone-w) * 0.165);
+  /* Not clipped: the side buttons sit outside the frame. The screen
+     rounds its own corners. */
+  overflow: visible;
+  background: #050506;
+  box-shadow:
+    0 0 0 calc(var(--phone-w) * 0.004) #2a2b2e,
+    0 0 0 calc(var(--phone-w) * 0.013) #d9dade,
+    0 0 0 var(--edge) #a4a6ab,
+    0 26px 46px -22px rgba(10, 10, 14, 0.38);
+}
+
+.project-grid--mobile .app-card .app-card-device > img,
+.project-grid--mobile .app-card .app-card-device > video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 390 / 844;
+  object-fit: cover;
+  object-position: top center;
+  border: none;
+  border-radius: calc(var(--phone-w) * 0.149);
+  box-shadow: none;
+  background: #fff;
+}
+
+/* Screenshots are ~2% wider than 390:844; a stretch that small is
+   invisible, whereas cover would shave content off both edges. */
+.project-grid--mobile .app-card .app-card-device > img {
+  object-fit: fill;
+}
+
+/* Dynamic Island */
+.project-grid--mobile .app-card .app-card-device::after {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  top: calc(var(--bezel) + var(--phone-w) * 0.026);
+  left: 50%;
+  width: calc(var(--phone-w) * 0.3);
+  height: calc(var(--phone-w) * 0.085);
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #000;
+  pointer-events: none;
+}
+
+/* Side buttons (iPhone 15 Pro layout): action button + volume up/down on
+   the left as one gradient strip, power button on the right. */
+.app-card-device-buttons {
+  display: none;
+}
+
+.project-grid--mobile .app-card-device-buttons {
+  --btn-w: calc(var(--phone-w) * 0.012);
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.project-grid--mobile .app-card-device-buttons::before,
+.project-grid--mobile .app-card-device-buttons::after {
+  content: '';
+  position: absolute;
+  width: var(--btn-w);
+}
+
+.project-grid--mobile .app-card-device-buttons::before {
+  left: calc(-1 * (var(--edge) + var(--btn-w)) + 1px);
+  top: 17%;
+  height: 27%;
+  border-radius: 2px 0 0 2px;
+  background: linear-gradient(
+    to bottom,
+    #b4b6bb 0 15%,
+    transparent 15% 30%,
+    #b4b6bb 30% 62%,
+    transparent 62% 68%,
+    #b4b6bb 68% 100%
+  );
+}
+
+.project-grid--mobile .app-card-device-buttons::after {
+  right: calc(-1 * (var(--edge) + var(--btn-w)) + 1px);
+  top: 27%;
+  height: 12.5%;
+  border-radius: 0 2px 2px 0;
+  background: #b4b6bb;
+}
+
+.app-card-slide-frame {
+  display: contents;
+}
+
+/* Fixed phone with stacked screens: the first sizes the device, the rest
+   sit on top of it and crossfade in (with a slight settle) when current. */
+.project-grid--mobile .app-card-slide--static {
+  height: 100%;
+}
+
+.project-grid--mobile .app-card .app-card-device--stack > img + img {
+  position: absolute;
+  inset: var(--bezel);
+  width: calc(100% - 2 * var(--bezel));
+}
+
+.project-grid--mobile .app-card .app-card-device--stack > img {
+  opacity: 0;
+  transform: scale(1.03);
+  filter: blur(6px);
+  transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s ease;
+}
+
+.project-grid--mobile .app-card .app-card-device--stack > img.is-current {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* The first screen stays in flow (it gives the phone its height), so it
+   is only ever faded, never removed. */
+.project-grid--mobile .app-card .app-card-device--stack > img:first-child:not(.is-current) {
+  opacity: 0;
+}
+
+/* ---------- section heading ---------- */
+.works-title {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text, #0b0b0c);
+}
+
+@media (max-width: 768px) {
+  .works-title {
+    padding: 0 12px;
+    font-size: 20px;
+  }
 }
 
 /* ---------- app card ---------- */
@@ -569,11 +1123,16 @@
   right: 0;
   bottom: 0;
   z-index: 3;
-  height: 54%;
+  /* Just the strip behind the name/description, not the whole screen. */
+  height: 18%;
+  min-height: 84px;
   display: flex;
   align-items: flex-end;
   padding: 0 18px 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* Fade the blur in from the top so it has no hard edge. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 40%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 40%);
   opacity: 0;
   transition: opacity 0.24s ease;
   pointer-events: none;
@@ -585,8 +1144,8 @@
 .app-card-overlay.is-visible {
   opacity: 1;
   pointer-events: auto;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .app-card-footer {
@@ -685,91 +1244,148 @@
   transform: translateX(-50%) translateY(0);
 }
 
+/* The last icon sits at the card's right edge, which clips overflow, so its
+   tooltip grows leftwards instead of centring. */
+.app-card-links a:last-child .app-card-link-tooltip {
+  left: auto;
+  right: -6px;
+  transform: translateY(4px);
+}
+
+.app-card-links a:last-child:hover .app-card-link-tooltip,
+.app-card-links a:last-child:focus-visible .app-card-link-tooltip {
+  transform: translateY(0);
+}
+
 .app-card-link-icon {
   width: 24px;
   height: 24px;
   object-fit: contain;
 }
 
-/* ---------- dock ---------- */
+/* ---------- bottom dock ---------- */
 .dock-nav {
   position: fixed;
-  left: 50%;
+  /* Centred over the works column (the sidebar offset is 0 off the home page). */
+  left: calc(50% + var(--sidebar-w, 0px) / 2);
   bottom: 24px;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%);
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 360px;
-  height: 52px;
-  padding: 2px;
-  background: rgba(255, 255, 255, 2.55);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 36px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, background 0.3s ease;
-  opacity: 1;
-}
-
-.dock-nav--hidden {
-  transform: translateX(-50%) translateY(100px);
-  opacity: 0;
-  pointer-events: none;
+  gap: 4px;
+  max-width: calc(100vw - 24px);
+  padding: 3px 6px 3px 3px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(238, 239, 243, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 12px 36px rgba(0, 0, 0, 0.12);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
 .theme-dark .dock-nav {
-  background: rgba(30, 32, 50, 0.55);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes silver-wave {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.dock-nav-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dock-nav-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--text, #0b0b0c);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-nav-pill { transition: none; }
+}
+
+.dock-nav-tab {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  gap: 6px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dock-nav-tab:hover {
+  color: var(--text, #0b0b0c);
+}
+
+.dock-nav-tab {
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.dock-nav-tab.is-active {
+  color: var(--card-bg, #fff);
+}
+
+.theme-dark .dock-nav-tab.is-active {
+  color: #0b0b0c;
+}
+
+.dock-nav-tab-icon {
+  display: inline-flex;
+  font-size: 16px;
+}
+
+.dock-nav-divider {
+  align-self: stretch;
+  margin: 7px 4px;
+  border-left: 1.5px dashed var(--border, rgba(0, 0, 0, 0.14));
 }
 
 .dock-nav-item {
-  flex: 1 1 0%;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
   border: none;
-  border-radius: 32px;
+  border-radius: 50%;
   background: transparent;
   color: var(--text, #0b0b0c);
-  opacity: 0.7;
   cursor: pointer;
-  padding: 0;
-  position: relative;
-}
-
-.dock-nav-item::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 32px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(200, 205, 215, 0.15) 25%,
-    rgba(220, 225, 235, 0.3) 50%,
-    rgba(200, 205, 215, 0.15) 75%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  opacity: 0;
-  pointer-events: none;
-  animation: silver-wave 1.5s ease-out 6.5s infinite;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .dock-nav-item:hover {
-  color: var(--text, #0b0b0c);
-  opacity: 1;
+  background: color-mix(in srgb, var(--text, #000) 6%, transparent);
+}
+
+.dock-nav-item.is-active {
+  background: color-mix(in srgb, var(--text, #000) 10%, transparent);
 }
 
 .dock-nav-tooltip {
@@ -795,74 +1411,76 @@
   transform: translateX(-50%) translateY(0);
 }
 
-.dock-nav-item.is-active {
-  opacity: 1;
-  padding: 4px 4px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.theme-dark .dock-nav-item.is-active {
-  background: rgba(50, 52, 75, 0.75);
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
 .dock-nav-icon {
-  width: 24px;
-  height: 24px;
+  width: 19px;
+  height: 19px;
 }
 
 .dock-nav-avatar {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-/* ---------- tab toggle ---------- */
-.tab-toggle {
-  display: inline-flex;
-  gap: 4px;
-  max-width: calc(100vw - 32px);
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding: 2px;
-  background: var(--tab-bg, #fff);
-  border-radius: 999px;
-  box-shadow: 0 16px 20px var(--card-shadow, rgba(20, 20, 30, 0.4));
-  margin-bottom: 28px;
-  position: sticky;
-  top: 3vh;
-  z-index: 100;
-}
-
-.tab-toggle::-webkit-scrollbar {
-  display: none;
-}
-
-.tab-toggle button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
-.tab-toggle .tab-toggle-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.tab-label-mobile,
-.tab-icon-mobile {
-  display: none;
-}
-
 /* ---------- responsive ---------- */
-@media (max-width: 900px) {
+/* The sidebar eats ~340px, so drop to two phone columns earlier. */
+@media (max-width: 1240px) {
+  .home-shell {
+    --sidebar-w: 300px;
+  }
+
   .project-grid--mobile {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-sidebar {
+    padding: 40px 28px 32px;
+  }
+}
+
+/* Below this the sidebar stops being fixed and becomes the page intro. */
+@media (max-width: 900px) {
+  .home-shell {
+    --sidebar-w: 0px;
+  }
+
+  .profile-sidebar {
+    position: static;
+    width: auto;
+    align-self: stretch;
+    gap: 24px;
+    /* Pull out over the page's padding so the white runs edge to edge. */
+    margin: -40px -24px 24px;
+    padding: 32px 24px 32px;
+    overflow: visible;
+    background: #fff;
+    border-right: none;
+  }
+
+  .theme-dark .profile-sidebar {
+    background: var(--bg, #0a0a14);
+  }
+
+  .gh-heatmap {
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 620px) {
+  .dock-nav {
+    bottom: 12px;
+    gap: 2px;
+  }
+
+  .dock-nav-tab {
+    padding: 0 11px;
+    font-size: 13px;
+  }
+
+  /* Icon-only for inactive tabs; the active one keeps its label. */
+  .dock-nav-tab:not(.is-active) .dock-nav-tab-label {
+    display: none;
   }
 }
 
@@ -873,45 +1491,12 @@
 }
 
 @media (max-width: 768px) {
-  .profile-name {
-    font-size: 31px;
-  }
-
   .profile-page {
     padding: 28px 0 110px;
   }
 
-  .tab-toggle {
-    top: 10px;
-    width: calc(100vw - 24px);
-    max-width: calc(100vw - 24px);
-    gap: 2px;
-    margin-bottom: 22px;
-    box-shadow: 0 4px 14px rgba(20, 20, 30, 0.1);
-  }
-
-  .tab-toggle button {
-    flex: 1 1 0;
-    justify-content: center;
-    min-width: 0;
-    gap: 6px;
-    padding: 9px 6px;
-    font-size: 11px;
-  }
-
-  .tab-label-desktop,
-  .tab-icon-desktop {
-    display: none;
-  }
-
-  .tab-label-mobile,
-  .tab-icon-mobile {
-    display: inline;
-  }
-
-  .tab-toggle .tab-toggle-icon {
-    width: 14px;
-    height: 14px;
+  .profile-sidebar {
+    margin: -28px 0 24px;
   }
 
   .project-grid {
@@ -932,8 +1517,8 @@
     width: calc(100% - 24px);
     max-width: 100%;
     min-width: 0;
-    aspect-ratio: 360 / 630;
-    border-radius: 14px;
+    height: auto;
+    aspect-ratio: 7 / 12;
     box-shadow: 0 2px 10px rgba(20, 20, 30, 0.07);
   }
 
@@ -971,10 +1556,6 @@
     object-position: top left;
   }
 
-  .dock-nav {
-    bottom: 1.5vh;
-    width: min(360px, calc(100vw - 32px));
-  }
 }
 
 /* Recorded desktop sites need the full browser viewport visible. */
@@ -993,12 +1574,6 @@
   height: 20%;
   padding-bottom: 16px;
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.58) 100%);
-}
-
-@media (max-width: 768px) {
-  .dock-nav-item--pinterest {
-    display: none;
-  }
 }
 
 /* ---------- project detail overlay (desktop only) ---------- */
@@ -1384,14 +1959,25 @@
   to { opacity: 1; }
 }
 
-/* ---------- section slide (Mobile Apps <-> Web Apps) ---------- */
-.tab-panel {
+/* ---------- stacked work sections ---------- */
+.works {
+  /* Height of a phone card (Mobile Apps + Components): the viewport minus
+     the section heading and the dock, so a row of two fits on screen. */
+  --mcard-h: clamp(520px, calc(100svh - 180px), 860px);
   width: 100%;
   display: flex;
   flex-direction: column;
-  /* stretch, not center: on phones .project-grid is width:auto with
-     percentage-width cards, which collapses to 0 when shrink-wrapped. */
   align-items: stretch;
+}
+
+.works-section + .works-section {
+  margin-top: 56px;
+}
+
+@media (max-width: 768px) {
+  .works-section + .works-section {
+    margin-top: 36px;
+  }
 }
 
 .tab-section {
@@ -1403,48 +1989,77 @@
 
 .tab-panel-loading { min-height: 60vh; }
 
+/* Components tab: same card shape, grid and phone size as the Mobile Apps
+   cards, so the two tabs read as one set. The previews were designed as
+   oversized phones cropped by the card; here they sit whole and centred.
+   Doubled class selectors outrank components.css, which loads later. */
+.tab-section.tab-section--components {
+  max-width: 1400px;
+}
+
+.tab-section--components .components-grid.components-grid {
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.tab-section--components .components-card.components-card {
+  container-type: inline-size;
+  height: var(--mcard-h);
+  border-radius: clamp(22px, 2.6vw, 38px);
+}
+
+.tab-section--components .components-card .components-card-scene {
+  align-items: center;
+}
+
+.tab-section--components .components-card :is(
+  .shift-clock,
+  .shift-calendar-phone,
+  .gas-order-phone,
+  .gas-tracking-phone,
+  .rider-home-phone,
+  .catalog-preview
+) {
+  /* Same footprint as the Mobile Apps phones: fitted to the card height
+     (minus the 32px top/bottom inset), capped by its width. */
+  width: min(74%, calc((var(--mcard-h) - 64px) * 0.4753));
+  height: auto;
+  aspect-ratio: 0.4753;
+  top: auto;
+  bottom: auto;
+}
+
+/* The calendar's top used to be cropped off; now the whole phone shows, so
+   its toolbar must clear the status bar (cqw = the phone's own width). */
+.tab-section--components .shift-calendar-phone .shift-calendar-toolbar {
+  margin-top: 11cqw;
+}
+
+@media (max-width: 768px) {
+  .tab-section--components .components-grid.components-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .tab-section--components .components-card.components-card {
+    height: auto;
+    aspect-ratio: 7 / 12;
+  }
+
+  .tab-section--components .components-card :is(
+    .shift-clock,
+    .shift-calendar-phone,
+    .gas-order-phone,
+    .gas-tracking-phone,
+    .rider-home-phone,
+    .catalog-preview
+  ) {
+    width: 74%;
+  }
+}
+
 @media (max-width: 768px) {
   .tab-section { padding: 0 12px; }
 }
 
-.tab-panel.is-slide-out-next { animation: grid-out-next 0.32s cubic-bezier(0.55, 0, 0.75, 0.2) forwards; }
-.tab-panel.is-slide-out-prev { animation: grid-out-prev 0.32s cubic-bezier(0.55, 0, 0.75, 0.2) forwards; }
-.tab-panel.is-slide-in-next { animation: grid-in-next 0.52s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.tab-panel.is-slide-in-prev { animation: grid-in-prev 0.52s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-@keyframes grid-out-next { to { opacity: 0; transform: translateX(-10%); } }
-@keyframes grid-out-prev { to { opacity: 0; transform: translateX(10%); } }
-@keyframes grid-in-next { from { opacity: 0; transform: translateX(10%); } }
-@keyframes grid-in-prev { from { opacity: 0; transform: translateX(-10%); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .tab-panel[class*='is-slide-'] { animation-duration: 0.01s; }
-}
-
-.section-next-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 4px auto 0;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 999px;
-  background: var(--card-bg, #fff);
-  color: var(--text-muted, rgba(11, 11, 12, 0.6));
-  font: inherit;
-  font-size: 14px;
-  box-shadow: 0 6px 24px var(--card-shadow, rgba(20, 20, 30, 0.04));
-  cursor: pointer;
-}
-
-.section-next-hint:hover { color: var(--text, #0b0b0c); }
-
-.section-next-hint span {
-  display: inline-block;
-  animation: next-hint-bob 1.6s ease-in-out infinite;
-}
-
-@keyframes next-hint-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
-}

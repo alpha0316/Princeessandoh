@@ -191,7 +191,7 @@ export default function SnapsPage({ onNavigate }: SnapsPageProps) {
         </section>
       )}
 
-      <DockNav activeLabel="Images" onNavigate={onNavigate} />
+      <DockNav active="snaps" onNavigate={onNavigate} />
     </div>
   )
 }
